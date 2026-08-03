@@ -1,0 +1,352 @@
+=========================================================
+            JAVA OOPS - REVISION NOTES
+   (all concepts covered till now, with my own code refs)
+=========================================================
+
+---------------------------------------------------------
+1. CLASS AND OBJECT
+---------------------------------------------------------
+CLASS  -> is the BLUEPRINT / template. It is NOT a real world entity.
+OBJECT -> is the REAL WORLD ENTITY created from that blueprint.
+
+(NOTE: earlier I wrote it reversed. Correct line is:
+ "Class is the blueprint, Object is the real world entity")
+
+A class has 2 things:
+  1. Data / properties  -> variables (state)
+  2. Behaviour          -> methods  (what it can do)
+
+class Car{
+    String type;
+    int model;
+    String car_name;
+    String car_color;
+
+    Car(String type, String car_name, String car_color, int model){
+        this.type      = type;
+        this.car_name  = car_name;
+        this.car_color = car_color;
+        this.model     = model;
+    }
+}
+
+In main:
+    Car c1 = new Car();
+
+  -> c1 is a REFERENCE VARIABLE of user defined data type Car
+  -> "new" allocates memory for the object in the HEAP
+  -> c1 (the reference) lives in the STACK, the object lives in the HEAP
+
+    c1.type      = "i20";
+    c1.model     = 2019;          // int -> no quotes
+    c1.car_color = "red";
+    c1.car_name  = "Hyundai";
+
+MEMORY IDEA (why we say ~16 bytes for the Student object):
+    3 String fields -> 3 references x 4 byte = 12 byte
+    1 int field     -> 4 byte
+    total           = 16 byte in heap
+    (the reference variable itself sits in the stack, 4 byte)
+    * String objects themselves are separate in heap, this count is only
+      the reference size.
+
+
+---------------------------------------------------------
+2. CONSTRUCTOR                       [chainingConstructor.java]
+---------------------------------------------------------
+Constructor = special method that runs AUTOMATICALLY when an object is
+created with "new". Same name as class, NO return type (not even void).
+
+Types:
+  a) Default constructor    -> Student(){ }   (Java gives one if I write none)
+  b) Parameterised          -> Student(String name){ ... }
+  c) Copy style             -> pass another object and copy its fields
+
+CONSTRUCTOR OVERLOADING:
+  Same constructor name, DIFFERENT parameter list (count or type).
+  This is what I actually wrote in chainingConstructor.java:
+
+    Student(){ System.out.println("Default constructor called"); }
+    Student(String name){ this.name = name; }
+    Student(String name, int age){ ... }
+    Student(String name, int age, int roll_no){ ... }
+    Student(String name, int age, int roll_no, String college){ ... }
+
+  * Correction: this is OVERLOADING, not chaining.
+  * CONSTRUCTOR CHAINING is when one constructor CALLS another using
+    this(...) as the first line:
+
+    Student(String name){
+        this(name, 18);          // calls the 2-arg constructor
+    }
+
+METHOD OVERLOADING = same idea for normal methods (same name, different
+parameters). Decided at COMPILE TIME -> compile time polymorphism.
+
+"this" KEYWORD:
+  this = reference to the CURRENT object.
+  Used when parameter name and field name are the same:
+      this.name = name;   // left = object's field, right = parameter
+
+
+---------------------------------------------------------
+3. CALL BY VALUE                          [callByValue.java]
+---------------------------------------------------------
+Java is ALWAYS call by value. A COPY of the value is passed.
+
+    int x = 10, y = 20;
+    addten(x, y);            // inside: x = x+10, y = y+10
+    print(x, y);             // still 10, 20  -> original NOT changed
+
+Reason: x and y in main and x and y in the method are different stack
+slots, so changing the copy does not touch the original.
+
+For OBJECTS: the REFERENCE is copied. So the copy still points to the
+SAME heap object -> changing obj.field inside the method DOES reflect
+outside, but reassigning obj = new Car() inside does NOT.
+
+
+---------------------------------------------------------
+4. STATIC                                     [Static.java]
+---------------------------------------------------------
+static -> belongs to the CLASS, not to any object.
+One single copy shared by ALL objects.
+
+    class Student{
+        String name;            // per object
+        static String college;  // shared by everyone
+
+        static{                 // STATIC BLOCK
+            college = "IIT";    // runs ONCE when class is first loaded
+        }
+    }
+
+Access with the class name:  Student.college   (not s1.college)
+
+Rules:
+  - static method can use only static data directly
+  - static method CANNOT use "this"
+  - main is static -> so JVM can call it without creating an object
+
+BLOCKS:
+  { ... }                   -> instance block, runs before constructor,
+                               every time an object is made
+  static { ... }            -> static block, runs once at class loading
+
+WHY String[] args IN MAIN:
+  In early Java, programs were run from the command line and any input
+  passed after the class name came in as an array of Strings.
+  java Demo hello 5   ->  args[0]="hello", args[1]="5"
+
+
+---------------------------------------------------------
+5. PACKAGES                        [Demo.java, College/, School/]
+---------------------------------------------------------
+Package = a folder / collection of related classes and interfaces.
+Purpose: grouping + avoiding NAME CONFLICT.
+
+Here I have TWO Student classes:
+    College/Student.java   and   School/Student.java
+Both can exist because they are in different packages.
+
+    import College.Student;       // import packagename.classname
+    Student s1 = new Student();
+    s1.print();
+
+Two types: built-in (java.util, java.io ...) and user defined.
+
+
+---------------------------------------------------------
+6. ENCAPSULATION                         [Encapsulation.java]
+---------------------------------------------------------
+DEFINITION: binding data + the methods that work on that data into one
+unit, and HIDING the data from outside direct access.
+Also called DATA HIDING.
+
+HOW: make fields private + give controlled public getter / setter.
+
+    class BankAccount{
+        private double balance;              // hidden
+
+        public void deposit(int amount){ balance += amount; }
+        public void withdraw(int amount){ balance -= amount; }
+        public double getbalance(){ return balance; }
+    }
+
+If I try ba.balance = 10000 from main after making it private, I get:
+    "The field BankAccount.balance is not visible"
+That error is the PROOF that encapsulation is working.
+
+ACCESS MODIFIERS (this is the tool that makes encapsulation possible):
+    private    -> only inside the same class
+    default    -> (no keyword) same package only
+    protected  -> same package + child classes (even other package)
+    public     -> everywhere
+
+GETTER / SETTER:
+    getter -> read the value        public String getName(){ return name; }
+    setter -> write the value       public void setName(String n){ this.name = n; }
+
+THE REAL BENEFIT = VALIDATION inside the setter:
+
+    public void setAge(int age){
+        if(age > 100){
+            System.out.println("Age is not valid");
+        } else {
+            this.age = age;          // only valid data reaches the field
+        }
+    }
+
+Without encapsulation anyone could write s1.age = 500 directly.
+Also: only getter and no setter -> READ ONLY field.
+      only setter and no getter -> WRITE ONLY field.
+
+
+---------------------------------------------------------
+7. INHERITANCE                            [Inheritance.java]
+---------------------------------------------------------
+Child class takes (reuses) the properties and methods of the parent.
+Keyword: extends.  Gives CODE REUSABILITY.
+
+    class Student{                       // PARENT / super / base
+        String name; int age;
+        void markAttendance(){ ... }
+    }
+
+    class EngineeringStudent extends Student{   // CHILD / sub / derived
+        void AttendLab(){ ... }
+    }
+
+    class CSEEngineeringStudent extends EngineeringStudent{
+        void attendCselab(){ ... }
+    }
+
+So cse object can call attendCselab(), AttendLab() AND markAttendance().
+
+TYPES:
+  1. Single        A -> B
+  2. Multilevel    A -> B -> C          (this is what I wrote above)
+  3. Hierarchical  A -> B and A -> C
+  4. Multiple      NOT supported with classes in Java (diamond problem)
+                   -> achieved using INTERFACES
+  5. Hybrid        mix, also only via interfaces
+
+SUPER KEYWORD:
+  super.field()   -> access parent's variable
+  super.method()  -> call parent's method (useful after overriding)
+  super(...)      -> call parent's constructor, must be the FIRST line
+
+  Note: Java does NOT support multiple inheritance of classes, so super
+  always refers to the one immediate parent.
+
+METHOD OVERRIDING:
+  Same method name + same parameters + same return type in the child.
+  Marked with @Override. Decided at RUNTIME -> runtime polymorphism.
+
+  Overloading vs Overriding:
+    overloading -> same class, different parameters, compile time
+    overriding  -> parent-child, same signature, runtime
+
+
+---------------------------------------------------------
+8. ABSTRACTION                           [AbstractClass.java]
+---------------------------------------------------------
+Show only the essential thing, HIDE the implementation.
+(Encapsulation hides DATA, abstraction hides IMPLEMENTATION.)
+
+Achieved by: (a) abstract class (0-100%)  (b) interface (100%)
+
+ABSTRACT CLASS:
+    abstract class Car{
+        void start(){                       // normal method WITH body
+            System.out.println("Car is started");
+        }
+        abstract void accelerate();          // NO body, child MUST write it
+        abstract void brake();
+    }
+
+    class FuelCar extends Car{
+        @Override void accelerate(){ System.out.println("Fuel car is accelerating"); }
+        @Override void brake(){ System.out.println("Fuel car is braking"); }
+    }
+    class ElectricCar extends Car{ ...same two overridden... }
+
+RULES:
+  - if a class has even ONE abstract method, the CLASS must be abstract
+  - an abstract class CANNOT be object-ified:  new Car()  -> error
+  - but the reference can be of parent type:
+        Car c1 = new FuelCar();      // UPCASTING
+        Car c2 = new ElectricCar();
+        c1.accelerate();             // runs FuelCar's version  -> polymorphism
+  - abstract class CAN have: constructors, normal methods, variables,
+    static methods, constructor is called when child object is made
+  - the child MUST override every abstract method, otherwise the child
+    also has to be declared abstract
+
+
+---------------------------------------------------------
+9. INTERFACE                                [Interface.java]
+---------------------------------------------------------
+Like an abstract class but 100% abstraction (traditionally).
+Keyword: interface + a class uses "implements" (not extends).
+
+    interface Student{
+        void study();
+        void markAttendace();
+        void gotoschool();          // implicitly public + abstract
+    }
+
+    class school implements Student{
+        @Override public void study(){ System.out.println("Student is studying"); }
+        @Override public void markAttendace(){ ... }
+        @Override public void gotoschool(){ ... }
+    }
+
+    class EngineeringSchool implements Student{ ...its own version... }
+
+IMPORTANT: the overridden methods MUST be public, because interface
+methods are public by default and visibility cannot be reduced.
+
+RULES:
+  - variables in an interface are automatically public static final
+    (constants), so they must be initialised there
+  - NO constructor, cannot create its object
+  - a class can implement MANY interfaces  -> this is how Java gets
+    MULTIPLE INHERITANCE
+        class A implements X, Y { }
+  - an interface can extend another interface
+  - Java 8+ also allows default and static methods with a body
+
+ABSTRACT CLASS vs INTERFACE:
+    abstract class            | interface
+    --------------------------|---------------------------
+    extends                   | implements
+    can have normal methods   | only abstract (till Java 7)
+    can have constructor      | no constructor
+    normal variables allowed  | only public static final
+    only ONE can be extended  | many can be implemented
+    use when classes are      | use when unrelated classes
+    closely related (is-a)    | share a common contract (can-do)
+
+
+---------------------------------------------------------
+10. THE 4 PILLARS - ONE LINE EACH
+---------------------------------------------------------
+ENCAPSULATION -> private data + public getter/setter (data hiding)
+INHERITANCE   -> child reuses parent using extends (code reuse)
+ABSTRACTION   -> hide implementation, show only what is needed
+POLYMORPHISM  -> one name, many forms
+                 compile time -> overloading
+                 run time     -> overriding (Car c1 = new FuelCar())
+
+
+---------------------------------------------------------
+QUICK MISTAKES I MADE EARLIER (keep in mind)
+---------------------------------------------------------
+1. Class is the blueprint, object is the entity (I had it reversed)
+2. Constructor has NO return type -> "return name;" inside a
+   constructor is wrong
+3. Overloading != chaining. Chaining needs this(...) or super(...)
+4. Java class names start with a capital -> Car, not car; School, not school
+5. c1.model = "2019" is wrong for an int -> c1.model = 2019
+6. Spelling in code: implements, @Override, markAttendance
