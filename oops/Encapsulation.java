@@ -66,6 +66,9 @@ class Student{
    public String getCollege(){
     return college;
    }
+   public int getRoll_number(){
+    return roll_number;
+   }
    //setter college
    public void setCollege(String college){
     // so here i can write the validation to check the college exit or not 
