@@ -1,0 +1,108 @@
+=========================================================
+        JAVA BASIC - ROOT REVISION NOTES
+   (topics sitting directly in "java basic", not in a folder)
+=========================================================
+
+FOLDER MAP - where each topic lives
+---------------------------------------------------------
+  Autoboxing/      -> wrapper classes, autoboxing/unboxing   [revision.txt]
+  Grid/            -> enum + package practice (tic-tac-toe)  [revision.txt]
+  Headfirstjava/   -> Head First Java book exercises         [revision.txt]
+  JavaI/o/         -> input in Java, BufferedReader          [revision.txt]
+  NestedClasses/   -> static nested / inner / local / anon   [revision.txt + notes.txt]
+  oops/            -> the whole OOPs series                  [revision.txt + ReviseConcept.txt]
+  ImmutableClass.java -> immutable classes (notes below)
+
+
+---------------------------------------------------------
+IMMUTABLE CLASS                        [ImmutableClass.java]
+---------------------------------------------------------
+IMMUTABLE = once the object is created, its state can NEVER change.
+Example from the JDK: String, Integer, LocalDate.
+
+WHY: safe to share, safe between threads, safe as a HashMap key,
+no one can silently break my object behind my back.
+
+THE 5 RULES TO MAKE A CLASS IMMUTABLE
+  1. mark the class     final          -> nobody can extend it and
+                                          override a method to add mutation
+  2. mark every field   private final  -> cannot be reassigned after
+                                          the constructor
+  3. NO setters at all
+  4. set every field inside the constructor
+  5. if a field is itself a MUTABLE OBJECT (like College here):
+        - copy it in the CONSTRUCTOR   (defensive copy IN)
+        - copy it in the GETTER        (defensive copy OUT)
+
+    final class Student{
+        private final String  name;
+        private final int     age;
+        private final College college;      // MUTABLE type -> danger
+
+        public Student(String name, int age, College college){
+            this.name = name;
+            this.age  = age;
+            this.college = new College(college.getName(),
+                                       college.getAddress());  // copy IN
+        }
+
+        public College getCollege(){
+            return new College(college.getName(),
+                               college.getAddress());          // copy OUT
+        }
+    }
+
+WHY final ALONE IS NOT ENOUGH  <-- this is the main point of the file
+  "private final College college" only means the REFERENCE cannot be
+  re-pointed. The OBJECT it points to can still be edited:
+
+        s1.getCollege().setName("IITB");   // no compile error!
+
+  final locks the arrow, NOT the box it points at.
+  Defensive copy is what actually locks the box.
+
+NOTE: College is PRIVATE + getter/setter (properly encapsulated) and it
+is STILL mutable. So encapsulation alone does not give immutability -
+a public setter is a mutation door no matter how private the field is.
+That is exactly why Student must copy instead of trusting College.
+
+TWO LEAKS THAT BREAK IMMUTABILITY (both are demoed in main)
+  LEAK 1 - constructor leak:
+      this.college = college;      // I store the caller's own object
+      Then the caller does college.setName("IITB") later and my
+      "immutable" Student changes.
+  LEAK 2 - getter leak:
+      return this.college;         // I hand my internal object outside
+      Then anyone does s1.getCollege().setName("IITD") and edits my field.
+
+  With both copies in place, main prints IITG both times -> proof it works.
+
+WHY String FIELDS NEED NO COPY
+  String is already immutable, so sharing the same String object is safe.
+  Same for int and the other primitives (value is copied anyway).
+
+MISTAKES THAT WERE IN THE FIRST VERSION OF THIS FILE
+  1. missing ";" after new College(...) and after the assignment line
+  2. constructor took College but never did this.college = ... , so the
+     field stayed null -> NullPointerException on getCollege().name
+  3. College had no constructor, but was being called as
+     new College("IITB","address")
+  4. comments said "iitg" while the code passed "IITB" - the print
+     comment and the actual value must match or the demo proves nothing
+  5. College fields were package-private with no way to set them
+  6. FILE NAME vs PUBLIC CLASS NAME (found on the rewrite):
+        file: Immutableclass.java    class: public class ImmutableClass
+     javac error:
+        "class ImmutableClass is public, should be declared in a file
+         named ImmutableClass.java"
+     RULE: a public class MUST live in a file with the EXACT same name,
+     capital letters included. Only ONE public class per file.
+     (Windows hides this because the file system ignores case, but javac
+      does not - so the file is now renamed to ImmutableClass.java.)
+
+RELATED
+  - Encapsulation (oops/revision.txt) = private + getter/setter.
+    Immutability is encapsulation taken further: private + getter only,
+    NO setter, and copies at the boundary.
+  - Java 14+ "record" gives shallow immutability for free, but it still
+    does NOT deep-copy mutable fields - the copy rule still applies.

@@ -1,0 +1,65 @@
+=========================================================
+        HEAD FIRST JAVA - REVISION NOTES
+=========================================================
+Exercises from the Head First Java book.
+Covered so far: the "99 bottles of beer" loop exercise.
+
+---------------------------------------------------------
+1. WHILE LOOP + IF/ELSE                    [BottleSong.java]
+---------------------------------------------------------
+The whole point of this exercise is loop + condition + string
+concatenation working together.
+
+    int bottles = 99;
+    String word = "bottles";
+    while (bottles > 0) {
+        if (bottles == 1) word = "bottle";      // singular / plural fix
+        System.out.println(bottles + " green " + word + " of beer on the wall");
+        ...
+        bottles = bottles - 1;                  // the UPDATE step
+        if (bottles > 0) { ...there will be... } else { ...no more... }
+    }
+
+THE 3 PARTS EVERY LOOP NEEDS
+  1. initialisation   int bottles = 99;
+  2. condition        bottles > 0
+  3. update           bottles--;      <- forget this and it loops forever
+
+while  vs  do-while  vs  for
+  while     -> condition checked FIRST, body may run 0 times
+  do-while  -> body runs at least ONCE, condition checked after
+  for       -> use when the number of turns is known:
+                   for(int b = 99; b > 0; b--){ ... }
+
+---------------------------------------------------------
+2. STRING CONCATENATION WITH +
+---------------------------------------------------------
+If either side of + is a String, the whole thing becomes a String and
+the number is converted automatically:
+    bottles + " green "     ->  "99 green "
+
+BUG CURRENTLY IN THE FILE:
+    System.out.println(bottles + "green " + word + ...);
+  prints  "99green bottles"  - the space is missing before "green".
+  Should be  bottles + " green "  .
+  Small thing, but this is exactly the kind of output bug the book
+  wants me to notice.
+
+Careful with the order:
+    1 + 2 + " bottles"   -> "3 bottles"     (numbers added first)
+    "bottles " + 1 + 2   -> "bottles 12"    (left to right, both appended)
+
+---------------------------------------------------------
+3. BRACES / INDENTATION
+---------------------------------------------------------
+In BottleSong.java the closing braces of the while and the method are
+mis-indented, which makes it look like the loop ends earlier than it
+does. Keep one indent level per block - most bracket bugs come from
+sloppy indentation.
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - fix the missing space and re-run
+  - rewrite the same song with a for loop, then with do-while
+  - continue with the book's next chapters (methods, arrays, objects)

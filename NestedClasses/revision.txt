@@ -1,0 +1,164 @@
+=========================================================
+        NESTED CLASSES - REVISION NOTES
+   (clean version of notes.txt + what the code actually shows)
+=========================================================
+
+NESTED CLASS = a class written INSIDE another class.
+    class Outer{
+        class Inner{ }
+    }
+Outer class = the one holding it. Inner class = the one inside.
+
+---------------------------------------------------------
+WHY USE THEM (2 real reasons)
+---------------------------------------------------------
+1. LOGICAL GROUPING
+   If a class is only useful to ONE other class, keep it inside instead
+   of leaving it loose in the package. Example: InterestCalculator is
+   only meaningful inside BankAcount, so it lives there.
+
+2. BETTER ENCAPSULATION / ACCESS
+   A nested class can reach the outer class's PRIVATE members directly,
+   no getter/setter needed. Any outside class would have to go through
+   public methods.
+
+        class Outer{
+            private int x;
+            class Inner{
+                // can use x directly
+            }
+        }
+
+---------------------------------------------------------
+THE 4 TYPES
+---------------------------------------------------------
+  1. Static nested class        static class Inner{ }
+  2. Inner (non-static) class   class Inner{ }
+  3. Local class                a class declared INSIDE a method
+  4. Anonymous class            a class with no name, made on the spot
+
+---------------------------------------------------------
+1. STATIC NESTED CLASS               [Nestedclasses.java]
+---------------------------------------------------------
+    class Outer{
+        int x = 4;                       // instance (non-static) field
+
+        static class Inner{
+            void hello(Outer outer){
+                System.out.println("Hello from the static nested class");
+                System.out.println("Value of x: " + outer.x);
+            }
+        }
+    }
+
+CREATING IT - no Outer object needed:
+    Outer.Inner inner = new Outer.Inner();
+
+THE KEY RULE
+  A static nested class CANNOT touch the outer class's non-static
+  members directly.
+  WHY: static means it belongs to the CLASS, and it can exist without
+  any Outer object existing. Non-static fields like x only exist INSIDE
+  an object, so there is no x to read.
+
+HOW TO STILL REACH x
+  Pass an Outer object in as a parameter - exactly what hello(Outer
+  outer) does, then outer.x works. That object is the "which x?" answer.
+
+REAL EXAMPLE FROM THE FILE
+    class BankAcount{
+        static class InterestCalculator{
+            private static double calculateInterestYearly(double principal){
+                return principal * 0.05;
+            }
+        }
+        public double computeInterest(double principal){
+            return InterestCalculator.calculateInterestYearly(principal);
+        }
+    }
+  The calculator is a pure helper - it needs no account data, so static
+  nested is the right choice. It is hidden from the rest of the package
+  and BankAcount can still call its private method (nested classes and
+  the outer class can see each other's private members).
+  (spelling: BankAcount should be BankAccount)
+
+---------------------------------------------------------
+2. INNER CLASS (non-static)  - the contrast
+---------------------------------------------------------
+    class Outer{
+        int x = 4;
+        class Inner{
+            void show(){ System.out.println(x); }   // x directly, no parameter
+        }
+    }
+
+CREATING IT - needs an Outer object FIRST:
+    Outer outer = new Outer();
+    Outer.Inner in = outer.new Inner();      // note the "outer.new" syntax
+
+  Every inner object secretly holds a reference to its outer object,
+  that is how it can see x. That hidden reference is also why an inner
+  class keeps the outer object alive in memory - prefer static nested
+  when the link is not needed.
+
+  static nested -> new Outer.Inner()      , no outer object, no non-static access
+  inner         -> outer.new Inner()      , has an outer object, full access
+
+---------------------------------------------------------
+3. LOCAL CLASS                                [Local.java]
+---------------------------------------------------------
+A class declared inside a METHOD body.
+
+    class outer {
+        void greet(){
+            class Local{
+                void hello(){ System.out.println("Hello from the local class"); }
+            }
+            Local l = new Local();      // <- MISSING in the file right now
+            l.hello();                  //    so nothing ever runs
+        }
+    }
+
+RULES
+  - visible ONLY inside that method, nowhere else
+  - cannot be public / private / protected / static
+  - can use the method's local variables only if they are final or
+    "effectively final" (never reassigned after being set)
+  - use it when a helper type is needed by one method and nothing else
+
+CURRENT STATE OF Local.java: the class is declared but never
+instantiated and main is empty, so running it prints nothing.
+Also `class outer` should be `Outer` (class names start capital).
+
+---------------------------------------------------------
+4. ANONYMOUS CLASS - still to do
+---------------------------------------------------------
+A local class with NO name, declared and instantiated in one shot.
+Used to override something once, usually for an interface/abstract class.
+
+    Runnable r = new Runnable(){
+        @Override public void run(){ System.out.println("running"); }
+    };
+    r.run();
+
+Since Java 8, a lambda replaces it when the interface has exactly one
+method:   Runnable r = () -> System.out.println("running");
+
+---------------------------------------------------------
+QUICK TABLE
+---------------------------------------------------------
+  type            | declared where     | needs outer object | sees outer non-static
+  ----------------|--------------------|--------------------|----------------------
+  static nested   | inside class       | no                 | no (pass it in)
+  inner           | inside class       | yes (outer.new)    | yes
+  local           | inside a method    | -                  | yes (if inner-style)
+  anonymous       | inside an expr     | -                  | yes
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - write a non-static inner class and use outer.new Inner()
+  - actually instantiate the Local class inside greet()
+  - write one anonymous class, then rewrite it as a lambda
+  - delete the stale .class files (Outer$Inner.class shows how the
+    compiler names nested classes: Outer$Inner)

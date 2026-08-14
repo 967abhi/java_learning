@@ -1,0 +1,61 @@
+nested class 
+class a{
+    class b{
+
+    }
+}
+
+
+one class with in another class that mean sthe nested class 
+outer class 
+and inside the class we call ineer class 
+
+Types of the nested class 
+1.Static class
+2.Inner class
+3.local class
+4. Anonyous class 
+
+the most important of the nested class is the logical grouping 
+like suppose that we build three clases 
+class a{   class b{    class c { }
+
+              }
+
+}
+
+so if three classes are there then it did not make any sense so that why they uses the nested class 
+so in the inner class is that then it make the logical and then only we called the nested class
+2.Better class 
+so inner class will able to access the private access modifier of the outer class 
+Class outer {
+    private int x;
+    class inner{
+        so here we are able to access the x without the getter and setter and if that was outside the class then for that 
+        we have to depend on the outer class and then we have to make a getter class and then a setter class 
+
+    }
+}
+
+
+
+1.Static nested class:- 
+Inner class is the static class 
+class outer {
+    static class inner{
+
+    now we know the static class is the class 
+    so it will sharable by the outer class 
+
+    }
+}
+
+//How it works 
+
+//Properties
+1. so if we make inner class as a static so it will not access the non static variable and method from the parent class 
+2. So what is the reason the non static variable is not accessible becasue we make an object with making the object that why we are able to acess the static variable but the non static variable is not able to create the  objec that's why we are not able to 
+acess it 
+3.How we can acess the non static variable ? 
+answer:- so we can access it my making a paramater so in the static class the method should take a text as a paramater 
+Outer Outer then we can access it 

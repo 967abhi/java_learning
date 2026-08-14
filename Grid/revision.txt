@@ -1,0 +1,77 @@
+=========================================================
+        GRID - REVISION NOTES
+   (tic-tac-toe style practice: package + enum)
+=========================================================
+STATUS: skeleton only.
+  Symbol.java -> enum written
+  Gird.java   -> a main method (note: file/class name is misspelled,
+                 should be Grid, and its main is NOT static - see below)
+  Board.java  -> empty class, still to be written
+
+---------------------------------------------------------
+1. ENUM                                       [Symbol.java]
+---------------------------------------------------------
+enum = a fixed set of named CONSTANTS. Use it when a variable can only
+be one of a few known values (X / O / EMPTY, days, directions, states).
+
+    public class Symbol {
+        public enum symbol{
+            X, O, EMPTY;
+        }
+    }
+
+Here the enum is nested inside a class, so it is used as:
+    Symbol.symbol s = Symbol.symbol.X;
+
+Cleaner would be its own top level enum in Symbol.java:
+    public enum Symbol { X, O, EMPTY; }
+    Symbol s = Symbol.X;
+
+WHY ENUM INSTEAD OF String OR int
+    String s = "X";     // typo "x" compiles and breaks at runtime
+    Symbol s = Symbol.X;// typo is a COMPILE error -> caught early
+  Also safe in switch, and can be compared with ==.
+
+USEFUL BUILT-IN METHODS
+    Symbol.values()        -> array of all constants  [X, O, EMPTY]
+    Symbol.valueOf("X")    -> the constant from its name
+    s.name()               -> "X"
+    s.ordinal()            -> position, 0 based
+    switch(s){ case X: ... case O: ... case EMPTY: ... }
+
+Enum is internally a class extending java.lang.Enum, so it CANNOT
+extend another class, but it CAN implement an interface and can have
+fields, a constructor and methods.
+
+---------------------------------------------------------
+2. PACKAGE                        [all 3 files: package Grid;]
+---------------------------------------------------------
+All files start with   package Grid;   so the folder name Grid IS the
+package name. They must match exactly, including the capital G.
+
+Compile and run from the PARENT folder ("java basic"), not from inside:
+    javac Grid/*.java
+    java  Grid.Grid            (fully qualified name)
+
+Classes in the same package see each other with no import.
+(Same idea already practised in oops/College and oops/School.)
+
+---------------------------------------------------------
+3. MISTAKE TO FIX IN THIS FOLDER
+---------------------------------------------------------
+Gird.java:
+    public void main(String[] args)      // WRONG - not static
+
+  The JVM entry point must be exactly:
+        public static void main(String[] args)
+  Without static, the JVM cannot call it without an object and the run
+  fails with "Main method is not static in class Grid".
+  Also the file/class name is spelled "Gird" instead of "Grid".
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - Board: a Symbol[][] grid of 3x3, initialised to EMPTY
+  - printBoard(), placeMove(row, col, symbol), isFull(), checkWinner()
+  - this folder is good practice for: array of enums, 2D arrays,
+    encapsulation (keep the board private) and packages together

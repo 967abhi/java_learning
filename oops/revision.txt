@@ -1,0 +1,89 @@
+=========================================================
+        OOPS - QUICK REVISION SHEET
+=========================================================
+The FULL detailed notes for this folder are already in
+    -> ReviseConcept.txt   (read that for the explanations)
+This file is the fast recall sheet + the file map, so I know which
+file to open for which concept.
+
+---------------------------------------------------------
+FILE MAP - which file demonstrates what
+---------------------------------------------------------
+  oops.java                -> first rough notes (commented out)
+  Firstoops.java           -> class, object, fields set one by one,
+                              methods markattendance() / print()
+  Constructor.java         -> default + parameterised constructor
+  chainingConstructor.java -> constructor OVERLOADING (5 versions)
+                              NOTE: this is overloading, real chaining
+                              needs this(...) as the first line
+  callByValue.java         -> Java is always call by value
+  Static.java              -> static field, static block, static method
+  Demo.java + College/ + School/ -> packages, two Student classes with
+                              the same name in different packages
+  Encapsulation.java       -> private fields + getter/setter + validation
+                              (BankAccount: deposit/withdraw/getbalance)
+  Inheritance.java         -> extends, multilevel, super, @Override
+  AbstractClass.java       -> abstract class, abstract methods,
+                              Car -> FuelCar / ElectricCar, upcasting
+  Abstraction.java         -> empty main, still to be written
+  Interface.java           -> interface + implements, school /
+                              EngineeringSchool
+
+---------------------------------------------------------
+ONE-LINE RECALL - if I remember only these, I am fine
+---------------------------------------------------------
+CLASS       = blueprint (not real).  OBJECT = the real entity from it.
+              reference in STACK, object in HEAP, "new" allocates heap.
+CONSTRUCTOR = same name as class, NO return type, runs on "new".
+              overloading = different parameter list.
+              chaining    = this(...) / super(...) as the FIRST line.
+this        = the current object. Used when parameter name == field name.
+CALL BY VALUE = always a copy. For objects the REFERENCE is copied, so
+              field changes DO show outside, but reassigning does not.
+STATIC      = belongs to the class, one shared copy, accessed by class
+              name, cannot use "this", static block runs once at load.
+PACKAGE     = folder of related classes, avoids name conflict.
+ENCAPSULATION = private data + public getter/setter (data hiding).
+              the real benefit is VALIDATION inside the setter.
+              getter only -> read only. setter only -> write only.
+ACCESS      private < default(package) < protected < public
+INHERITANCE = extends, code reuse. single / multilevel / hierarchical.
+              multiple NOT allowed for classes (diamond) -> interfaces.
+              super.field, super.method(), super(...) first line.
+OVERLOADING = same class, different params  -> COMPILE time polymorphism
+OVERRIDING  = parent-child, same signature  -> RUNTIME polymorphism
+ABSTRACTION = hide implementation. abstract class (0-100%) or
+              interface (100%). abstract class cannot be instantiated,
+              child MUST override every abstract method.
+INTERFACE   = implements, methods public by default, variables are
+              public static final, no constructor, many can be
+              implemented -> Java's multiple inheritance.
+4 PILLARS   = Encapsulation, Inheritance, Abstraction, Polymorphism.
+
+---------------------------------------------------------
+UPCASTING - the line to remember
+---------------------------------------------------------
+    Car c1 = new FuelCar();     // parent reference, child object
+    c1.accelerate();            // runs FuelCar's version -> runtime
+                                //   polymorphism / dynamic dispatch
+  Reference type decides WHAT I can call.
+  Object type decides WHICH version runs.
+
+---------------------------------------------------------
+MISTAKES ALREADY MADE HERE (from ReviseConcept.txt)
+---------------------------------------------------------
+  1. class vs object definition was reversed
+  2. "return" inside a constructor - constructors have no return type
+  3. overloading called chaining
+  4. class names must be Capitalised (school -> School)
+  5. c1.model = "2019" for an int field
+  6. spellings: implements, @Override, markAttendance
+     (still open: BankAcount, markAttendace in some files)
+
+---------------------------------------------------------
+WHAT COMES AFTER THIS FOLDER
+---------------------------------------------------------
+  NestedClasses/       -> static nested, inner, local, anonymous
+  ImmutableClass.java  -> final class + private final + defensive copy
+                          (extension of encapsulation - see the root
+                           revision.txt)

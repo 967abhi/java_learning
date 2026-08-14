@@ -1,0 +1,69 @@
+=========================================================
+        AUTOBOXING - REVISION NOTES
+=========================================================
+STATUS: just started. Autoboxing.java only has the one-line comment
+        "in this what happen they make a wrapper class from every".
+        Notes below are the concept, code still to be written.
+
+---------------------------------------------------------
+1. WRAPPER CLASS
+---------------------------------------------------------
+Every primitive has a matching CLASS in java.lang:
+
+    byte    -> Byte           float   -> Float
+    short   -> Short          double  -> Double
+    int     -> Integer        char    -> Character
+    long    -> Long           boolean -> Boolean
+
+Note the two odd names: int -> Integer (not Int), char -> Character.
+
+WHY WRAPPERS EXIST
+  - Collections (ArrayList, HashMap ...) store OBJECTS only, not
+    primitives. ArrayList<int> is illegal, ArrayList<Integer> is fine.
+  - Generics work only with reference types.
+  - A wrapper can be null, a primitive cannot (useful for "no value").
+  - They carry useful methods and constants:
+        Integer.parseInt("25"), Integer.MAX_VALUE, Integer.MIN_VALUE
+
+---------------------------------------------------------
+2. AUTOBOXING / UNBOXING
+---------------------------------------------------------
+AUTOBOXING = primitive -> wrapper, done AUTOMATICALLY by the compiler.
+UNBOXING   = wrapper   -> primitive, also automatic.
+
+    Integer a = 10;        // autoboxing   (compiler writes Integer.valueOf(10))
+    int b = a;             // unboxing     (compiler writes a.intValue())
+
+    ArrayList<Integer> list = new ArrayList<>();
+    list.add(5);           // 5 is autoboxed to Integer
+    int x = list.get(0);   // unboxed back to int
+
+Manual (old) way, same thing without the magic:
+    Integer a = Integer.valueOf(10);
+    int b     = a.intValue();
+
+---------------------------------------------------------
+3. THE 3 TRAPS TO REMEMBER
+---------------------------------------------------------
+a) NullPointerException on unboxing
+       Integer i = null;
+       int x = i;          // NPE at runtime, compiles fine
+
+b) == compares REFERENCES for wrappers, not values
+       Integer a = 127, b = 127;   System.out.println(a == b); // true
+       Integer c = 128, d = 128;   System.out.println(c == d); // false !!
+   Reason: Integer CACHES -128 to 127, so small values reuse the same
+   object. Above 127 a new object is made.
+   RULE: always use .equals() to compare wrapper values.
+
+c) Performance
+       Long sum = 0L;
+       for(long i = 0; i < 1000000; i++) sum += i;   // boxes 1 million times
+   Use the primitive type in loops.
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - write the actual Autoboxing.java with all 8 wrappers
+  - print the ==  vs  .equals() difference for 127 and 128
+  - try Integer.parseInt / Integer.valueOf and see the return types

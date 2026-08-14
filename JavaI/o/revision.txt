@@ -1,0 +1,89 @@
+=========================================================
+        JAVA I/O (INPUT / OUTPUT) - REVISION NOTES
+=========================================================
+NOTE ON THE FOLDER NAME: this is meant to be "Java I/O", but "/" is a
+folder separator on disk, so it became JavaI\o (folder JavaI, subfolder
+o). Because of that, Java_input.java declares  package JavaI.o;  while
+Demo3.java has NO package line. Better name for later: JavaIO.
+
+---------------------------------------------------------
+1. WHAT A STREAM IS
+---------------------------------------------------------
+STREAM = a flow of data between the program and a source/destination
+(keyboard, file, network). Two families:
+
+  BYTE  streams -> InputStream / OutputStream    (raw 8-bit data, images)
+  CHAR  streams -> Reader      / Writer          (text, handles encoding)
+
+The 3 standard streams the JVM always gives me:
+    System.in    -> InputStream   (keyboard)
+    System.out   -> PrintStream   (screen)
+    System.err   -> PrintStream   (errors)
+
+---------------------------------------------------------
+2. READING INPUT WITH BufferedReader            [Demo3.java]
+---------------------------------------------------------
+    import java.io.*;
+
+    public class Demo3 {
+        public static void main(String[] args) throws IOException {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            String name = br.readLine();
+            System.out.println(name);
+        }
+    }
+
+THE FULL PATH OF ONE KEYSTROKE (the flow written in the file)
+  1. I type   Aditya   and press enter
+  2. the OS buffer holds the BYTES        (65, 100, 105, 116, 121, 97)
+  3. System.in (an InputStream) receives those bytes
+  4. InputStreamReader converts the byte stream -> CHARACTER stream
+         ('A','d','i','t','y','a')                 <- the "bridge" class
+  5. BufferedReader.readLine() collects chars until \n -> "Aditya"
+  6. printed back out
+
+WHY THREE OBJECTS WRAPPED IN EACH OTHER
+  This is the DECORATOR pattern - each wrapper adds one ability:
+      System.in            gives bytes only, 1 byte at a time
+      + InputStreamReader  bytes -> characters (handles encoding)
+      + BufferedReader     adds a buffer + readLine(), so it does not
+                           hit the OS for every single character (fast)
+
+---------------------------------------------------------
+3. WHY "throws IOException"
+---------------------------------------------------------
+readLine() can fail (stream closed, device error), so it declares a
+CHECKED exception. Java forces me to either:
+    a) declare it:   public static void main(...) throws IOException
+    b) or handle it: try{ ... } catch(IOException e){ ... }
+Checked = compiler checks it. Unchecked (RuntimeException, NPE,
+ArithmeticException) needs neither.
+
+---------------------------------------------------------
+4. BufferedReader  vs  Scanner
+---------------------------------------------------------
+  BufferedReader                  | Scanner
+  --------------------------------|-------------------------------
+  java.io                         | java.util
+  readLine() only -> always String| nextInt(), nextLine(), nextDouble()
+  need Integer.parseInt() myself  | parses for me
+  faster (bigger buffer)          | slower, but easier
+  throws IOException              | no checked exception
+
+  Reading an int with BufferedReader:
+      int age = Integer.parseInt(br.readLine());
+
+  Scanner version:
+      Scanner sc = new Scanner(System.in);
+      int age = sc.nextInt();
+
+  Classic Scanner trap: nextInt() leaves the newline in the buffer, so
+  the next nextLine() returns "" -> call sc.nextLine() once to eat it.
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - the same input with Scanner, side by side
+  - read an int and a double, see parseInt / parseDouble
+  - FileReader / FileWriter, then try-with-resources so the stream
+    closes itself
