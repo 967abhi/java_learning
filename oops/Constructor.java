@@ -8,33 +8,33 @@ public class Constructor {
 
     }
 
-}
-class Student {
-    //characteristics of student
-    String name;
-    int age;
-    int roll_no;
-    String college;
-    //default constructor
-   Student(){
-        System.out.println("Constructor called");
-    }
-    //parameterized constructor
-    Student(String name,int age,int roll_no,String college){
-        this.name=name;
-        this.age=age;
-        this.roll_no=roll_no;
-        this.college=college;
-    }
+    static class Student {
+        //characteristics of student
+        String name;
+        int age;
+        int roll_no;
+        String college;
+        //default constructor
+        Student(){
+            System.out.println("Constructor called");
+        }
+        //parameterized constructor
+        Student(String name,int age,int roll_no,String college){
+            this.name=name;
+            this.age=age;
+            this.roll_no=roll_no;
+            this.college=college;
+        }
 
-    
 
-    //behaviour of student
-    void markattendance(){
-        System.out.println("Attendace marked by"+ name);
-    }
-    void print(){
-            System.out.println(name+" "+ age+" "+roll_no+" ");
-    }
 
+        //behaviour of student
+        void markattendance(){
+            System.out.println("Attendace marked by"+ name);
+        }
+        void print(){
+                System.out.println(name+" "+ age+" "+roll_no+" ");
+        }
+
+    }
 }

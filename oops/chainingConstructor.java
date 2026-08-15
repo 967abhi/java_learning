@@ -10,48 +10,48 @@ public class chainingConstructor {
 
 
     }
-}
 
-class Student{
-    //Characteristics of student 
-    String name;
-    int age;
-    int roll_no;
-    String college;
+    static class Student{
+        //Characteristics of student
+        String name;
+        int age;
+        int roll_no;
+        String college;
 
-    //Default constructor
-    Student(){
-        System.out.println("Default constuructor called");
+        //Default constructor
+        Student(){
+            System.out.println("Default constuructor called");
+
+        }
+        //name string
+        Student(String name){
+            this.name=name;
+        }
+        //name and age
+        Student(String name,int age){
+            this.name=name;
+            this.age=age;
+        }
+        //name age,roll number
+        Student(String name,int age,int roll_no){
+            this.name=name;
+            this.age=age;
+            this.roll_no=roll_no;
+        }
+        //NAME AGE ROLL NUMBER COLLEGE
+        Student(String name,int age,int roll_no,String college){
+            this.name=name;
+            this.age=age;
+            this.roll_no=roll_no;
+            this.college=college;
+        }
+
+        void markattendance(){
+            System.out.println("Attendace marked by"+ name);
+        }
+        void print(){
+            System.out.println(name+" "+ age+" "+roll_no+" ");
+        }
 
     }
-    //name string 
-    Student(String name){
-        this.name=name;
-    }
-    //name and age 
-    Student(String name,int age){
-        this.name=name;
-        this.age=age;
-    }
-    //name age,roll number 
-    Student(String name,int age,int roll_no){
-        this.name=name;
-        this.age=age;
-        this.roll_no=roll_no;
-    }
-    //NAME AGE ROLL NUMBER COLLEGE
-    Student(String name,int age,int roll_no,String college){
-        this.name=name;
-        this.age=age;
-        this.roll_no=roll_no;
-        this.college=college;
-    }   
-
-    void markattendance(){
-        System.out.println("Attendace marked by"+ name);
-    }
-    void print(){
-        System.out.println(name+" "+ age+" "+roll_no+" ");
-    }
-
 }

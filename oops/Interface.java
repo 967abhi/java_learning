@@ -6,42 +6,43 @@ public static void main(String[] args) {
     s1.markAttendace();
     s1.gotoschool();
 }
-}
-interface Student{
-    void study();
-    void markAttendace();
-    void gotoschool();
 
-}
-class school implements Student{
-    @Override
-    public void study() {
-        System.out.println("Student is studying");
-    }
+    interface Student{
+        void study();
+        void markAttendace();
+        void gotoschool();
 
-    @Override
-    public void markAttendace() {
-        System.out.println("Student is marking attendance");
     }
+    static class school implements Student{
+        @Override
+        public void study() {
+            System.out.println("Student is studying");
+        }
 
-    @Override
-    public void gotoschool() {
-        System.out.println("Student is going to school");
-    }
-}
-class EngineeringSchool implements Student{
-    @Override
-    public void study() {
-        System.out.println("Engineering student is studying");
-    }
+        @Override
+        public void markAttendace() {
+            System.out.println("Student is marking attendance");
+        }
 
-    @Override
-    public void markAttendace() {
-        System.out.println("Engineering student is marking attendance");
+        @Override
+        public void gotoschool() {
+            System.out.println("Student is going to school");
+        }
     }
+    static class EngineeringSchool implements Student{
+        @Override
+        public void study() {
+            System.out.println("Engineering student is studying");
+        }
 
-    @Override
-    public void gotoschool() {
-        System.out.println("Engineering student is going to school");
+        @Override
+        public void markAttendace() {
+            System.out.println("Engineering student is marking attendance");
+        }
+
+        @Override
+        public void gotoschool() {
+            System.out.println("Engineering student is going to school");
+        }
     }
 }

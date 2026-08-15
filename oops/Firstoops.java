@@ -23,24 +23,24 @@ public class Firstoops {
     s2.print();
 
     }
-}
 
-class Student {
-    //characteristics of student
-    String name;
-    int age;
-    int roll_no;
-    String college;
+    static class Student {
+        //characteristics of student
+        String name;
+        int age;
+        int roll_no;
+        String college;
 
 
-    //behaviour of student
-    void markattendance(){
-        System.out.println("Attendace marked by"+ name);
+        //behaviour of student
+        void markattendance(){
+            System.out.println("Attendace marked by"+ name);
+        }
+        void print(){
+                System.out.println(name+" "+ age+" "+roll_no+" ");
+        }
+
     }
-    void print(){
-            System.out.println(name+" "+ age+" "+roll_no+" ");
-    }
-
 }
 
 

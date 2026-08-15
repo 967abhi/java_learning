@@ -26,7 +26,6 @@ class FuelCar extends Car{
     @Override
     void accelerate(){
         System.out.println("Fuel car is accelerating");
-
     }
     @Override
     void brake(){
