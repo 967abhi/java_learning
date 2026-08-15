@@ -1,22 +1,10 @@
 {
-  // The Java language server itself must run on JDK 17+ (21 here).
-  // Without this it falls back to JAVA_HOME (JDK 8) and cannot load the
-  // standard library -> "java.lang.Object cannot be resolved" on every file.
   "java.jdt.ls.java.home": "C:/Program Files/Eclipse Adoptium/jdk-21.0.11.10-hotspot",
-
-  // The JDK the code is actually compiled against.
-  // JavaSE-1.8 is the default so the editor matches the `javac` on PATH.
   "java.configuration.runtimes": [
     {
-      "name": "JavaSE-1.8",
-      "path": "C:/Program Files/Eclipse Adoptium/jdk-8.0.492.9-hotspot",
-      "default": true
-    },
-    {
       "name": "JavaSE-21",
-      "path": "C:/Program Files/Eclipse Adoptium/jdk-21.0.11.10-hotspot"
+      "path": "C:/Program Files/Eclipse Adoptium/jdk-21.0.11.10-hotspot",
+      "default": true
     }
-  ],
-
-  "java.compile.nullAnalysis.mode": "disabled"
+  ]
 }

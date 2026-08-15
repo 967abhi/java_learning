@@ -12,28 +12,29 @@ public static void main(String[] args){
 
 
 }
-}
-class Student{
 
-    String name;
-    int age;
+    static class Student{
 
-    void markAttendance(){
-        System.out.println("Attendance marked by ");
+        String name;
+        int age;
+
+        void markAttendance(){
+            System.out.println("Attendance marked by ");
+        }
+
+    }
+    static class EngineeringStudent extends Student{
+        void AttendLab(){
+            System.out.println("Attend lab");
+        }
     }
 
-}
-class EngineeringStudent extends Student{
-    void AttendLab(){
-        System.out.println("Attend lab");
-    }
-}
+    //multilevel inheritance
+    // so it will work like this a->b->c
 
-//multilevel inheritance
-// so it will work like this a->b->c
-
-class CSEEnginneringstudent extends EngineeringStudent{
-    void attendCselab(){
-        System.out.println("Attend cse lab");
+    static class CSEEnginneringstudent extends EngineeringStudent{
+        void attendCselab(){
+            System.out.println("Attend cse lab");
+        }
     }
 }

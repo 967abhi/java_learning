@@ -4,7 +4,7 @@ public class Local{
     }
 
 }
-class outer {
+class OuterLocal {
     void greet(){
         class Local{
             void hello(){

@@ -9,21 +9,21 @@ public class Static {
 
     }
 
-}
-class Student{
-    String name;
-    int age;
-    int roll_no;
-    static String college;
+    static class Student{
+        String name;
+        int age;
+        int roll_no;
+        static String college;
 
-    Student(String name,int age,int roll_no){
-        this.name = name;
-        this.age = age;
-        this.roll_no = roll_no;
-       
-    }
-    //static block 
-    static{
-        college="IIT";
+        Student(String name,int age,int roll_no){
+            this.name = name;
+            this.age = age;
+            this.roll_no = roll_no;
+
+        }
+        //static block
+        static{
+            college="IIT";
+        }
     }
 }
