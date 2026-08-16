@@ -43,14 +43,13 @@ public class Encapsulation {
     }
     static class Student{
        private String name;
-       private int roll_number;
        private int age;
        private String college;
 
     //constructor
        Student(String name,int roll_number,int age,String college){
         this.name=name;
-        this.roll_number=roll_number;
+        ;
         this.age=age;
         this.college=college;
        }
