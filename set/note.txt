@@ -1,0 +1,183 @@
+So there is nothing like the set in the hashmap everything which we define on the set in the java that internally it changes 
+to the hashmap 
+set<Integer>set=new Hashset<>();
+so it changes to the private Hashmap<Integer,object> mpp=new Hashmap();
+in the Integer it will store the index and the object it store the value    
+
+so how it going inside 
+set.add(2)
+then in the Hashmap
+mpp.put(2,present); present is dummy object it make inside the private static final PRSENT =new object ();
+
+set.contains(2)
+then it changes the java in the map 
+mpp.containskey(2);
+so in the java (set/map) they both store in the java like the map only 
+key->hashcode
+bucket number using module operation 
+and then we go on the bucket and store the value and if the value is already present in the bucket then we do linkedlist and we store the value in last node 
+class node<k,v>{
+    k key;
+    v value;
+    int hash;
+    node<k,v>next;
+
+}
+image of 35:08 minutes
+
+set<string>k=new hashset<>();
+s.add("Abhishek");
+so how the add function is implement the add function is 
+so the add function is a boolean suppose that if you are adding two abhishek s.add("abhishel") and then again s.("abhishek" ) then on that time it will return a false it not able to add because the dublicate value is not allowed in the set
+boolan add(string key){
+    SO THE KEY IS STORING THE GENERICS BUT NOW I MADE A STRING  
+    (mpp.put(key,present)==null){
+
+    }
+}
+then this mpp.put is define in the map 
+let check how it is define 
+put(key,value){
+    int i=key.hashcode();
+    index=(i%n);
+
+}
+so here ti want to insert the abhishek in the bucket then it store it make the hascode of the abhishek and now the value i came and then it module with the present size of the set and then it store there in the bucket 
+Then there few cases came :- 
+case1:- Bucket empty 
+bucket[index]=new node("Abhsihek",present,i,nextkalink that is null);
+Case 2: Bucket is not empty
+so in this if the bucket is not empty there two more case came 
+case 2.1:- Here the case came like that key already present 
+so we are here what checking 
+n1%n==0
+n2%n==0
+then it means n1 is not equal to n2 
+and if that is equal then we are not going to store the value 
+temp =head;
+while(temp!=head){
+    if(temp.hash==hash&temp.key==key){
+        //duplicate value 
+        that means not to store then there it update the present and return the old present 
+
+    }
+    else{
+        store the valu 
+       new node(k,value,i,null);
+    }
+}
+so similalry it work for the contains also how the contains work in the mapp 
+set.contains("Abhishel")
+contains(key){
+    mpp.containskey(key)
+}
+and return now check how the contains implement in the mapp 
+[0,1,2,3,4,5] bucket of the array 
+so similalry 
+it came 
+like 
+int i=key.hashcode();
+int index=i%n;
+if the element present then it give the true or false 
+what the contract of the equals and hascode in the java ?
+if the k1 and k2 in java and then k1.equal(k2) is true and then k1.hascode()==k2.hascode()
+if there is two key k1 and k2 and it does not check reference it check the value and then k1 and k2 hascode is also true and vice versa is not true 
+abhishek hashcode 203
+and raj is hashcode 203 then bucket is same 
+
+
+collision handle we uses linkedlist 
+there is diffferent way also  that is open addressing but the java does not uses the open addressing 
+then it is called linar probing means if the index come and then there value is filled then it will put the value next to it which is empty 
+
+
+Load factor 
+there is five size of the bucket then there are lot of value store 
+then it check no of elements and capacity 
+element/capacity and there value is come 0.75 then then array is filled more then 75 percent then we do 
+rehashing like the dynamic array 
+Then we make a rule of the rehashing where we check if the array is filled more then 75 percent then we do rehashing 
+what we do rehashing 
+1. create twice size of the array
+2. And then we mode again of the value with the upcoming array size and rehash and then we will get the size of linked list size is less
+the java itself create 16 array size in the memory and then we do the rehashing 
+
+then we do tree fication 
+after java 8 the java do one more optimixation 
+if the linked list is go with 8 then we do bst and bst itself do red black tree and then o(n) change to o(logn n)
+
+
+Linkedhashset 
+so this give like that the way we store the value then it will print the same way 
+it uses the doubly linkedlist inside this 
+take the image from the 1 14 min 
+class node{
+    key ,value,hash,next,before,after
+}
+the above one is the strucutre and we uses this where we need to store the structure 
+treemap /tree set
+
+here we are using self balancing tree 
+bst 
+red black tree 
+and there complexity change o(logn
+so the 0)\
+give the key sorted 
+largest values 
+smallest 
+range wuery 
+for string they uses the lexicographic order in like the dictornary 
+
+
+bst 
+smaller vlaues go to left
+higher value go to right 
+os they uses the null hashmao and linkedhashmap
+
+
+
+set methods and all 
+set extends two set sorted set->navigable set->tree set 
+Iterble->collection -> set->hashset->Linkedhashset
+                        |
+                        ^
+                        sorted set->navigableset->TreeSet
+
+so the tree set get some method from the sorted set and the navigableset also 
+so set donot have any methods so they took from the collection and iterable 
+so collection almost have everything that are present in the set 
+list down all the method of the TreeSet
+we have more map also like the 
+Hashtable 
+properties
+enummap
+Identity map 
+Concurrentmap 
+WeakHashmap 
+
+
+Map have to define there own method so it have to define there method 
+so same like the hashmap and linkedhashmap 
+they hashmap and linkedhashmap are similalry as the hasset and set 
+        // Set<Integer> set=new HashSet<>();//16size
+the constructor of the hashmap and linkedhashmap will be similary to the hashset 
+Map->sortedmap->navigablemap->Treemap 
+Hashtable is the legacy class 
+hashmao thread safe and for today threadsafe we can use the concurrentHashmap 
+Hashtable->properties->specialiszed map 
+username=admin
+password-123 configuration and the configuration is text and they used to represent the specialiszed map 
+property
+    weak hashmap 
+    rarely used we need cache like behaviour then we can use the weak hashmap weak reference
+    Identity hashmap 
+This is different then normal hashmap equality map hashmap equality based map 
+so till a and b will euql form me then a and b if points same object
+Hashing tech 
+memory efficient 
+null key are not allowed
+null values are allowed 
+enummap 
+iteration map is order
+concurrentHashmap thread safe map 
+hashtable and linked hasmpa and tree map 
