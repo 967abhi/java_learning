@@ -133,3 +133,51 @@ bst
 smaller vlaues go to left
 higher value go to right 
 os they uses the null hashmao and linkedhashmap
+
+
+
+set methods and all 
+set extends two set sorted set->navigable set->tree set 
+Iterble->collection -> set->hashset->Linkedhashset
+                        |
+                        ^
+                        sorted set->navigableset->TreeSet
+
+so the tree set get some method from the sorted set and the navigableset also 
+so set donot have any methods so they took from the collection and iterable 
+so collection almost have everything that are present in the set 
+list down all the method of the TreeSet
+we have more map also like the 
+Hashtable 
+properties
+enummap
+Identity map 
+Concurrentmap 
+WeakHashmap 
+
+
+Map have to define there own method so it have to define there method 
+so same like the hashmap and linkedhashmap 
+they hashmap and linkedhashmap are similalry as the hasset and set 
+        // Set<Integer> set=new HashSet<>();//16size
+the constructor of the hashmap and linkedhashmap will be similary to the hashset 
+Map->sortedmap->navigablemap->Treemap 
+Hashtable is the legacy class 
+hashmao thread safe and for today threadsafe we can use the concurrentHashmap 
+Hashtable->properties->specialiszed map 
+username=admin
+password-123 configuration and the configuration is text and they used to represent the specialiszed map 
+property
+    weak hashmap 
+    rarely used we need cache like behaviour then we can use the weak hashmap weak reference
+    Identity hashmap 
+This is different then normal hashmap equality map hashmap equality based map 
+so till a and b will euql form me then a and b if points same object
+Hashing tech 
+memory efficient 
+null key are not allowed
+null values are allowed 
+enummap 
+iteration map is order
+concurrentHashmap thread safe map 
+hashtable and linked hasmpa and tree map 

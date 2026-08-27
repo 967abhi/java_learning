@@ -1,6 +1,7 @@
 ================================================================
-                JAVA SET  -  COMPLETE NOTES
-        (HashSet / LinkedHashSet / TreeSet - Internal Working)
+                JAVA SET & MAP  -  COMPLETE NOTES
+        (HashSet / LinkedHashSet / TreeSet - Internal Working
+         + Set Hierarchy + All Map Implementations)
 ================================================================
 
 
@@ -10,7 +11,7 @@
 
 There is no separate data structure called "Set" inside Java.
 Whatever we write as a Set, internally Java converts it into a HashMap.
-
+                                                                                                                                                                        
     Set<Integer> set = new HashSet<>();
 
 Internally becomes:
@@ -25,7 +26,7 @@ The dummy object is:
     private static final Object PRESENT = new Object();
 
 Why a dummy? Because a Set only needs KEYS. HashMap needs a value
-for every key, so Java puts the same useless object everywhere.
+for every key, so Java puts the same useless object everywhere.                                                
 
 
 ----------------------------------------------------------------
@@ -158,7 +159,7 @@ IMPORTANT : we check BOTH hash and equals(), not the reference.
 Inside the map :
 
     int i     = key.hashCode();
-    int index = i % n;
+    int index = i % n; 
     go to bucket[index];
     walk the linked list;
     if (hash matches && equals() matches)  -> return true
@@ -177,7 +178,7 @@ RULE :
 
 REVERSE IS NOT TRUE :
     If  k1.hashCode() == k2.hashCode()
-    It does NOT mean  k1.equals(k2)
+    It does NOT mean  k1.equals(k2)                                                    
 
 Example:
     "Abhishek".hashCode() = 203
@@ -300,13 +301,163 @@ Note : TreeSet does NOT allow null (it has to compare).
 
 
 ----------------------------------------------------------------
-13. QUICK COMPARISON TABLE
+13. SET HIERARCHY  (draw this diagram in your copy)
+----------------------------------------------------------------
+
+    Iterable
+       |
+    Collection
+       |
+      Set  ------------------------> SortedSet
+       |                                 |
+    HashSet                         NavigableSet
+       |                                 |
+   LinkedHashSet                      TreeSet
+
+
+IMPORTANT POINT :
+Set itself does NOT declare any new method of its own.
+It takes almost everything from Collection and Iterable.
+Set only changes the CONTRACT -> "duplicates are not allowed".
+
+    Iterable   -> gives  iterator(), forEach()
+    Collection -> gives  add, remove, contains, size, isEmpty,
+                         clear, addAll, removeAll, retainAll,
+                         containsAll, toArray, stream
+
+TreeSet is special : it gets EXTRA methods from SortedSet and
+NavigableSet (that is why it can do sorting and range queries).
+
+
+----------------------------------------------------------------
+14. ALL METHODS OF TreeSet  (grouped by where they come from)
+----------------------------------------------------------------
+
+(A) FROM Iterable / Collection / Set  (common to every set)
+    add(e)              addAll(c)
+    remove(e)           removeAll(c)
+    contains(e)         containsAll(c)
+    retainAll(c)        removeIf(predicate)
+    size()              isEmpty()
+    clear()             iterator()
+    toArray()           stream()
+    forEach()
+
+(B) FROM SortedSet
+    first()             -> smallest element
+    last()              -> largest element
+    headSet(e)          -> all elements  <  e
+    tailSet(e)          -> all elements  >= e
+    subSet(a, b)        -> elements from a (incl) to b (excl)
+    comparator()        -> the comparator used (null = natural order)
+
+(C) FROM NavigableSet
+    ceiling(e)          -> smallest element  >= e
+    floor(e)            -> largest  element  <= e
+    higher(e)           -> smallest element  >  e   (strictly)
+    lower(e)            -> largest  element  <  e   (strictly)
+    pollFirst()         -> remove and return the smallest
+    pollLast()          -> remove and return the largest
+    descendingSet()     -> the set in reverse order
+    descendingIterator()
+    headSet(e, inclusive)
+    tailSet(e, inclusive)
+    subSet(a, aIncl, b, bIncl)
+
+REMEMBER : HashSet and LinkedHashSet have only group (A).
+           Only TreeSet has (B) and (C).
+
+
+----------------------------------------------------------------
+15. MAP HIERARCHY  (draw this too)
+----------------------------------------------------------------
+
+      Map ---------------------------> SortedMap
+       |                                   |
+    HashMap                           NavigableMap
+       |                                   |
+  LinkedHashMap                         TreeMap
+
+    Hashtable  (LEGACY class, separate branch)
+       |
+    Properties
+
+
+KEY DIFFERENCE FROM SET :
+Map does NOT extend Collection. So Map has to DEFINE its own
+methods : put, get, containsKey, containsValue, keySet,
+values, entrySet, getOrDefault, putIfAbsent, merge, compute.
+
+Relation to remember :
+
+    HashSet        <->   HashMap
+    LinkedHashSet  <->   LinkedHashMap
+    TreeSet        <->   TreeMap
+
+They are exactly the same pair - the Set is just the Map's key side.
+Even the CONSTRUCTORS of HashMap / LinkedHashMap are the same as
+HashSet (default capacity 16, load factor 0.75).
+
+    // Set<Integer> set = new HashSet<>();   // 16 size by default
+
+
+----------------------------------------------------------------
+16. OTHER MAP IMPLEMENTATIONS (know when to use which)
+----------------------------------------------------------------
+
+(1) Hashtable
+    - LEGACY class (very old, from Java 1.0).
+    - Thread safe, but every method is synchronized -> SLOW.
+    - Null key and null value are NOT allowed.
+    - Today we do NOT use it.
+
+(2) ConcurrentHashMap
+    - The MODERN thread-safe map. Use this instead of Hashtable.
+    - Locks only a part of the map, not the whole map -> fast.
+
+(3) Properties   (extends Hashtable)
+    - A SPECIALIZED map used for CONFIGURATION files.
+    - Both key and value are STRING only (text).
+    - Example of a .properties file :
+
+            username = admin
+            password = 123
+
+    - Used to read/write app settings.
+
+(4) WeakHashMap
+    - Rarely used. Keys are held by WEAK REFERENCE.
+    - If nobody else is using that key object, the Garbage
+      Collector removes the entry automatically.
+    - Use it when you want CACHE-like behaviour.
+
+(5) IdentityHashMap
+    - Normal HashMap is an EQUALITY based map -> uses equals().
+    - IdentityHashMap is a REFERENCE based map -> uses  ==
+    - So a and b are "equal" only if they point to the SAME object.
+                                                           
+            String a = new String("hi");
+            String b = new String("hi");
+            // HashMap         -> a and b are the same key
+            // IdentityHashMap -> a and b are DIFFERENT keys
+
+(6) EnumMap
+    - Keys must be ENUM constants only.
+    - No hashing at all - internally it is just an ARRAY
+      indexed by the enum's ordinal.
+    - Very FAST and MEMORY EFFICIENT.
+    - Null key is NOT allowed, null value IS allowed.
+    - Iteration is always in the enum's declaration order.
+
+                    
+----------------------------------------------------------------
+17. QUICK COMPARISON TABLE
 ----------------------------------------------------------------
 
   FEATURE          HashSet        LinkedHashSet     TreeSet
   ------------------------------------------------------------
   Internal         HashMap        LinkedHashMap     TreeMap
-  Structure        (buckets)      (buckets + DLL)   (Red-Black)
+  Structure        (buckets)      (buckets + DLL)   (Red-Black)                                  
   Order            No order       Insertion order   Sorted order
   Time             O(1) avg       O(1) avg          O(log n)
   Null allowed     Yes (one)      Yes (one)         No
@@ -314,7 +465,7 @@ Note : TreeSet does NOT allow null (it has to compare).
 
 
 ----------------------------------------------------------------
-14. SAMPLE CODE (Demo.java)
+18. SAMPLE CODE (Demo.java)
 ----------------------------------------------------------------
 
     Set<String> set = new HashSet<>();
@@ -335,7 +486,7 @@ Note : in a MAP duplicate VALUES are allowed (Abhishek twice),
 
 
 ----------------------------------------------------------------
-15. ONE LINE REVISION (write this at the end of your copy)
+19. ONE LINE REVISION (write this at the end of your copy)
 ----------------------------------------------------------------
 
   1. Set is internally a HashMap with a dummy PRESENT value.
@@ -348,5 +499,15 @@ Note : in a MAP duplicate VALUES are allowed (Abhishek twice),
   8. Linked list of size 8 -> converted to Red-Black Tree (Java 8).
   9. LinkedHashSet = hashing + doubly linked list (insertion order).
  10. TreeSet = Red-Black Tree, sorted, O(log n), range queries.
+ 11. Iterable -> Collection -> Set -> HashSet -> LinkedHashSet,
+     and Set -> SortedSet -> NavigableSet -> TreeSet.
+ 12. Set has no method of its own; TreeSet gets extra methods
+     from SortedSet + NavigableSet.
+ 13. Map does NOT extend Collection - it defines its own methods.
+ 14. Hashtable = legacy + slow; use ConcurrentHashMap for threads.
+ 15. Properties = String-only config map (username=admin).
+ 16. WeakHashMap = cache behaviour, GC removes unused keys.
+ 17. IdentityHashMap uses == , normal HashMap uses equals().
+ 18. EnumMap = array based, enum keys, fast, no null key.
 
 ================================================================
