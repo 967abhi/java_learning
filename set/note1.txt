@@ -1,0 +1,352 @@
+================================================================
+                JAVA SET  -  COMPLETE NOTES
+        (HashSet / LinkedHashSet / TreeSet - Internal Working)
+================================================================
+
+
+----------------------------------------------------------------
+1. BIG IDEA :  Set does NOT exist separately in Java
+----------------------------------------------------------------
+
+There is no separate data structure called "Set" inside Java.
+Whatever we write as a Set, internally Java converts it into a HashMap.
+
+    Set<Integer> set = new HashSet<>();
+
+Internally becomes:
+
+    private transient HashMap<Integer, Object> map = new HashMap<>();
+
+    -> Key   = the value we add in the set
+    -> Value = a dummy object (same object for everyone)
+
+The dummy object is:
+
+    private static final Object PRESENT = new Object();
+
+Why a dummy? Because a Set only needs KEYS. HashMap needs a value
+for every key, so Java puts the same useless object everywhere.
+
+
+----------------------------------------------------------------
+2. SET OPERATIONS -> MAP OPERATIONS
+----------------------------------------------------------------
+
+    SET CALL                 INTERNAL MAP CALL
+    ---------------------------------------------------
+    set.add(2)         ->    map.put(2, PRESENT)
+    set.contains(2)    ->    map.containsKey(2)
+    set.remove(2)      ->    map.remove(2)
+    set.size()         ->    map.size()
+
+CONCLUSION : In Java, Set and Map are the SAME thing internally.
+             Set = Map with only keys.
+
+
+----------------------------------------------------------------
+3. STORAGE MECHANISM (how a value is actually stored)
+----------------------------------------------------------------
+
+Steps:
+    1. key  ->  hashCode()            (convert key to a number)
+    2. index = hash % n               (n = current capacity / bucket count)
+    3. go to bucket[index] and store the node there
+    4. if that bucket already has data  ->  attach in a LINKED LIST
+       (new node is added at the END of the list)
+
+Node structure used inside HashMap :
+
+    class Node<K, V> {
+        K         key;
+        V         value;
+        int       hash;
+        Node<K,V> next;
+    }
+
+Picture:
+
+    bucket
+    [0] -> null
+    [1] -> ("Abhishek", PRESENT) -> ("Raj", PRESENT) -> null
+    [2] -> null
+    [3] -> ("Rohan", PRESENT) -> null
+    [4] -> null
+    [5] -> null
+
+
+----------------------------------------------------------------
+4. HOW add() IS IMPLEMENTED
+----------------------------------------------------------------
+
+    Set<String> s = new HashSet<>();
+    s.add("Abhishek");
+
+add() returns BOOLEAN :
+    true  -> value was new, it got added
+    false -> value already present, duplicate NOT allowed
+
+Actual code idea :
+
+    boolean add(K key) {
+        return map.put(key, PRESENT) == null;
+    }
+
+    // map.put() returns the OLD value.
+    // old value == null  -> key was not there     -> return true
+    // old value != null  -> key was already there -> return false
+
+Example:
+    s.add("Abhishek");   // true
+    s.add("Abhishek");   // false  (duplicate)
+
+
+----------------------------------------------------------------
+5. HOW put() WORKS  (the real logic)
+----------------------------------------------------------------
+
+    put(key, value) {
+        int i     = key.hashCode();
+        int index = i % n;              // n = capacity
+        ...
+    }
+
+Now two cases arise:
+
+CASE 1 : BUCKET IS EMPTY
+------------------------
+    bucket[index] = new Node("Abhishek", PRESENT, hash, null);
+    (next link = null)
+
+
+CASE 2 : BUCKET IS NOT EMPTY  (COLLISION)
+-----------------------------------------
+Two different keys can land on the same index:
+
+        hash1 % n  ==  hash2 % n      but      hash1 != hash2
+
+So we must travel the linked list of that bucket and compare properly.
+
+    Node temp = head;
+    while (temp != null) {
+        if (temp.hash == hash && temp.key.equals(key)) {
+            // 2.1 DUPLICATE KEY FOUND
+            // do NOT create a new node
+            // just update the value and return the OLD value
+            V old = temp.value;
+            temp.value = value;
+            return old;
+        }
+        temp = temp.next;
+    }
+    // 2.2 KEY NOT FOUND -> add a new node at the end
+    temp.next = new Node(key, value, hash, null);
+    return null;
+
+IMPORTANT : we check BOTH hash and equals(), not the reference.
+
+
+----------------------------------------------------------------
+6. HOW contains() WORKS
+----------------------------------------------------------------
+
+    set.contains("Abhishek");
+
+    boolean contains(K key) {
+        return map.containsKey(key);
+    }
+
+Inside the map :
+
+    int i     = key.hashCode();
+    int index = i % n;
+    go to bucket[index];
+    walk the linked list;
+    if (hash matches && equals() matches)  -> return true
+    else                                   -> return false
+
+Buckets array : [0, 1, 2, 3, 4, 5]
+
+
+----------------------------------------------------------------
+7. CONTRACT OF equals() AND hashCode()   (VERY IMPORTANT)
+----------------------------------------------------------------
+
+RULE :
+    If    k1.equals(k2) == true
+    Then  k1.hashCode() == k2.hashCode()   MUST also be true.
+
+REVERSE IS NOT TRUE :
+    If  k1.hashCode() == k2.hashCode()
+    It does NOT mean  k1.equals(k2)
+
+Example:
+    "Abhishek".hashCode() = 203
+    "Raj".hashCode()      = 203
+    -> same bucket, but they are DIFFERENT keys
+    -> this is called a COLLISION
+
+Also note : equals() compares VALUE, not reference.
+
+That is why whenever you override equals(), you MUST override
+hashCode() too. Otherwise Set / Map will break.
+
+
+----------------------------------------------------------------
+8. COLLISION HANDLING
+----------------------------------------------------------------
+
+Two known techniques :
+
+    (a) CHAINING  (Linked List)   <-- JAVA USES THIS
+        Store all colliding elements in a linked list at that bucket.
+
+    (b) OPEN ADDRESSING / LINEAR PROBING   <-- JAVA DOES NOT USE
+        If the index is already filled, keep moving to the next
+        empty index and put the value there.
+
+
+----------------------------------------------------------------
+9. LOAD FACTOR AND REHASHING
+----------------------------------------------------------------
+
+Problem : If the bucket size is small (say 5) and we store many
+values, every bucket becomes a long linked list -> searching
+becomes slow O(n).
+
+LOAD FACTOR = (number of elements) / (capacity)
+
+Default load factor in Java = 0.75
+
+RULE : When the array becomes more than 75% filled, do REHASHING.
+
+REHASHING STEPS :
+    1. Create a NEW array of DOUBLE the size.
+    2. Recalculate index for every old element:  hash % newCapacity
+    3. Place all the elements again in the new array.
+
+Result : elements spread out, linked list length becomes small again.
+(Same idea as a dynamic array growing.)
+
+Default initial capacity of HashMap / HashSet in Java = 16
+    16 -> 32 -> 64 -> 128 ...
+
+
+----------------------------------------------------------------
+10. TREEIFICATION  (Java 8 optimization)
+----------------------------------------------------------------
+
+Even after rehashing, one bucket can still get too long.
+
+RULE : If a single bucket's linked list length reaches 8,
+       Java converts that linked list into a BALANCED BST
+       (specifically a RED-BLACK TREE).
+
+Benefit :
+    Search inside that bucket :  O(n)  ->  O(log n)
+
+(It converts back to a linked list if the size shrinks again.)
+
+
+----------------------------------------------------------------
+11. LinkedHashSet
+----------------------------------------------------------------
+
+Problem with HashSet : it does NOT keep insertion order.
+
+LinkedHashSet : prints the elements in the SAME ORDER
+                in which we inserted them.
+
+HOW ? It uses a DOUBLY LINKED LIST on top of the hash table.
+
+Node structure :
+
+    class Node {
+        K    key;
+        V    value;
+        int  hash;
+        Node next;     // for the bucket chain
+        Node before;   // previous in insertion order
+        Node after;    // next in insertion order
+    }
+
+Use it when : you need hashing speed + insertion order.
+
+
+----------------------------------------------------------------
+12. TreeSet / TreeMap
+----------------------------------------------------------------
+
+Not based on hashing at all.
+
+Internally uses a SELF-BALANCING BST -> RED-BLACK TREE
+
+BST rule :
+    smaller value  ->  goes to LEFT
+    larger  value  ->  goes to RIGHT
+
+Time complexity : O(log n)  for add / remove / search
+(HashSet is O(1) average)
+
+What TreeSet gives you :
+    - keys always in SORTED order
+    - largest value   (last())
+    - smallest value  (first())
+    - RANGE QUERIES   (headSet, tailSet, subSet)
+
+For Strings : sorting is in LEXICOGRAPHIC order (dictionary order).
+
+Note : TreeSet does NOT allow null (it has to compare).
+       HashSet and LinkedHashSet allow one null.
+
+
+----------------------------------------------------------------
+13. QUICK COMPARISON TABLE
+----------------------------------------------------------------
+
+  FEATURE          HashSet        LinkedHashSet     TreeSet
+  ------------------------------------------------------------
+  Internal         HashMap        LinkedHashMap     TreeMap
+  Structure        (buckets)      (buckets + DLL)   (Red-Black)
+  Order            No order       Insertion order   Sorted order
+  Time             O(1) avg       O(1) avg          O(log n)
+  Null allowed     Yes (one)      Yes (one)         No
+  Duplicates       Not allowed    Not allowed       Not allowed
+
+
+----------------------------------------------------------------
+14. SAMPLE CODE (Demo.java)
+----------------------------------------------------------------
+
+    Set<String> set = new HashSet<>();
+    set.add("Abhishek");
+    set.add("Rohan");
+    set.add("Raj");
+    System.out.println(set.contains("Raj"));   // true
+
+    Map<Integer,String> mpp = new HashMap<>();
+    mpp.put(101, "Abhishek");
+    mpp.put(102, "Rohan");
+    mpp.put(103, "Abhishek");
+    System.out.println(mpp.containsKey(101));  // true
+    System.out.println(mpp.get(103));          // Abhishek
+
+Note : in a MAP duplicate VALUES are allowed (Abhishek twice),
+       only duplicate KEYS are not allowed.
+
+
+----------------------------------------------------------------
+15. ONE LINE REVISION (write this at the end of your copy)
+----------------------------------------------------------------
+
+  1. Set is internally a HashMap with a dummy PRESENT value.
+  2. add -> put , contains -> containsKey.
+  3. index = hashCode() % capacity.
+  4. Collision -> linked list in the same bucket (chaining).
+  5. equals() true  =>  hashCode() must be same. Reverse not true.
+  6. Load factor 0.75 -> rehash -> double the array size.
+  7. Default capacity = 16.
+  8. Linked list of size 8 -> converted to Red-Black Tree (Java 8).
+  9. LinkedHashSet = hashing + doubly linked list (insertion order).
+ 10. TreeSet = Red-Black Tree, sorted, O(log n), range queries.
+
+================================================================
