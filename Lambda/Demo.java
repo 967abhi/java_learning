@@ -6,13 +6,20 @@ public class Demo {
         list.add(new Student("abhishek",101,85));
         list.add(new Student("raj",102,86));
         list.add(new Student("rohan",103,88));
-        Comparator<Student>c1=new SortByName();
-        Comparator<Student>c2=new SortByMarks();
-        Comparator<Student>c3=new SortByRoll_No();
-        Collections.sort(list,c3);
-        for (Student s : list) {
-            System.out.println(s.name + " " + s.roll_no + " " + s.marks);
-        }        
+        // Comparator<Student>c1=new SortByName();
+        // Comparator<Student>c2=new SortByMarks();
+        // Comparator<Student>c3=new SortByRoll_No();
+        // Collections.sort(list,c3);
+        // for (Student s : list) {
+        //     System.out.println(s.name + " " + s.roll_no + " " + s.marks);
+        // }        
+
+        Collections.sort(list,(s1,s2)->s1.marks-s2.marks);
+         for (Student s : list) {
+             System.out.println(s.name + " " + s.roll_no + " " + s.marks);
+         }
+
+         
 
     }
 }
