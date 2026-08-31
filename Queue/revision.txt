@@ -1,0 +1,733 @@
+=========================================================
+      QUEUE, DEQUE AND STACK - DEEP REVISION NOTES
+  (expanded from Note.txt - same order, same topics,
+   with the diagrams that Note.txt asks for)
+=========================================================
+Note.txt is the raw brain-dump. This file is the cleaned up
+version of the SAME points, in the SAME sequence, with the
+code, the diagrams, the complexity and the corrections.
+
+Read Note.txt first, then this.
+
+
+---------------------------------------------------------
+0. WHAT A QUEUE IS  (the one line before anything else)
+---------------------------------------------------------
+QUEUE = FIFO = First In, First Out.
+The element that entered first is the one that leaves first.
+
+Real picture: a ticket line. New people join at the BACK,
+the person served is always at the FRONT.
+
+Two ends, two different jobs:
+    REAR  (tail / back)  -> where we ADD      -> enqueue / offer
+    FRONT (head)         -> where we REMOVE   -> dequeue / poll
+
+CORRECTION TO Note.txt
+    Note.txt says "the deletion happes lifo".
+    That is wrong - deletion in a QUEUE is FIFO.
+    LIFO is the STACK (section 4 below). Easy to mix up
+    because both are written with the same array + pointers.
+
+
+---------------------------------------------------------
+1. THE TWO WAYS TO IMPLEMENT A QUEUE
+---------------------------------------------------------
+Exactly what Note.txt says:
+
+    (a) using an ARRAY
+    (b) using a LINKED LIST
+
+Both give O(1) enqueue and O(1) dequeue.
+They differ in MEMORY LAYOUT, and that is the whole
+interview answer later in section 9.
+
+
+---------------------------------------------------------
+2. ARRAY IMPLEMENTATION
+---------------------------------------------------------
+Take an array of size N and two integer pointers:
+
+    int[] arr   = new int[N];
+    int front   = -1;      // nothing to point at yet
+    int rear    = -1;
+    int size    = 0;       // how many real elements
+
+-1 means EMPTY. Both start there.
+
+2.1  ADDING  (enqueue)
+---------------------------------------------------------
+    rear++  then  arr[rear] = value
+
+    start:        front = -1, rear = -1
+      index   0     1     2     3     4     5
+            [  ] [  ] [  ] [  ] [  ] [  ]
+
+    offer(10):    front = 0, rear = 0
+      index   0     1     2     3     4     5
+            [10 ] [  ] [  ] [  ] [  ] [  ]
+              ^
+            F,R
+
+    offer(20), offer(30):     front = 0, rear = 2
+      index   0     1     2     3     4     5
+            [10 ] [20 ] [30 ] [  ] [  ] [  ]
+              ^           ^
+              F           R
+
+    NOTE: on the very first add, FRONT also has to move from
+    -1 to 0. After that FRONT never moves on an add.
+
+
+2.2  REMOVING  (dequeue)
+---------------------------------------------------------
+    value = arr[front]  then  front++
+
+    Nothing is shifted. We do NOT slide the array left -
+    that would make every removal O(n). We just move FRONT.
+
+    poll() -> returns 10:      front = 1, rear = 2
+      index   0     1     2     3     4     5
+            [ x ] [20 ] [30 ] [  ] [  ] [  ]
+                    ^     ^
+                    F     R
+
+    Index 0 is now FREE SPACE, but it is stuck behind FRONT.
+
+
+2.3  THE PROBLEM WITH A PLAIN (LINEAR) ARRAY
+---------------------------------------------------------
+Keep adding until REAR hits the last index:
+
+      index   0     1     2     3     4     5
+            [ x ] [20 ] [30 ] [40 ] [50 ] [60 ]
+                    ^                       ^
+                    F                       R
+
+    rear == N-1, so a naive check says "QUEUE IS FULL".
+    But index 0 is empty. We are wasting slots.
+    This is called FALSE OVERFLOW.
+
+
+2.4  THE FIX - CIRCULAR ARRAY   <-- the point of Note.txt
+---------------------------------------------------------
+Let the pointers WRAP AROUND using modulo:
+
+    rear  = (rear  + 1) % N;      // on add
+    front = (front + 1) % N;      // on remove
+
+    offer(70) -> rear wraps from 5 back to 0:
+
+      index   0     1     2     3     4     5
+            [70 ] [20 ] [30 ] [40 ] [50 ] [60 ]
+              ^     ^
+              R     F
+
+    Drawn as an actual circle (this is the diagram Note.txt
+    asks for):
+
+                    [0] 70
+              [5]  /       \  [1] 20
+             60   |    -->   |  <- direction of travel
+              [4] \         / [2] 30
+                50   [3] 40
+
+    FRONT chases REAR around the ring, forever.
+
+
+2.5  FULL AND EMPTY - THE TWO CONDITIONS
+---------------------------------------------------------
+This is the exact line from Note.txt ("when ever the rear
+points next to the front ... then we get to know that the
+array is full"):
+
+    FULL  ->   (rear + 1) % N == front
+    EMPTY ->   front == -1        (or size == 0)
+
+WHY ONE SLOT IS SACRIFICED
+    With only front and rear, "all full" and "all empty"
+    would BOTH look like front == rear. So the classic
+    trick is to keep one slot always unused, and full
+    becomes (rear+1)%N == front.
+
+    The cleaner way (and what real code does): keep a
+    separate  int size  counter.
+        EMPTY -> size == 0
+        FULL  -> size == N
+    Then all N slots are usable.
+
+
+2.6  GROWING THE ARRAY
+---------------------------------------------------------
+Note.txt: "we can copy it and then we can make a new array
+of the array and copy all the element and we will give the
+rear and front some gap".
+
+    When full:
+      1. allocate a NEW array of double the size
+      2. copy elements IN QUEUE ORDER, walking from front
+         to rear WITH the modulo, not from index 0
+      3. reset  front = 0,  rear = size - 1
+
+    Step 2 is the part people get wrong. The old array is
+    wrapped, so a straight System.arraycopy gives you the
+    elements in the wrong order.
+
+        for (int i = 0; i < size; i++)
+            neu[i] = old[(front + i) % oldN];
+        front = 0;
+        rear  = size - 1;
+
+    Same idea as ArrayList growth - amortised O(1).
+
+
+2.7  COMPLEXITY (array queue)
+---------------------------------------------------------
+    enqueue / offer   O(1)      (amortised, because of resize)
+    dequeue / poll    O(1)
+    peek              O(1)
+    search            O(n)
+    space             O(N)      contiguous block
+
+
+---------------------------------------------------------
+3. LINKED LIST IMPLEMENTATION
+---------------------------------------------------------
+Note.txt writes the node as:
+
+    class node{ int data; node next; }
+
+Two fixes: class names start with a CAPITAL, and give it a
+constructor.
+
+    class Node {
+        int  data;
+        Node next;
+        Node(int data){ this.data = data; this.next = null; }
+    }
+
+Keep TWO references, exactly like the array kept two indexes:
+
+    Node front = null;   // remove from here
+    Node rear  = null;   // add here
+
+3.1  DIAGRAM
+---------------------------------------------------------
+    empty:            front = null,  rear = null
+
+    offer(10):        front and rear point at the SAME node
+                      (this is the case Note.txt describes)
+
+        front
+        rear
+          |
+        [10|/]
+
+    offer(20), offer(30):
+
+        front                          rear
+          |                              |
+        [10| ] --> [20| ] --> [30| / ]
+
+    poll() removes from the FRONT:
+
+               front                    rear
+                 |                        |
+        [10| ] --> [20| ] --> [30| / ]
+          ^
+        this node is now garbage - GC frees it
+
+
+3.2  THE CODE
+---------------------------------------------------------
+    void offer(int value){
+        Node temp = new Node(value);
+        if (rear == null) {          // queue was empty
+            front = rear = temp;     // both point at it
+        } else {
+            rear.next = temp;        // link it on
+            rear      = temp;        // rear moves forward
+        }
+        size++;
+    }
+
+    int poll(){
+        if (front == null) throw new NoSuchElementException();
+        int value = front.data;
+        front = front.next;          // front moves forward
+        if (front == null) rear = null;   // <- EDGE CASE
+        size--;
+        return value;
+    }
+
+    THE EDGE CASE THAT BREAKS PEOPLE
+        When the last element is removed, front becomes null
+        but REAR is still pointing at the freed node. If you
+        forget "if (front == null) rear = null;" the next
+        offer() links onto a node that is no longer in the
+        queue, and elements silently disappear.
+
+
+3.3  ARRAY vs LINKED LIST (the honest comparison)
+---------------------------------------------------------
+                    ARRAY QUEUE          LINKED LIST QUEUE
+  enqueue           O(1) amortised       O(1) always
+  dequeue           O(1)                 O(1)
+  resizing          yes - copy on full   never
+  memory per item   just the value       value + a reference
+  memory layout     CONTIGUOUS           SCATTERED on heap
+  cache behaviour   very good            poor (pointer chase)
+  wasted space      unused slots         per-node overhead
+  code              modulo arithmetic    null checks, edge cases
+
+  Note.txt says "the code is clean also" about the linked
+  list, and that is fair - no modulo, no resize. But see
+  section 9: the JDK still prefers the array.
+
+
+---------------------------------------------------------
+4. STACK  (Note.txt: "Now implement using stack")
+---------------------------------------------------------
+STACK = LIFO = Last In, First Out.
+One end only. Both push and pop happen at the TOP.
+
+    push(x)  ->  add at top
+    pop()    ->  remove from top
+    peek()   ->  look at top, do not remove
+
+4.1  ARRAY STACK
+---------------------------------------------------------
+    int[] arr = new int[N];
+    int   top = -1;                   // one pointer, not two
+
+    push:   arr[++top] = value;
+    pop:    return arr[top--];
+    empty:  top == -1
+    full:   top == N-1
+
+      push 10, 20, 30
+      index   0     1     2     3
+            [10 ] [20 ] [30 ] [  ]
+                          ^
+                         TOP
+
+      pop() -> 30, top drops to 1. The value is still
+      physically in the array, but it is unreachable.
+
+
+4.2  LINKED LIST STACK  (the code from Note.txt, corrected)
+---------------------------------------------------------
+Note.txt writes:
+
+        push(int i){
+            temp = new node(i,new);
+            temp.node = top;         <- two mistakes here
+            top = temp;
+        }
+
+    Corrected:
+
+        Node top = null;
+
+        void push(int value){
+            Node temp = new Node(value);
+            temp.next = top;         // FIELD is next, not node
+            top       = temp;        // new node becomes the top
+        }
+
+        int pop(){
+            if (top == null) throw new EmptyStackException();
+            int value = top.data;
+            top = top.next;
+            return value;
+        }
+
+    Diagram - new nodes go on the FRONT, so push is O(1)
+    with no traversal:
+
+        push(10)      top -> [10|/]
+        push(20)      top -> [20| ] -> [10|/]
+        push(30)      top -> [30| ] -> [20| ] -> [10|/]
+
+    Note.txt says java "inside it using the double linkedlist
+    only the top is denoting the new node".
+    Precisely: a singly linked list is enough for a stack -
+    you only ever touch one end. java.util.LinkedList is a
+    DOUBLY linked list because it also has to serve Deque
+    from BOTH ends (section 8).
+
+
+4.3  DO NOT USE java.util.Stack
+---------------------------------------------------------
+    - it is a LEGACY class (Java 1.0)
+    - it extends Vector, so EVERY method is synchronized ->
+      you pay for locking you never asked for
+    - because it extends Vector it also exposes get(index),
+      so someone can reach into the middle of your "stack"
+    - its iteration order is bottom-to-top, which surprises
+      everybody
+
+    Use ArrayDeque instead:
+
+        Deque<Integer> stack = new ArrayDeque<>();
+        stack.push(10);
+        stack.push(20);
+        stack.pop();          // 20
+
+
+---------------------------------------------------------
+5. HIERARCHY  (Note.txt: "Hireechy")
+---------------------------------------------------------
+Note.txt writes "Iterbale -> collection and the collection
+extends queue -> dequeue".
+
+Two corrections, both worth marks:
+
+  (a) DIRECTION. Collection does not extend Queue.
+      QUEUE extends COLLECTION. The child extends the parent.
+
+  (b) SPELLING, and it is not a typo that can be ignored:
+        DEQUE   = the interface (say "deck"),
+                  Double Ended QUEue
+        DEQUEUE = the OPERATION of removing from a queue
+      Writing "Dequeue interface" mixes up a type with an
+      operation. The interface is java.util.Deque.
+
+CORRECT TREE
+
+        Iterable            (interface)  - iterator()
+            |
+        Collection          (interface)  - add, remove, size...
+            |
+          Queue             (interface)  - offer, poll, peek
+            |
+          Deque             (interface)  - both ends
+         /      \
+    ArrayDeque   LinkedList     (both are CLASSES)
+
+    Also implementing Queue but NOT Deque:
+        PriorityQueue        (a heap - not FIFO, see section 10)
+
+    LinkedList is special: it implements List AND Deque,
+    which is why it can act as a list, a queue and a stack.
+
+
+5.1  QUEUE METHODS - THE TWO FAMILIES
+---------------------------------------------------------
+Every queue operation has two versions. Know both, this is
+a straight interview question.
+
+    OPERATION   THROWS ON FAILURE     RETURNS A VALUE INSTEAD
+    ------------------------------------------------------
+    insert      add(e)                offer(e)   -> false
+    remove      remove()              poll()     -> null
+    examine     element()             peek()     -> null
+
+    Rule of thumb: use offer/poll/peek. Exceptions for a
+    full or empty queue are not "exceptional".
+
+
+5.2  DEQUE METHODS - BOTH ENDS
+---------------------------------------------------------
+Note.txt lists offerfirst / offerlast / pollfirst. Full set:
+
+                    FIRST (head)      LAST (tail)
+    insert          offerFirst(e)     offerLast(e)
+                    addFirst(e)       addLast(e)
+    remove          pollFirst()       pollLast()
+                    removeFirst()     removeLast()
+    examine         peekFirst()       peekLast()
+                    getFirst()        getLast()
+
+    AS A QUEUE (FIFO):   offer = offerLast,  poll = pollFirst
+    AS A STACK (LIFO):   push  = offerFirst, pop  = pollFirst
+
+    That single table is why ONE class can be both.
+
+
+---------------------------------------------------------
+6. THE Deque INTERFACE AND ITS IMPLEMENTATIONS
+---------------------------------------------------------
+Note.txt: "either arraydequeue or linkedlist inside they
+both are using the dequeue implement".
+
+Correct and important: Deque is only an INTERFACE - a
+contract, no code. Two classes implement it:
+
+    ArrayDeque    -> backed by a resizable CIRCULAR ARRAY
+    LinkedList    -> backed by a DOUBLY LINKED LIST
+
+So the two implementations from sections 2 and 3 are exactly
+the two classes the JDK ships. Nothing new to learn - the
+array queue you drew IS ArrayDeque, the linked queue you
+drew IS LinkedList.
+
+
+---------------------------------------------------------
+7. ArrayDeque INTERNALS
+---------------------------------------------------------
+The teaching model in Note.txt (front and rear starting at
+-1, rear++ on every add) is the right MENTAL model. The real
+JDK code differs in three details worth knowing:
+
+    1. The two indexes are called HEAD and TAIL, and they
+       start at 0, not -1. Emptiness is head == tail.
+
+    2. The backing array length is ALWAYS A POWER OF TWO.
+       That lets the wrap-around use a bitmask instead of
+       modulo:
+             index = (index + 1) & (array.length - 1)
+       which is the same thing as % length but faster.
+       (Exactly the same trick HashMap uses for buckets.)
+
+    3. When full it DOUBLES the array and copies - same
+       amortised O(1) as section 2.6.
+
+    Growth: 16 -> 32 -> 64 -> 128 ... (default capacity 16)
+
+    So: circular array + power-of-two + doubling.
+    That is the whole class in one line.
+
+    NULL IS NOT ALLOWED. Reason, and it is a good answer:
+    poll() and peek() return null to mean "the deque is
+    empty". If null were a legal element you could never
+    tell "empty" from "the element stored here is null".
+
+
+---------------------------------------------------------
+8. LinkedList INTERNALS
+---------------------------------------------------------
+    java.util.LinkedList is a DOUBLY linked list:
+
+        class Node<E> {
+            E       item;
+            Node<E> next;
+            Node<E> prev;        // <- this is the "doubly"
+        }
+
+        first                              last
+          |                                  |
+     null<-[10]<->[20]<->[30]->null
+
+    It keeps a  first  and a  last  reference, so add and
+    remove at EITHER end are O(1) - which is exactly what
+    Deque needs. prev is what makes removeLast() O(1);
+    with a singly linked list you would have to walk the
+    whole list to find the second-to-last node.
+
+    Cost: every single element carries TWO extra references
+    plus the object header. For an Integer queue that is
+    more overhead than the data itself.
+
+    NULL IS ALLOWED here (it has no index-based "empty"
+    signal to confuse).
+
+
+---------------------------------------------------------
+9. WHICH ONE IS BETTER?   <-- the interview question
+---------------------------------------------------------
+Note.txt gets to the right answer: "the linkedlist is better
+to implementation by seeing but the javadocs say arraydequeue
+is best implementations because array is contiguous and cache
+friendly".
+
+Written out properly:
+
+  ON PAPER, LinkedList looks better
+      - O(1) at both ends with no resize ever
+      - no modulo, no wrap-around, no copy
+
+  IN PRACTICE, ArrayDeque wins, and the JDK says so
+      - an array is ONE CONTIGUOUS BLOCK of memory. The CPU
+        loads a whole cache line at a time, so walking it is
+        nearly free.
+      - a linked list scatters its nodes anywhere on the
+        heap. Every step is a POINTER CHASE and very likely
+        a CACHE MISS - the CPU stalls waiting for RAM.
+      - the occasional resize-and-copy costs far less than
+        millions of cache misses.
+      - fewer objects also means less GC pressure.
+
+  The javadoc line to remember:
+      "ArrayDeque is likely to be faster than Stack when
+       used as a stack, and faster than LinkedList when
+       used as a queue."
+
+  THE DECISION TABLE
+                                  use
+    plain FIFO queue          ->  ArrayDeque
+    stack (LIFO)              ->  ArrayDeque   (NOT Stack)
+    need to store nulls       ->  LinkedList
+    need List behaviour too
+    (get(i), ListIterator)    ->  LinkedList
+    thread safe queue         ->  ArrayDeque is NOT safe;
+                                  use ArrayBlockingQueue or
+                                  ConcurrentLinkedQueue
+
+  THE ONE TRADE-OFF TO STATE OUT LOUD
+      ArrayDeque does not accept null; LinkedList does.
+      That is the only real thing you give up.
+
+
+---------------------------------------------------------
+10. NOT IN Note.txt - THE OTHER Queue YOU WILL BE ASKED
+---------------------------------------------------------
+    PriorityQueue implements Queue but IS NOT FIFO.
+
+    - internally a BINARY HEAP stored in an array
+    - poll() always returns the SMALLEST element (natural
+      order), or whatever a supplied Comparator ranks first
+    - offer / poll are O(log n), peek is O(1)
+    - iteration order is the HEAP order, which looks random.
+      Only poll() comes out sorted.
+    - does not allow null, does not allow non-comparable
+      elements without a Comparator
+
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        pq.offer(30); pq.offer(10); pq.offer(20);
+        pq.poll();    // 10, not 30
+
+    Mentioned here because "name the implementations of
+    Queue" always expects ArrayDeque, LinkedList AND
+    PriorityQueue.
+
+
+---------------------------------------------------------
+11. INTERVIEW Q & A
+---------------------------------------------------------
+Q: Queue vs Stack?
+A: Queue is FIFO, two ends - add at rear, remove at front.
+   Stack is LIFO, one end - push and pop at the top.
+
+Q: Why a circular array for a queue?
+A: In a linear array, removing moves front forward and the
+   slots behind it become unusable, so the queue reports
+   full while space is free (false overflow). Wrapping with
+   % N reuses those slots.
+
+Q: How do you know a circular queue is full?
+A: (rear + 1) % N == front, if you sacrifice one slot.
+   Or keep a size counter and check size == N, which lets
+   you use all N slots.
+
+Q: Deque vs Queue?
+A: Queue adds at one end and removes at the other. Deque is
+   double-ended - insert and remove at BOTH ends, which is
+   how one class serves as both a queue and a stack.
+
+Q: ArrayDeque or LinkedList?
+A: ArrayDeque. Contiguous memory is cache friendly, while a
+   linked list pays a cache miss per node. The only reason
+   to pick LinkedList is null elements or List behaviour.
+
+Q: Why is java.util.Stack discouraged?
+A: Legacy class extending Vector - every method synchronized
+   (a cost you rarely need), and it inherits get(index),
+   which breaks the stack abstraction. Use ArrayDeque.
+
+Q: Why does ArrayDeque forbid null?
+A: poll() and peek() return null to signal emptiness. A null
+   element would make "empty" and "the value is null"
+   indistinguishable.
+
+Q: Time complexity of enqueue and dequeue?
+A: O(1) for both, in both implementations. The array version
+   is amortised O(1) because of the occasional resize.
+
+Q: Is ArrayDeque thread safe?
+A: No. For concurrency use ConcurrentLinkedQueue (unbounded,
+   lock free) or ArrayBlockingQueue / LinkedBlockingQueue
+   (bounded, blocking - the producer-consumer classic).
+
+
+---------------------------------------------------------
+12. MISTAKES IN THE FIRST VERSION (Note.txt)
+---------------------------------------------------------
+ 1. "the deletion happes lifo" - queue deletion is FIFO.
+    LIFO is the stack.
+ 2. "class node" - class names start with a capital: Node.
+    (Same mistake as "class outer" in NestedClasses and
+    "class school" in oops - it keeps coming back.)
+ 3. "temp.node = top" - the field is next, so it is
+    temp.next = top.
+ 4. "new node(i,new)" - "new" is a keyword, not an argument.
+    Node temp = new Node(i);
+ 5. "dequeue" used for the interface. The interface is
+    Deque; dequeue is the remove OPERATION.
+ 6. "the collection extends queue" - backwards. Queue
+    extends Collection.
+ 7. "arraydequeue" / "ArrayDequeu" - the class is ArrayDeque.
+ 8. The array section never mentions the wrap-around formula
+    itself - the whole trick is
+        rear = (rear + 1) % N.
+ 9. The linked list section misses the edge case: after
+    removing the last element, rear must be set to null too.
+10. Queue/Demo1.java declares an ArrayDeque and then does
+    nothing with it - no offer, no poll, no output.
+
+
+---------------------------------------------------------
+13. ONE LINE REVISION  (write this at the end of the copy)
+---------------------------------------------------------
+  1. Queue = FIFO. Add at REAR, remove at FRONT.
+  2. Two implementations: array and linked list. Both O(1).
+  3. Array: front = rear = -1 to start; add does rear++,
+     remove does front++ - nothing is ever shifted.
+  4. Linear array wastes the slots behind front = FALSE
+     OVERFLOW. Fix = CIRCULAR array, (rear+1) % N.
+  5. FULL  -> (rear + 1) % N == front.  EMPTY -> size == 0.
+  6. Full and want more? New array of double size, copy in
+     queue order with the modulo, reset front = 0.
+  7. Linked list: front and rear node references; on the
+     first add both point at the same node; on the last
+     remove, set rear = null as well.
+  8. Stack = LIFO, ONE pointer (top). push: temp.next = top,
+     top = temp.
+  9. Hierarchy: Iterable -> Collection -> Queue -> Deque.
+     The child extends the parent, not the other way round.
+ 10. DEQUE is the interface ("deck"); DEQUEUE is the remove
+     operation. Different words.
+ 11. Deque implementations: ArrayDeque and LinkedList.
+     Queue also has PriorityQueue (a heap, not FIFO).
+ 12. Two method families: add/remove/element THROW,
+     offer/poll/peek RETURN false/null. Prefer the second.
+ 13. As a queue: offer = offerLast, poll = pollFirst.
+     As a stack: push = offerFirst, pop = pollFirst.
+ 14. ArrayDeque = circular array, power-of-two capacity,
+     bitmask instead of modulo, doubles when full.
+ 15. LinkedList = doubly linked (prev + next), which is what
+     makes removeLast() O(1).
+ 16. ArrayDeque BEATS LinkedList - contiguous memory is
+     cache friendly, pointer chasing is not.
+ 17. ArrayDeque allows NO NULL (null means "empty").
+     LinkedList allows null.
+ 18. Never use java.util.Stack - legacy, extends Vector,
+     synchronized, leaks get(index). Use ArrayDeque.
+ 19. Nothing here is thread safe. For that:
+     ConcurrentLinkedQueue or the BlockingQueue family.
+ 20. PriorityQueue: binary heap, poll returns the smallest,
+     O(log n), iteration order is NOT sorted.
+
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - Queue/Demo1.java: actually use the ArrayDeque -
+    offer / poll / peek and print, as a queue and as a stack
+  - write MyArrayQueue by hand: circular array, the two
+    full/empty checks, and the resize-with-modulo copy
+  - write MyLinkedQueue by hand, and prove the rear = null
+    edge case by breaking it first
+  - write MyStack on a singly linked list (push/pop/peek)
+  - one PriorityQueue demo showing that iteration order and
+    poll order are different
+  - time ArrayDeque vs LinkedList on a million offer/poll
+    operations - see the cache argument for yourself
+
+RELATED
+  - set/note1.txt      - the same power-of-two + bitmask
+                         trick, used for HashMap buckets
+  - List/              - ArrayList growth is the same
+                         resize-and-copy idea as section 2.6
+  - Interable/         - Deque is Iterable, so for-each and
+                         the CME rules apply here too

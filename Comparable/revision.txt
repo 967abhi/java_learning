@@ -1,0 +1,714 @@
+=========================================================
+      COMPARABLE AND COMPARATOR - DEEP REVISION NOTES
+   (expanded from note.txt + Demo.java - same order,
+    same points, with the code and the corrections)
+=========================================================
+note.txt is the raw idea. Demo.java is the working proof.
+This file is the two of them cleaned up and taken further.
+
+Read note.txt, run Demo.java, then read this.
+
+
+---------------------------------------------------------
+1. THE PROBLEM  (exactly where note.txt starts)
+---------------------------------------------------------
+Java already knows how to order some things:
+
+    List<Integer> list1 = new ArrayList<>();
+    list1.add(2); list1.add(1);
+    Collections.sort(list1);          // works, no complaint
+
+    Strings sort LEXICOGRAPHICALLY (dictionary order), and
+    Integer / Double / Character / LocalDate all have a
+    built-in order too.
+
+Now write your own class:
+
+    class Student {
+        int    marks;
+        String name;
+    }
+
+    Student s1 = new Student(109, "Abhishek");
+    Student s2 = new Student(108, "Raj");
+
+    Collections.sort(list);           // <-- Java is stuck
+
+WHY IS JAVA STUCK
+    It has two Student objects and NO RULE. Should it order
+    them by marks? by name? by name length? Java cannot
+    guess, and it will not guess. There is nothing wrong
+    with the objects - the ORDER simply has not been
+    defined anywhere.
+
+    This is the exact line from note.txt: "so know the java
+    will go the confussions when we compare the both above
+    object".
+
+WHAT ACTUALLY HAPPENS
+    Collections.sort(list) on a List<Student> that does not
+    implement Comparable is a COMPILE ERROR:
+
+        no suitable method found for sort(List<Student>)
+        ... inference variable T has incompatible bounds
+            upper bounds: Comparable<? super T>
+
+    The signature is
+
+        static <T extends Comparable<? super T>> void sort(List<T> list)
+
+    Read it in plain English: "I will only sort a list of T
+    if T knows how to compare itself." Student does not, so
+    the compiler refuses before the program ever runs.
+
+
+---------------------------------------------------------
+2. THE SECOND PLACE IT HURTS - TreeSet / TreeMap
+---------------------------------------------------------
+note.txt: "we are not able to store the value of treeset
+because internally it uses the bst and then we know the bst
+compare the value".
+
+    Correct, and worth saying precisely:
+
+    TreeSet is backed by TreeMap, and TreeMap is a
+    RED-BLACK TREE. To place a node the tree must ask
+    "is this smaller or larger than that?" - so ordering
+    is not optional for it, the way it is for a HashSet.
+
+    Set<Student> ts = new TreeSet<>();
+    ts.add(s1);                       // ClassCastException
+
+    ClassCastException: class Student cannot be cast to
+    class java.lang.Comparable
+
+    NOTE THE DIFFERENCE FROM SECTION 1
+        Collections.sort  -> COMPILE time error
+        TreeSet.add       -> RUNTIME error
+
+    Why runtime? Because TreeSet's type parameter has no
+    "extends Comparable" bound - a TreeSet can also be
+    built with a Comparator, so the compiler cannot know.
+    It fails on the FIRST add: TreeMap.put does
+    compare(key, key) on an empty tree purely as a type
+    and null check.
+
+    HashSet does not care at all - it only needs hashCode()
+    and equals(), never an order. That is the cleanest way
+    to remember the difference between the two sets.
+
+
+---------------------------------------------------------
+3. THE FIX - Comparable
+---------------------------------------------------------
+note.txt gets the contract sentence exactly right:
+
+    "I know how to compare myself with another object of
+     my same type"
+
+That is Comparable. The class itself carries the rule.
+
+THE REAL INTERFACE (note.txt sketches it, with 2 slips)
+
+    note.txt wrote:
+        interface comparable <T>{ int comparable(T,o); }
+
+    The actual JDK declaration:
+
+        package java.lang;
+
+        public interface Comparable<T> {
+            int compareTo(T o);
+        }
+
+    Corrections:
+      a) capital C - Comparable, not comparable
+      b) the METHOD is compareTo, not comparable. The
+         interface and the method have different names.
+      c) "(T,o)" is one parameter written wrong. It is
+         (T o) - type T, variable named o.
+
+    It lives in java.lang, so no import is needed.
+
+FUNCTIONAL INTERFACE - note.txt spots this itself
+    "if the interface is only one method then we called a
+     functional Interfaces"
+
+    True: Comparable has exactly one abstract method.
+    But a caution worth carrying:
+
+    Comparable is NOT normally used as a lambda, because
+    the method compares "me" to "the other" - it needs an
+    instance to be the "me". You implement it on the class.
+
+    COMPARATOR (section 7) is the one you write as a
+    lambda, because compare(a, b) takes both objects as
+    parameters and needs no instance of its own.
+
+    So: both are functional interfaces; only one of them is
+    convenient as a lambda. That is a good thing to say out
+    loud, because it shows you know WHY, not just WHAT.
+
+
+---------------------------------------------------------
+4. THE WORKING CODE  (Demo.java, walked through)
+---------------------------------------------------------
+    class Student implements Comparable<Student> {
+        String name;
+        int    marks;
+
+        Student(String name, int marks){
+            this.name  = name;
+            this.marks = marks;
+        }
+
+        @Override
+        public int compareTo(Student other){
+            return Integer.compare(this.marks, other.marks);
+        }
+    }
+
+    List<Student> list = new ArrayList<>();
+    list.add(new Student("abhishe", 85));
+    list.add(new Student("raj",     95));
+    list.add(new Student("Rohan",   85));
+
+    Collections.sort(list);           // now it compiles AND runs
+
+    for (Student s : list)
+        System.out.println(s.name + " " + s.marks);
+
+    OUTPUT
+        abhishe 85
+        Rohan   85
+        raj     95
+
+    Note that "abhishe" stays ahead of "Rohan" - both have
+    85, and the sort did not reorder them. That is
+    STABILITY, and it is section 8.
+
+WHY THE for LOOP AND NOT println(list)
+    Demo.java has "System.out.println(list)" commented out.
+    Uncomment it and you get
+
+        [Comparable.Student@1b6d3586, Comparable.Student@4554617c, ...]
+
+    because Student never overrode toString(). Object's
+    default is ClassName@hexHashCode. Adding
+
+        @Override public String toString(){
+            return name + " " + marks;
+        }
+
+    makes println(list) print properly and is worth doing -
+    it is the same Object-class contract as equals/hashCode.
+
+
+---------------------------------------------------------
+5. THE RETURN VALUE - THE PART TO GET EXACTLY RIGHT
+---------------------------------------------------------
+Demo.java ends with three comment lines that are half
+written:
+
+        //this.marks-other,amrks
+        //<0:this.marks,other.marks
+        //>0:this.marks,other.marks
+
+Completed, this is the whole contract:
+
+    a.compareTo(b)  returns
+
+        NEGATIVE   ->  a comes BEFORE b   (a is "smaller")
+        ZERO       ->  a and b are EQUAL in this ordering
+        POSITIVE   ->  a comes AFTER  b   (a is "bigger")
+
+    The exact number does not matter. -1 and -9999 mean the
+    same thing. Only the SIGN is read.
+
+    Memory hook: read a.compareTo(b) as "a MINUS b".
+    Same sign as the subtraction would give.
+
+        s1.compareTo(s2) < 0   =>  s1 sorts first
+        ascending order is the DEFAULT everywhere in Java
+
+THE THREE RULES THE JDK REQUIRES
+    1. ANTISYMMETRIC
+           sgn(a.compareTo(b)) == -sgn(b.compareTo(a))
+    2. TRANSITIVE
+           a > b and b > c  =>  a > c
+    3. CONSISTENT
+           a.compareTo(b) == 0  =>  a and c compare the
+           same way against every other c
+
+    Break any of these and sorting does not just give a
+    wrong order - it can throw (section 9).
+
+    NEVER RETURN A BOOLEAN-STYLE 0/1
+        return this.marks > other.marks ? 1 : 0;   // WRONG
+    That is not antisymmetric: comparing b to a also gives
+    0, so the sort has no idea they are different.
+
+
+---------------------------------------------------------
+6. THE SUBTRACTION TRAP
+---------------------------------------------------------
+Demo.java uses:
+
+        return this.marks - other.marks;
+
+This is CORRECT FOR MARKS and a BAD HABIT in general.
+
+    Marks are 0..100, so the subtraction can never overflow
+    and the code is fine in this file.
+
+    But int subtraction wraps around:
+
+        int a = 2000000000, b = -2000000000;
+        a - b   ==  4000000000   -> overflows int
+                ->  actually -294967296  (NEGATIVE!)
+
+        So a.compareTo(b) says "a comes first" when a is
+        clearly the larger number. The sort produces
+        garbage, silently, with no exception.
+
+    THE SAFE FORM - always:
+
+        return Integer.compare(this.marks, other.marks);
+
+    Same for Long.compare, Double.compare, Boolean.compare.
+
+    Double is worse than int: subtraction of doubles also
+    mishandles -0.0 and NaN. Double.compare handles both.
+
+    RULE: use X.compare(a, b). Never subtract. The only
+    reason subtraction is still seen everywhere is that it
+    predates Integer.compare (added in Java 7).
+
+
+---------------------------------------------------------
+7. THE OTHER HALF - Comparator
+---------------------------------------------------------
+Comparable answers "what is the ONE natural order for this
+class". That is a strong statement, and it has limits:
+
+    - a class can only have ONE compareTo
+    - you must be able to EDIT the class - useless for
+      String, Integer, or any library type
+    - sorting Students by marks today and by name tomorrow
+      cannot both be "natural"
+
+COMPARATOR is the answer: an ordering as a SEPARATE OBJECT.
+
+    package java.util;
+
+    public interface Comparator<T> {
+        int compare(T a, T b);          // two parameters
+    }
+
+    Also one abstract method -> also a functional interface,
+    and this one IS written as a lambda constantly.
+
+    // the same three shapes, oldest to newest
+    Collections.sort(list, new Comparator<Student>(){
+        public int compare(Student a, Student b){
+            return Integer.compare(a.marks, b.marks);
+        }
+    });
+
+    list.sort((a, b) -> Integer.compare(a.marks, b.marks));
+
+    list.sort(Comparator.comparingInt(s -> s.marks));
+
+THE BUILDER METHODS - learn these five, they are asked
+    Comparator.comparing(Student::getName)
+    Comparator.comparingInt(Student::getMarks)   // no boxing
+    .thenComparing(...)        // tie-breaker
+    .reversed()                // flip the whole thing
+    Comparator.nullsFirst(cmp) // tolerate null elements
+
+    // marks descending, then name ascending as tie-break
+    list.sort(Comparator.comparingInt(Student::getMarks)
+                        .reversed()
+                        .thenComparing(Student::getName));
+
+    ORDER OF CALLS MATTERS
+        cmp.reversed().thenComparing(x)   reverses only cmp
+        cmp.thenComparing(x).reversed()   reverses BOTH
+    Read it left to right: each call wraps everything so far.
+
+USING A COMPARATOR WITH A TREE
+    TreeSet<Student> ts =
+        new TreeSet<>(Comparator.comparingInt(s -> s.marks));
+
+    Now Student does not need Comparable at all - the tree
+    was handed its own rule. This is exactly why TreeSet
+    cannot enforce Comparable at compile time (section 2).
+
+
+---------------------------------------------------------
+8. COMPARABLE vs COMPARATOR - THE TABLE
+---------------------------------------------------------
+                    COMPARABLE          COMPARATOR
+  package           java.lang           java.util
+  method            compareTo(T o)      compare(T a, T b)
+  parameters        one (the other)     two
+  lives             INSIDE the class    OUTSIDE it
+  how many          exactly ONE         as many as you want
+  edits the class   yes                 no
+  works on          your own classes    ANY class, incl.
+                                        String, Integer,
+                                        library types
+  called "the"      natural ordering    a custom ordering
+  used by           sort(list)          sort(list, cmp)
+                    TreeSet<>()         TreeSet<>(cmp)
+                    TreeMap<>()         TreeMap<>(cmp)
+                    binarySearch        max/min with cmp
+  lambda-friendly   not really          yes, always
+
+  IF BOTH ARE PRESENT, the Comparator WINS. Passing a
+  comparator explicitly overrides the natural ordering,
+  every time.
+
+  WHICH DO I WRITE?
+      Is there one obviously correct order that is part of
+      what this type IS?  (money by amount, date by time)
+          -> Comparable
+      Is this just one of several ways a caller might want
+      to view the data?
+          -> Comparator
+
+
+---------------------------------------------------------
+9. STABILITY, AND THE ALGORITHM UNDERNEATH
+---------------------------------------------------------
+In Demo.java, "abhishe" (85) and "Rohan" (85) tie. Which
+one comes first in the output?
+
+    The one that was inserted first. Java's object sort is
+    STABLE: equal elements keep their original relative
+    order.
+
+WHAT ACTUALLY RUNS
+    Collections.sort(list)  ->  list.sort(null)
+                            ->  Arrays.sort(array, cmp)
+                            ->  TimSort
+
+    TimSort = an adaptive MERGE sort. It finds runs that
+    are already ordered and merges them, so nearly-sorted
+    data is close to O(n). Worst case O(n log n), stable,
+    needs O(n) extra space.
+
+    PRIMITIVE arrays are different:
+        Arrays.sort(int[])  ->  dual-pivot QUICKSORT
+        faster, NOT stable - and stability is meaningless
+        for primitives, since equal ints are identical.
+
+    So: Arrays.sort(Integer[]) and Arrays.sort(int[]) run
+    two different algorithms with different guarantees.
+    That is a real interview question.
+
+WHY STABILITY IS USEFUL
+    It lets you sort in PASSES. Sort by name, then sort by
+    marks - and inside each mark group the names are still
+    in order. thenComparing() does it in one pass, but the
+    two-pass version only works because the sort is stable.
+
+THE ERROR YOU WILL EVENTUALLY SEE
+        java.lang.IllegalArgumentException:
+        Comparison method violates its general contract!
+
+    Thrown since Java 7 when TimSort detects that the
+    comparator contradicted itself while merging.
+
+    Causes, in order of likelihood:
+      1. subtraction overflow (section 6)
+      2. a comparator returning only 0 and 1
+      3. comparing on a field that CHANGES during the sort
+      4. NaN, or an inconsistent nulls policy
+
+    Note it usually appears only on LARGE inputs - TimSort
+    does not merge real runs on small arrays, so the bug
+    hides in unit tests and shows up in production.
+
+
+---------------------------------------------------------
+10. compareTo AND equals MUST AGREE
+---------------------------------------------------------
+This is the deepest point in the whole topic, and Demo.java
+walks straight into it.
+
+    compareTo returns 0 only on marks.
+    Student never overrides equals().
+
+So for the two 85-mark students:
+
+    a.compareTo(b) == 0        ->  "equal" to a TREE
+    a.equals(b)    == false    ->  "different" to a HASH
+
+RESULT - the same two objects, two different answers:
+
+    Set<Student> hs = new HashSet<>(list);
+    hs.size();      // 3   - equals() says all distinct
+
+    Set<Student> ts = new TreeSet<>(list);
+    ts.size();      // 2   - compareTo says 85 == 85,
+                    //       so Rohan is silently DROPPED
+
+    A TreeSet/TreeMap decides duplicates using compareTo
+    ONLY. It never calls equals(). Data disappears with no
+    error at all.
+
+THE RULE
+    "It is strongly recommended, though not required, that
+     (x.compareTo(y) == 0) == x.equals(y)."
+                                       - the javadoc
+
+    Not required, so it compiles either way. But a class
+    whose ordering disagrees with its equality is a set of
+    bugs waiting for a TreeSet.
+
+    BigDecimal is the famous JDK example that breaks it:
+        new BigDecimal("1.0").equals(new BigDecimal("1.00"))
+            -> false   (different scale)
+        new BigDecimal("1.0").compareTo(new BigDecimal("1.00"))
+            -> 0       (same value)
+    So a HashSet keeps both and a TreeSet keeps one.
+
+FIX FOR Student
+    Compare on marks AND name, and override equals/hashCode
+    on the same two fields:
+
+        @Override
+        public int compareTo(Student other){
+            int byMarks = Integer.compare(marks, other.marks);
+            return byMarks != 0 ? byMarks
+                                : name.compareTo(other.name);
+        }
+
+        @Override
+        public boolean equals(Object o){
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Student s = (Student) o;
+            return marks == s.marks && Objects.equals(name, s.name);
+        }
+
+        @Override
+        public int hashCode(){ return Objects.hash(name, marks); }
+
+    Same fields in all three methods. That is the whole
+    discipline.
+
+
+---------------------------------------------------------
+11. STRING ORDERING - THE DETAIL BEHIND "LEXICOGRAPHIC"
+---------------------------------------------------------
+note.txt opens with lexicographic comparison. Worth being
+precise, because Demo.java has a case-mixed list.
+
+    "abhishe", "raj", "Rohan"  sorted by NAME gives:
+
+        Rohan, abhishe, raj
+
+    Not what most people expect. String.compareTo compares
+    CHAR CODES, and every uppercase letter is lower than
+    every lowercase one:
+
+        'A' = 65 ... 'Z' = 90
+        'a' = 97 ... 'z' = 122
+
+    So ALL capitals sort before ALL lowercase.
+
+    How compareTo works: walk both strings together, return
+    the first difference (c1 - c2). If one string runs out,
+    return the length difference.
+
+        "abc".compareTo("abd")   ->  'c'-'d'  =  -1
+        "abc".compareTo("ab")    ->  3 - 2    =   1
+
+    CASE-INSENSITIVE ordering:
+        list.sort(String.CASE_INSENSITIVE_ORDER);
+        list.sort(Comparator.comparing(Student::getName,
+                                       String.CASE_INSENSITIVE_ORDER));
+
+    REAL human-language ordering needs java.text.Collator -
+    char codes are wrong for accents and non-English text.
+
+
+---------------------------------------------------------
+12. INTERVIEW Q & A
+---------------------------------------------------------
+Q: Comparable vs Comparator?
+A: Comparable is the type's single natural ordering, written
+   inside the class as compareTo(T). Comparator is an
+   external ordering object with compare(T,T); you can have
+   many, and it works on classes you cannot modify. If both
+   exist, the comparator passed to sort wins.
+
+Q: What does compareTo return?
+A: Negative if this comes first, zero if equal in this
+   ordering, positive if this comes after. Only the sign is
+   read, never the magnitude.
+
+Q: Why does Collections.sort fail on my class?
+A: The signature is <T extends Comparable<? super T>>, so
+   the element type must implement Comparable. Without it
+   the call does not compile. Either implement Comparable
+   or pass a Comparator.
+
+Q: Why does TreeSet throw ClassCastException but HashSet
+   does not?
+A: TreeSet is a red-black tree - it must compare to place a
+   node, so it casts the element to Comparable on the first
+   add. HashSet only needs hashCode() and equals(), so
+   ordering never comes up.
+
+Q: Why is TreeSet a runtime error and sort a compile error?
+A: TreeSet can also be constructed with a Comparator, so
+   its type parameter carries no Comparable bound and the
+   compiler cannot check it.
+
+Q: What is wrong with "return a.marks - b.marks"?
+A: Int overflow. For large or negative values the
+   subtraction wraps and the sign flips, so the order comes
+   out wrong with no exception. Use Integer.compare.
+
+Q: Must compareTo be consistent with equals?
+A: Strongly recommended, not enforced. If it is not, a
+   TreeSet and a HashSet built from the same list will
+   disagree on duplicates - the tree uses compareTo only
+   and will silently drop elements. BigDecimal is the JDK's
+   own example of the inconsistency.
+
+Q: Is Java's sort stable?
+A: For objects, yes - TimSort, a stable adaptive merge
+   sort. For primitive arrays, no - dual-pivot quicksort.
+   Stability is what makes thenComparing and multi-pass
+   sorting work.
+
+Q: When does "Comparison method violates its general
+   contract" appear?
+A: When TimSort detects a comparator that contradicts
+   itself while merging - usually overflow, a 0/1 return,
+   or a field that changed mid-sort. It typically only
+   fires on large inputs.
+
+Q: Is Comparable a functional interface?
+A: Yes, one abstract method. But it is rarely used as a
+   lambda, because compareTo compares THIS to another, so
+   it needs an instance. Comparator takes both objects as
+   parameters, which is why that one is written as a
+   lambda everywhere.
+
+Q: How do I sort by two fields?
+A: Comparator.comparingInt(Student::getMarks)
+              .thenComparing(Student::getName)
+   or, inside compareTo, compare the first field and only
+   fall through to the second when it returns 0.
+
+
+---------------------------------------------------------
+13. MISTAKES IN THE FIRST VERSION (note.txt / Demo.java)
+---------------------------------------------------------
+ 1. "interface comparable<T>" - capital C: Comparable.
+ 2. "int comparable(T,o)" - the METHOD is compareTo, and
+    the parameter is written (T o), not (T,o). Interface
+    name and method name are different.
+ 3. "Class Student" / "string name" - class names are
+    capitalised, type names are String and int. Java is
+    case sensitive; "Class" and "string" do not compile.
+ 4. "this.marks - other.marks" - correct for marks,
+    overflows in general. Integer.compare is the habit.
+ 5. The trailing comments are half written. Completed:
+        < 0  ->  this comes BEFORE other
+        = 0  ->  equal in this ordering
+        > 0  ->  this comes AFTER  other
+ 6. Student has no toString(), so the commented-out
+    println(list) would print Student@1b6d3586.
+ 7. Student has no equals()/hashCode(), so compareTo and
+    equals disagree - a TreeSet built from this list
+    silently loses one of the two 85s.
+ 8. Fields name and marks are package-private with no
+    getters - fine for a demo file, but the encapsulation
+    card says private + accessor.
+ 9. Spelling in the data: "abhishe" is missing its k. Also
+    worth noticing that "Rohan" is the only capitalised
+    name, which is exactly what makes the name-ordering
+    example in section 11 surprising.
+10. note.txt says the TreeSet problem and the sort problem
+    are the same problem. They are the same CAUSE but not
+    the same SYMPTOM - one fails at compile time, the other
+    at runtime.
+
+
+---------------------------------------------------------
+14. ONE LINE REVISION
+---------------------------------------------------------
+  1. Java can order String and the wrappers; it cannot
+     guess an order for YOUR class.
+  2. Collections.sort on a non-Comparable type is a
+     COMPILE error. TreeSet.add is a RUNTIME
+     ClassCastException. HashSet does not care.
+  3. Comparable is in java.lang: int compareTo(T o).
+     One method, one natural ordering, inside the class.
+  4. Comparator is in java.util: int compare(T a, T b).
+     Many orderings, outside the class, works on any type.
+  5. Both are functional interfaces; Comparator is the one
+     you write as a lambda.
+  6. Return NEGATIVE / ZERO / POSITIVE. Only the sign
+     matters. Read a.compareTo(b) as "a minus b".
+  7. Ascending is the default everywhere in Java.
+  8. Never subtract - Integer.compare / Double.compare.
+     Subtraction overflows and flips the sign.
+  9. Never return only 0 and 1 - that is not antisymmetric.
+ 10. compareTo must be antisymmetric, transitive and
+     consistent, or sort can throw.
+ 11. If both are present, the Comparator passed to sort
+     BEATS the natural ordering.
+ 12. comparing / comparingInt / thenComparing / reversed /
+     nullsFirst - the five builder methods to know.
+ 13. reversed() applies to everything chained before it -
+     read the chain left to right.
+ 14. Object sort = TimSort: stable, adaptive, O(n log n).
+     Primitive sort = dual-pivot quicksort: not stable.
+ 15. Stability is why equal elements keep their insertion
+     order, and why multi-pass sorting works.
+ 16. TreeSet/TreeMap decide duplicates with compareTo ONLY
+     - they never call equals().
+ 17. So compareTo should agree with equals, or a TreeSet
+     silently drops elements a HashSet keeps.
+ 18. BigDecimal is the JDK's own example of that
+     inconsistency: equals says no, compareTo says yes.
+ 19. String.compareTo compares char codes, so ALL
+     uppercase sorts before ALL lowercase.
+ 20. "Comparison method violates its general contract" =
+     a broken comparator, usually overflow, usually only
+     visible on large input.
+
+
+---------------------------------------------------------
+TO DO NEXT IN THIS FOLDER
+---------------------------------------------------------
+  - add toString(), equals() and hashCode() to Student and
+    print the list directly
+  - build the same list into a HashSet and a TreeSet and
+    print both sizes - watch one 85 disappear
+  - sort by name and see Rohan land first; then fix it with
+    String.CASE_INSENSITIVE_ORDER
+  - write a second ordering as a Comparator WITHOUT
+    touching Student, to prove the difference
+  - chain comparingInt(marks).reversed().thenComparing(name)
+  - deliberately write "return (int)(bigA - bigB)" with two
+    huge ints and watch the sort come out wrong
+  - build a TreeSet<Student> with a comparator and confirm
+    Comparable is not needed at all
+
+RELATED
+  - set/note1.txt   - TreeSet/TreeMap are red-black trees;
+                      that is WHY they need an ordering
+  - ObjectClass/    - equals/hashCode; section 10 is the
+                      point where the two topics meet
+  - Interable/      - sorting a list you are iterating is a
+                      structural modification -> CME
+  - Queue/          - PriorityQueue orders with the same
+                      Comparable/Comparator pair
