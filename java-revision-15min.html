@@ -1,0 +1,1048 @@
+<title>Fifteen Minute Java Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+:root{
+  --paper:#EBEEF3;
+  --surface:#FFFFFF;
+  --surface-2:#F4F6FA;
+  --ink:#141B28;
+  --ink-soft:#4C586B;
+  --ink-faint:#7B8698;
+  --rule:#D3DAE5;
+  --rule-strong:#B9C3D2;
+  --accent:#B26A00;
+  --accent-bright:#E09A2B;
+  --accent-wash:#FAEFDC;
+  --alert:#A9331F;
+  --alert-wash:#F9E7E3;
+  --navy:#1B3055;
+  --grid:rgba(27,48,85,.08);
+  --shadow:0 1px 2px rgba(20,27,40,.06),0 8px 24px -12px rgba(20,27,40,.18);
+
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D131E;
+    --surface:#141C2A;
+    --surface-2:#1A2333;
+    --ink:#DFE6F2;
+    --ink-soft:#9DAABE;
+    --ink-faint:#6E7C93;
+    --rule:#273145;
+    --rule-strong:#3A465E;
+    --accent:#F0B429;
+    --accent-bright:#F5C453;
+    --accent-wash:#2C2312;
+    --alert:#E8917C;
+    --alert-wash:#331F1A;
+    --navy:#9FB6DC;
+    --grid:rgba(159,182,220,.08);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D131E;
+  --surface:#141C2A;
+  --surface-2:#1A2333;
+  --ink:#DFE6F2;
+  --ink-soft:#9DAABE;
+  --ink-faint:#6E7C93;
+  --rule:#273145;
+  --rule-strong:#3A465E;
+  --accent:#F0B429;
+  --accent-bright:#F5C453;
+  --accent-wash:#2C2312;
+  --alert:#E8917C;
+  --alert-wash:#331F1A;
+  --navy:#9FB6DC;
+  --grid:rgba(159,182,220,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0}
+code,kbd{font-family:var(--f-mono);font-size:.86em}
+a{color:var(--accent);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent-bright);outline-offset:3px;border-radius:3px}
+
+/* ---------- drill bar ---------- */
+.bar{
+  position:sticky;top:0;z-index:40;
+  background:var(--surface);
+  border-bottom:1px solid var(--rule);
+  box-shadow:var(--shadow);
+}
+.bar-in{
+  max-width:1220px;margin:0 auto;padding:10px 22px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.brand{font-family:var(--f-display);font-weight:800;font-size:14px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink)}
+.brand span{color:var(--accent)}
+.clock{
+  font-family:var(--f-mono);font-weight:700;font-size:30px;line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  color:var(--ink);padding:2px 0;
+}
+.clock.run{color:var(--accent)}
+.clock.done{color:var(--alert)}
+.btn{
+  font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--ink);color:var(--paper);border:1px solid var(--ink);
+  padding:8px 15px;border-radius:2px;cursor:pointer;transition:transform .12s ease,opacity .12s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--rule-strong)}
+.bar-pace{margin-left:auto;text-align:right;font-family:var(--f-display);font-size:12px;color:var(--ink-faint);line-height:1.4}
+.bar-pace b{display:block;font-size:13px;color:var(--ink);font-weight:700}
+.track{height:3px;background:var(--rule);position:relative}
+.track i{display:block;height:100%;width:0%;background:var(--accent);transition:width .5s linear}
+
+/* ---------- shell ---------- */
+.shell{max-width:1220px;margin:0 auto;padding:0 22px 96px;display:grid;grid-template-columns:238px minmax(0,1fr);gap:52px}
+.rail{position:sticky;top:86px;align-self:start;padding-top:38px;max-height:calc(100vh - 110px);overflow-y:auto}
+.rail-h{font-family:var(--f-display);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+.rail a{
+  display:grid;grid-template-columns:20px 1fr auto;gap:9px;align-items:baseline;
+  font-family:var(--f-display);font-size:13px;line-height:1.35;
+  color:var(--ink-soft);text-decoration:none;padding:6px 8px 6px 6px;
+  border-left:2px solid transparent;transition:color .18s,background .18s,border-color .18s;
+}
+.rail a:hover{background:var(--surface-2);color:var(--ink)}
+.rail .n{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.rail .s{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.rail a.here{color:var(--ink);border-left-color:var(--accent);background:var(--surface-2);font-weight:700}
+.rail a.pace .n{color:var(--accent);font-weight:700}
+.rail a.pace::after{content:"◂ pace";grid-column:2/-1;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.rail a.past{opacity:.55}
+
+/* ---------- lede ---------- */
+main{padding-top:38px;min-width:0}
+.lede{border-bottom:2px solid var(--ink);padding-bottom:30px;margin-bottom:8px}
+.kicker{font-family:var(--f-display);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.lede h1{font-size:clamp(38px,6vw,60px);line-height:.98;letter-spacing:-.03em;font-weight:800;margin:12px 0 14px}
+.lede p{max-width:62ch;color:var(--ink-soft);margin:0 0 14px}
+.lede-meta{display:flex;gap:26px;flex-wrap:wrap;font-family:var(--f-display);font-size:12px;color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase}
+.lede-meta b{color:var(--ink);font-weight:700}
+
+/* ---------- sections ---------- */
+section{padding:44px 0 8px;border-bottom:1px solid var(--rule);scroll-margin-top:96px}
+.s-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.s-num{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:700}
+.s-head h2{font-size:clamp(23px,3vw,30px);letter-spacing:-.02em;font-weight:800;line-height:1.12}
+.budget{
+  margin-left:auto;font-family:var(--f-mono);font-size:11px;font-variant-numeric:tabular-nums;
+  color:var(--ink-faint);border:1px solid var(--rule);padding:2px 7px;border-radius:2px;white-space:nowrap;
+}
+.star{color:var(--accent);font-size:13px}
+.s-why{font-family:var(--f-display);font-size:12.5px;color:var(--ink-faint);margin:0 0 20px;letter-spacing:.02em}
+
+.facts{margin:0 0 20px;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;max-width:70ch}
+.facts li{padding-left:17px;position:relative}
+.facts li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;background:var(--accent);border-radius:1px}
+.facts b{font-weight:600;color:var(--ink)}
+
+.say{
+  background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--ink);
+  padding:13px 17px;margin:20px 0;box-shadow:var(--shadow);
+}
+.say .lbl{font-family:var(--f-display);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:5px}
+.say p{margin:0;font-size:17px;line-height:1.5}
+
+.trap{background:var(--alert-wash);border:1px solid color-mix(in srgb,var(--alert) 30%,transparent);padding:13px 17px;margin:18px 0}
+.trap .lbl{font-family:var(--f-display);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--alert);font-weight:700;display:block;margin-bottom:6px}
+.trap ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.trap code{background:color-mix(in srgb,var(--alert) 12%,transparent);padding:1px 4px}
+
+pre{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.65;
+  background:var(--surface);border:1px solid var(--rule);
+  padding:14px 16px;margin:18px 0;overflow-x:auto;color:var(--ink-soft);
+}
+pre b{color:var(--ink);font-weight:700}
+pre i{color:var(--accent);font-style:normal}
+pre s{color:var(--alert);text-decoration:none}
+
+.tbl{overflow-x:auto;margin:18px 0;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--f-display);font-size:13px;min-width:440px}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--rule)}
+th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td code{font-size:12px}
+
+/* ---------- animation stage ---------- */
+.anim{margin:22px 0;border:1px solid var(--rule);background:var(--surface);box-shadow:var(--shadow)}
+.anim-stage{
+  padding:22px 20px;overflow-x:auto;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.anim-cap{border-top:1px solid var(--rule);padding:12px 18px;min-height:62px;background:var(--surface-2)}
+.anim-cap p{margin:0;font-size:14.5px;color:var(--ink-soft);display:none}
+.anim-cap p.on{display:block;animation:fade .3s ease}
+.anim-cap p b{color:var(--ink)}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.anim-ctl{display:flex;align-items:center;gap:10px;padding:9px 18px;border-top:1px solid var(--rule)}
+.step-btn{
+  font-family:var(--f-mono);font-size:15px;line-height:1;width:30px;height:28px;
+  background:var(--surface-2);border:1px solid var(--rule-strong);color:var(--ink);cursor:pointer;border-radius:2px;
+}
+.step-btn:hover{background:var(--accent-wash);border-color:var(--accent)}
+.play{
+  font-family:var(--f-display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  background:var(--accent-wash);border:1px solid var(--accent);color:var(--accent);
+  padding:6px 12px;cursor:pointer;border-radius:2px;
+}
+.dots{display:flex;gap:5px;margin-left:auto}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--rule-strong);transition:background .2s,transform .2s}
+.dots i.on{background:var(--accent);transform:scale(1.35)}
+
+/* stage primitives */
+.chip{
+  font-family:var(--f-mono);font-size:12px;padding:5px 10px;border:1px solid var(--rule-strong);
+  background:var(--surface);color:var(--ink);border-radius:2px;white-space:nowrap;
+  transition:opacity .35s,transform .35s,border-color .35s,background .35s,color .35s;
+}
+.dim{opacity:.3}
+.hot{border-color:var(--accent);background:var(--accent-wash);color:var(--accent);font-weight:700}
+.bad{border-color:var(--alert);background:var(--alert-wash);color:var(--alert);font-weight:700}
+.flow{display:flex;align-items:center;gap:11px;flex-wrap:nowrap;min-width:min-content}
+.arrow{color:var(--ink-faint);font-family:var(--f-mono);font-size:14px;transition:opacity .35s}
+
+/* hashmap */
+.buckets{display:flex;flex-direction:column;gap:5px;min-width:330px}
+.brow{display:flex;align-items:center;gap:9px}
+.bidx{
+  font-family:var(--f-mono);font-size:11px;width:34px;height:28px;display:grid;place-items:center;
+  border:1px solid var(--rule-strong);background:var(--surface-2);color:var(--ink-faint);
+  transition:border-color .35s,background .35s,color .35s;
+}
+.brow.hot .bidx{border-color:var(--accent);background:var(--accent-wash);color:var(--accent);font-weight:700}
+.node{
+  font-family:var(--f-mono);font-size:11px;padding:4px 9px;border:1px solid var(--navy);
+  background:var(--surface);color:var(--ink);white-space:nowrap;
+  opacity:0;transform:scale(.7);transition:opacity .4s ease,transform .4s cubic-bezier(.3,1.4,.5,1);
+}
+.node.in{opacity:1;transform:none}
+.link{color:var(--ink-faint);font-family:var(--f-mono);font-size:12px;opacity:0;transition:opacity .4s}
+.link.in{opacity:1}
+
+/* treeify stage */
+.tstage{position:relative;height:190px;min-width:430px}
+.tnode{
+  position:absolute;font-family:var(--f-mono);font-size:11px;width:34px;height:26px;
+  display:grid;place-items:center;border:1px solid var(--navy);background:var(--surface);color:var(--ink);
+  transform:translate(-50%,-50%);transition:left .65s cubic-bezier(.4,0,.2,1),top .65s cubic-bezier(.4,0,.2,1),background .4s,border-color .4s,color .4s;
+}
+.tnode.red{border-color:var(--alert);color:var(--alert);background:var(--alert-wash)}
+.tnode.blk{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.tedge{position:absolute;height:1px;background:var(--rule-strong);transform-origin:0 0;opacity:0;transition:opacity .4s .5s}
+.tedge.in{opacity:1}
+
+/* iterator */
+.cells{display:flex;gap:8px;position:relative;padding-top:30px;min-width:390px}
+.cell{font-family:var(--f-mono);font-size:12px;width:78px;height:36px;display:grid;place-items:center;border:1px solid var(--rule-strong);background:var(--surface);transition:border-color .3s,background .3s,opacity .3s}
+.cell.hot{border-color:var(--accent);background:var(--accent-wash);color:var(--accent);font-weight:700}
+.cell.gone{opacity:.28;border-style:dashed}
+.caret{position:absolute;top:0;left:0;width:78px;text-align:center;font-family:var(--f-mono);font-size:12px;color:var(--accent);transform:translateX(calc(var(--i,0) * 86px));transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.caret.off{opacity:0}
+
+/* memory panels */
+.mem{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-width:420px}
+.pane{border:1px solid var(--rule-strong);background:var(--surface);padding:11px 13px}
+.pane h4{font-family:var(--f-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:9px}
+.slot{font-family:var(--f-mono);font-size:11.5px;padding:4px 8px;border:1px solid var(--rule);margin-bottom:5px;background:var(--surface-2);transition:all .35s}
+.slot.hot{border-color:var(--accent);background:var(--accent-wash);color:var(--accent)}
+.slot.bad{border-color:var(--alert);background:var(--alert-wash);color:var(--alert)}
+
+.gap{background:var(--surface-2);border:1px dashed var(--rule-strong);padding:13px 17px;margin:18px 0;font-size:14.5px;color:var(--ink-soft)}
+.gap b{font-family:var(--f-display);color:var(--ink)}
+
+.end{padding:44px 0 0}
+.end h2{font-size:26px;letter-spacing:-.02em;margin-bottom:14px}
+.end-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:18px}
+.end-card{border:1px solid var(--rule);background:var(--surface);padding:14px}
+.end-card h4{font-family:var(--f-display);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;color:var(--alert)}
+.end-card p{margin:0;font-size:14px;color:var(--ink-soft)}
+
+@media (max-width:940px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .rail{position:static;max-height:none;padding-top:24px;border-bottom:1px solid var(--rule);padding-bottom:14px}
+  .rail ol{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:6px}
+  .rail a{grid-template-columns:auto;white-space:nowrap;border-left:0;border-bottom:2px solid transparent;padding:5px 9px}
+  .rail a.here{border-left:0;border-bottom-color:var(--accent)}
+  .rail a.pace::after{display:none}
+  .rail .s{display:none}
+  .mem{grid-template-columns:1fr}
+  .bar-pace{width:100%;text-align:left;margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.001ms !important;animation-duration:.001ms !important}
+}
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">15&#8209;Minute <span>Java Drill</span></div>
+    <div class="clock" id="clock">15:00</div>
+    <button class="btn" id="startBtn">Start</button>
+    <button class="btn ghost" id="resetBtn">Reset</button>
+    <div class="bar-pace" id="pace"><b>Not started</b>Press Start and let the pace marker pull you along</div>
+  </div>
+  <div class="track"><i id="trackFill"></i></div>
+</header>
+
+<div class="shell">
+
+  <nav class="rail" aria-label="Drill sections">
+    <div class="rail-h">The run &middot; 900s</div>
+    <ol id="railList"></ol>
+  </nav>
+
+  <main>
+
+    <div class="lede">
+      <div class="kicker">Everything covered so far &middot; one pass</div>
+      <h1>Fifteen minutes, fourteen stops, no notes.</h1>
+      <p>This is a recall drill, not a tutorial. Every card is something already written up in your repo &mdash; OOPs, collections internals, iterators, immutability, nested classes, wrappers, I/O. Read the facts, run the animation where a mechanism is hard to hold in your head, then say the bold line out loud before moving on.</p>
+      <p>The clock is the whole point. If a card takes longer than its budget, that card is not revision &mdash; it is relearning, and it belongs back in the notes file.</p>
+      <div class="lede-meta">
+        <span><b>14</b> sections</span>
+        <span><b>900s</b> total budget</span>
+        <span><b>6</b> animated mechanisms</span>
+        <span><b>Not here:</b> streams, concurrency, JVM</span>
+      </div>
+    </div>
+
+    <!-- 1 -->
+    <section id="s1" data-budget="80">
+      <div class="s-head"><span class="s-num">01</span><h2>OOPs foundation</h2><span class="budget">80s</span></div>
+      <p class="s-why">Class &middot; object &middot; constructor &middot; static &middot; call by value</p>
+      <ul class="facts">
+        <li><b>Class is the blueprint, object is the real entity.</b> A class holds fields (state) and methods (behaviour); it is not itself a thing in the world.</li>
+        <li><b>Constructor:</b> same name as the class, <b>no return type</b>, runs automatically on <code>new</code>. Default, parameterised, copy.</li>
+        <li><b>Chaining</b> uses <code>this(...)</code> or <code>super(...)</code> and must be the <b>first statement</b>. Overloading is not chaining &mdash; overloading is just same name, different parameter list, resolved at compile time.</li>
+        <li><b>static</b> belongs to the class: one shared copy, accessed by class name, no <code>this</code>, cannot touch instance members directly. A static block runs once at class load &mdash; before <code>main</code>.</li>
+        <li><code>public static void main(String[] args)</code> is the JVM's entry contract; <code>args</code> carries command-line input.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="4" id="cbv">
+        <div class="anim-stage">
+          <div class="mem">
+            <div class="pane">
+              <h4>Stack &mdash; main</h4>
+              <div class="slot" data-s="a">x = 10</div>
+              <div class="slot" data-s="b">s &rarr; @1f4a</div>
+            </div>
+            <div class="pane">
+              <h4>Stack &mdash; method / Heap</h4>
+              <div class="slot" data-s="c">copy x = 10</div>
+              <div class="slot" data-s="d">copy s &rarr; @1f4a</div>
+              <div class="slot" data-s="e">Heap @1f4a &nbsp;name = "Abhi"</div>
+            </div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>Two variables, two kinds of value.</b> A primitive <code>x</code> and a reference <code>s</code> sit in main's stack frame. The object itself lives on the heap.</p>
+          <p><b>Call the method.</b> Java copies both &mdash; the number 10, and the reference value @1f4a. Copies, always.</p>
+          <p><b>Change the primitive inside.</b> The copy becomes 99; main's <code>x</code> is untouched. This is why "swap two numbers in a method" is impossible in Java.</p>
+          <p><b>Change the object's field inside.</b> The copied reference still points at the <em>same</em> heap object, so <code>s.name</code> genuinely changes for everyone.</p>
+          <p><b>Reassign the parameter inside.</b> The copy now points somewhere else; main's reference never moved. That is the proof it was pass-by-value all along.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>Java is <b>always pass by value</b>. For objects the <b>reference value</b> is copied, so mutating the object is visible outside &mdash; but reassigning the parameter is not.</p></div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2" data-budget="45">
+      <div class="s-head"><span class="s-num">02</span><h2>Encapsulation &amp; access</h2><span class="budget">45s</span></div>
+      <p class="s-why">Data hiding &middot; the real benefit &middot; four modifiers</p>
+      <ul class="facts">
+        <li>Binding data and the methods that act on it into one unit, then making the fields <code>private</code> with controlled getters and setters.</li>
+        <li><b>The real benefit is validation inside the setter</b> &mdash; not the getter/setter ceremony itself. Without it anyone writes <code>s.age = 500</code>.</li>
+        <li>Getter only, no setter &rarr; a <b>read-only</b> field.</li>
+        <li>The compile error you get when you touch a private field from outside <b>is the proof encapsulation works</b>.</li>
+      </ul>
+      <div class="tbl"><table>
+        <tr><th>Modifier</th><th>Same class</th><th>Same package</th><th>Subclass, other package</th><th>Anywhere</th></tr>
+        <tr><td><code>private</code></td><td>yes</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+        <tr><td><code>default</code></td><td>yes</td><td>yes</td><td>&mdash;</td><td>&mdash;</td></tr>
+        <tr><td><code>protected</code></td><td>yes</td><td>yes</td><td>yes</td><td>&mdash;</td></tr>
+        <tr><td><code>public</code></td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr>
+      </table></div>
+      <div class="say"><span class="lbl">Say it out loud</span><p>Encapsulation is <b>private data plus a public gate</b>, and the gate is where the rules live.</p></div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3" data-budget="75">
+      <div class="s-head"><span class="s-num">03</span><h2>Inheritance &amp; polymorphism</h2><span class="budget">75s</span></div>
+      <p class="s-why">extends &middot; overriding rules &middot; upcasting</p>
+      <ul class="facts">
+        <li><code>extends</code> for reuse. Types: single, multilevel, hierarchical. <b>No multiple inheritance of classes</b> (the diamond problem) &mdash; interfaces solve it.</li>
+        <li><b>Overloading</b> = same name, different parameters, <b>compile time</b>. <b>Overriding</b> = same signature in parent and child, <b>runtime</b>.</li>
+        <li>Cannot override <code>static</code> (that is method <i>hiding</i>), <code>private</code>, or <code>final</code>. Access cannot be narrowed. Checked exceptions cannot be broadened.</li>
+        <li><code>super.method()</code> reaches the parent version; <code>super(...)</code> calls the parent constructor and runs first, always.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="3" id="upc">
+        <div class="anim-stage">
+          <div class="flow">
+            <div class="chip" data-u="ref">Parent&nbsp;p</div>
+            <span class="arrow">&rarr;</span>
+            <div class="chip" data-u="obj">new&nbsp;Child()</div>
+            <span class="arrow">&nbsp;</span>
+            <div class="chip" data-u="m">p.speak()</div>
+            <div class="chip" data-u="f">p.name</div>
+            <div class="chip" data-u="d">p.childOnly()</div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>Upcasting.</b> A parent-type reference holding a child object: <code>Parent p = new Child();</code> &mdash; legal, implicit, no cast needed.</p>
+          <p><b>Overridden method &rarr; child wins.</b> Method calls are resolved at <b>runtime</b> from the actual object, so <code>p.speak()</code> runs Child's version. This is dynamic dispatch.</p>
+          <p><b>Field &rarr; parent wins.</b> Fields and static methods are resolved at <b>compile time</b> from the reference type. Fields are hidden, not overridden.</p>
+          <p><b>Child-only method &rarr; will not compile.</b> The reference type decides what is <em>visible</em>. You need a downcast, guarded by <code>instanceof</code>, or you get a ClassCastException.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><b>Methods are resolved at runtime by the object; fields and statics at compile time by the reference.</b></p></div>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4" data-budget="60">
+      <div class="s-head"><span class="s-num">04</span><h2>Abstract class vs interface</h2><span class="budget">60s</span></div>
+      <p class="s-why">The comparison + the "which do you pick" follow-up</p>
+      <div class="tbl"><table>
+        <tr><th></th><th>Abstract class</th><th>Interface</th></tr>
+        <tr><td>Keyword</td><td><code>extends</code> (one only)</td><td><code>implements</code> (many)</td></tr>
+        <tr><td>Abstraction</td><td>0&ndash;100%</td><td>100% before Java 8</td></tr>
+        <tr><td>State</td><td>instance fields allowed</td><td><code>public static final</code> only</td></tr>
+        <tr><td>Constructor</td><td>yes (runs via super)</td><td>no</td></tr>
+        <tr><td>Methods</td><td>any modifier</td><td><code>public abstract</code> by default</td></tr>
+        <tr><td>Since Java 8/9</td><td>&mdash;</td><td><code>default</code>, <code>static</code>, then <code>private</code></td></tr>
+      </table></div>
+      <ul class="facts">
+        <li><b>Pick abstract</b> when there is shared state and a real is-a relationship. <b>Pick interface</b> for a capability that unrelated types can all claim.</li>
+        <li>Abstraction hides <i>implementation</i>; encapsulation hides <i>data</i>. Interviewers ask this difference constantly.</li>
+        <li>An interface with exactly <b>one abstract method</b> is a <b>functional interface</b> &mdash; that is the door into lambdas, which is your next topic.</li>
+      </ul>
+      <div class="say"><span class="lbl">Say it out loud</span><p>Abstract class = <b>partial implementation with state</b>. Interface = <b>a contract you can sign many times</b>.</p></div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5" data-budget="45">
+      <div class="s-head"><span class="s-num">05</span><h2>Immutable class</h2><span class="budget">45s</span></div>
+      <p class="s-why">The five rules &mdash; and the one everyone forgets</p>
+      <pre><b>final</b> class Student {              <i>// 1. final class - no subclass can add mutation</i>
+    <b>private final</b> String  name;      <i>// 2. private final fields</i>
+    <b>private final</b> College college;   <i>//    (this one is MUTABLE)</i>
+
+    Student(String name, College c) {
+        this.name    = name;
+        this.college = <i>new College(c)</i>;  <i>// 5a. defensive copy IN</i>
+    }
+    College getCollege() {
+        return <i>new College(college)</i>;    <i>// 5b. defensive copy OUT</i>
+    }                                  <i>// 3. no setters  4. set in constructor</i>
+}</pre>
+      <ul class="facts">
+        <li><b>Why:</b> safe to share, safe across threads with no locking, safe as a HashMap key (its hash can never drift).</li>
+        <li>From the JDK: <code>String</code>, all wrappers, <code>LocalDate</code>.</li>
+      </ul>
+      <div class="trap"><span class="lbl">The one everyone forgets</span><ul>
+        <li>Returning the mutable field directly from the getter. The caller now holds a live handle and your object silently changes behind your back. <b>Copy in, copy out.</b></li>
+      </ul></div>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6" data-budget="40">
+      <div class="s-head"><span class="s-num">06</span><h2>Nested classes</h2><span class="budget">40s</span></div>
+      <p class="s-why">Four kinds, one distinction that matters</p>
+      <div class="tbl"><table>
+        <tr><th>Kind</th><th>How you create it</th><th>Key rule</th></tr>
+        <tr><td>Static nested</td><td><code>Outer.Inner o = new Outer.Inner();</code></td><td>No outer object needed; cannot see instance fields</td></tr>
+        <tr><td>Inner (non-static)</td><td><code>outer.new Inner();</code></td><td>Needs an outer instance; holds an implicit reference to it</td></tr>
+        <tr><td>Local</td><td>declared inside a method body</td><td>Sees effectively-final locals only</td></tr>
+        <tr><td>Anonymous</td><td>declared and instantiated in one shot</td><td>One abstract method &rarr; a lambda replaces it</td></tr>
+      </table></div>
+      <ul class="facts">
+        <li><b>Why use them:</b> logical grouping, and access to the outer class's private members.</li>
+        <li>An inner class holding an implicit outer reference is a real <b>memory-leak source</b> &mdash; prefer static nested unless you need the link.</li>
+      </ul>
+      <div class="gap"><b>Still open in your repo:</b> the anonymous class file. It is the bridge into lambdas &mdash; write it before you start section&nbsp;#38 of the course.</div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7" data-budget="45">
+      <div class="s-head"><span class="s-num">07</span><h2>Wrappers &amp; autoboxing</h2><span class="budget">45s</span></div>
+      <p class="s-why">Boxing is free; the traps are not</p>
+      <ul class="facts">
+        <li>Every primitive has a class in <code>java.lang</code>. Two odd names: <code>int &rarr; Integer</code>, <code>char &rarr; Character</code>.</li>
+        <li><b>Why they exist:</b> collections and generics hold objects only, and a wrapper can be <code>null</code> where a primitive cannot.</li>
+        <li><b>Autoboxing</b> primitive &rarr; wrapper, <b>unboxing</b> the reverse; the compiler inserts <code>valueOf()</code> / <code>intValue()</code> for you.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="3" id="cache">
+        <div class="anim-stage">
+          <div class="flow" style="flex-wrap:wrap;gap:14px">
+            <div class="chip" data-c="lo">Integer a = 127, b = 127;</div>
+            <div class="chip" data-c="lores">a == b &rarr; ?</div>
+            <div class="chip" data-c="hi">Integer c = 128, d = 128;</div>
+            <div class="chip" data-c="hires">c == d &rarr; ?</div>
+          </div>
+          <div class="flow" style="margin-top:16px">
+            <div class="chip" data-c="pool">IntegerCache &nbsp;[ &minus;128 &hellip; 127 ]</div>
+            <span class="arrow">&larr;</span>
+            <div class="chip" data-c="note">valueOf() looks here first</div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>Two identical-looking comparisons.</b> Both compare two boxed Integers with <code>==</code>. Most people say both are true.</p>
+          <p><b>127 &rarr; true.</b> <code>valueOf()</code> pulls from the IntegerCache, so <code>a</code> and <code>b</code> are literally the same object.</p>
+          <p><b>128 &rarr; false.</b> Outside the cache range, <code>valueOf()</code> allocates a new object each time. Same value, different references.</p>
+          <p><b>Rule:</b> <code>==</code> on wrappers compares <em>references</em>. Always use <code>.equals()</code> &mdash; the cache only makes the bug hide until your test data grows.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <div class="trap"><span class="lbl">Three more traps</span><ul>
+        <li>Unboxing a <code>null</code> wrapper throws <b>NullPointerException</b> &mdash; the classic <code>Integer x = map.get(k); int y = x;</code></li>
+        <li><code>list.remove(1)</code> on a <code>List&lt;Integer&gt;</code> removes <b>index</b> 1; <code>list.remove(Integer.valueOf(1))</code> removes the <b>value</b>.</li>
+        <li>Boxing in a hot loop allocates on every iteration &mdash; a real performance answer, not a trivia one.</li>
+      </ul></div>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8" data-budget="45">
+      <div class="s-head"><span class="s-num">08</span><h2>The collections family tree</h2><span class="budget">45s</span></div>
+      <p class="s-why">Draw this from memory &mdash; it is a whiteboard question</p>
+      <pre>Iterable
+   &#9492;&#9472; Collection
+        &#9500;&#9472; List &#8594; ArrayList, LinkedList, Vector
+        &#9500;&#9472; <b>Set</b>  &#8594; <b>HashSet</b> &#8594; <b>LinkedHashSet</b>
+        &#9474;         &#9492;&#9472; SortedSet &#8594; NavigableSet &#8594; <b>TreeSet</b>
+        &#9492;&#9472; Queue &#8594; Deque, PriorityQueue        <i>&#8592; still pending</i>
+
+<b>Map</b> (separate &#8212; NOT a Collection)
+   &#9500;&#9472; HashMap &#8594; LinkedHashMap
+   &#9500;&#9472; SortedMap &#8594; NavigableMap &#8594; TreeMap
+   &#9492;&#9472; Hashtable &#8594; Properties          <i>(legacy branch)</i></pre>
+      <ul class="facts">
+        <li><b>Set declares almost no method of its own.</b> It inherits from Collection and Iterable and only tightens the <i>contract</i>: no duplicates.</li>
+        <li><b>TreeSet is the exception</b> &mdash; it gains real extra methods from SortedSet and NavigableSet.</li>
+        <li><b>Map is not a Collection</b>, so it defines its own vocabulary: <code>put get containsKey keySet values entrySet</code>.</li>
+        <li>The pairing to remember: <code>HashSet&#8596;HashMap</code>, <code>LinkedHashSet&#8596;LinkedHashMap</code>, <code>TreeSet&#8596;TreeMap</code>.</li>
+      </ul>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9" data-budget="140">
+      <div class="s-head"><span class="s-num">09</span><h2>HashMap internals <span class="star">&#9733;</span></h2><span class="budget">140s</span></div>
+      <p class="s-why">The single highest-frequency question in the whole interview</p>
+      <ul class="facts">
+        <li><b>A Set is a HashMap wearing a disguise.</b> <code>HashSet</code> holds a <code>HashMap&lt;K,Object&gt;</code>, and every value is the same dummy: <code>private static final Object PRESENT = new Object();</code></li>
+        <li><code>set.add(x)</code> &rarr; <code>map.put(x, PRESENT)</code>. <code>set.contains(x)</code> &rarr; <code>map.containsKey(x)</code>.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="5" id="hm">
+        <div class="anim-stage">
+          <div class="flow" style="margin-bottom:18px">
+            <div class="chip" data-h="key">"Abhishek"</div>
+            <span class="arrow">&rarr;</span>
+            <div class="chip" data-h="hash">hashCode() = 203</div>
+            <span class="arrow">&rarr;</span>
+            <div class="chip" data-h="idx">203 % 6 = <b>5</b></div>
+          </div>
+          <div class="buckets">
+            <div class="brow" data-b="0"><span class="bidx">0</span></div>
+            <div class="brow" data-b="1"><span class="bidx">1</span></div>
+            <div class="brow" data-b="2"><span class="bidx">2</span></div>
+            <div class="brow" data-b="3"><span class="bidx">3</span></div>
+            <div class="brow" data-b="4"><span class="bidx">4</span></div>
+            <div class="brow" data-b="5"><span class="bidx">5</span>
+              <span class="node" data-n="n1">"Abhishek" | PRESENT</span>
+              <span class="link" data-n="l1">&rarr;</span>
+              <span class="node" data-n="n2">"Raj" | PRESENT</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>An empty table of buckets.</b> Really a <code>Node[]</code> array. We are about to insert the key "Abhishek".</p>
+          <p><b>Step 1 &mdash; hash the key.</b> <code>key.hashCode()</code> turns the object into an int. (Real HashMap then spreads it: <code>h ^ (h &gt;&gt;&gt; 16)</code>.)</p>
+          <p><b>Step 2 &mdash; find the bucket.</b> <code>index = hash % capacity</code>. Bucket 5 lights up. (Real HashMap uses <code>hash &amp; (n-1)</code>, which is why capacity is always a power of two.)</p>
+          <p><b>Step 3 &mdash; bucket empty, so just store.</b> <code>bucket[5] = new Node(key, PRESENT, hash, null)</code>.</p>
+          <p><b>Step 4 &mdash; collision.</b> "Raj" also hashes to 203, so the same bucket. Java walks the chain comparing <b>hash first, then equals()</b> &mdash; no match, so the new node is appended at the <b>end</b> of the list.</p>
+          <p><b>Step 5 &mdash; duplicate key.</b> If hash <em>and</em> equals both match, no new node is created: the value is overwritten and the <b>old value is returned</b>. That returned value is exactly what makes <code>set.add()</code> return false.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <pre>class Node&lt;K,V&gt; { K key; V value; int hash; Node&lt;K,V&gt; next; }
+
+boolean add(K key) { return map.put(key, PRESENT) == <b>null</b>; }
+<i>// put returns the OLD value: null means it was new  &#8594; true
+//                            non-null means duplicate &#8594; false</i></pre>
+
+      <ul class="facts">
+        <li><b>get / containsKey walk the exact same path</b> &mdash; hash, index, then chain-walk comparing hash and equals.</li>
+        <li><b>The contract:</b> if <code>k1.equals(k2)</code> then <code>k1.hashCode() == k2.hashCode()</code> <b>must</b> hold. <b>The reverse is not true</b> &mdash; equal hashes are just a collision.</li>
+        <li>So: override <code>equals()</code> and you <b>must</b> override <code>hashCode()</code>, or your key goes into one bucket and gets looked up in another and vanishes.</li>
+        <li><b>Collision strategy:</b> Java uses <b>chaining</b> (a linked list per bucket). It does <b>not</b> use open addressing / linear probing.</li>
+      </ul>
+      <div class="say"><span class="lbl">Say it out loud</span><p>Hash the key, mask to a bucket, walk the chain comparing <b>hash then equals</b>. Duplicate updates in place and returns the old value; everything else appends.</p></div>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10" data-budget="80">
+      <div class="s-head"><span class="s-num">10</span><h2>Rehashing &amp; treeification <span class="star">&#9733;</span></h2><span class="budget">80s</span></div>
+      <p class="s-why">"What changed in Java 8?" &mdash; this is the answer</p>
+      <ul class="facts">
+        <li><b>Default capacity 16, load factor 0.75.</b> Once <code>size &gt; capacity &times; 0.75</code>, the table <b>doubles</b> and every entry is re-indexed against the new capacity.</li>
+        <li>Why bother: long chains turn O(1) lookup into O(n). Rehashing spreads entries back out.</li>
+        <li>Sizing a HashMap up front avoids repeated rehashing &mdash; a good performance answer.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="3" id="tf">
+        <div class="anim-stage">
+          <div class="tstage" id="tfStage">
+            <div class="tnode" data-t="0">10</div>
+            <div class="tnode" data-t="1">23</div>
+            <div class="tnode" data-t="2">31</div>
+            <div class="tnode" data-t="3">44</div>
+            <div class="tnode" data-t="4">50</div>
+            <div class="tnode" data-t="5">67</div>
+            <div class="tnode" data-t="6">80</div>
+            <div class="tnode" data-t="7">92</div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>One bucket, eight nodes.</b> Every lookup that lands here walks the chain &mdash; worst case O(n). Bad keys or a bad hashCode make this the normal case.</p>
+          <p><b>Threshold hit.</b> At a chain length of <b>8</b> (and only once the table itself is at least 64), Java 8 converts the linked list into a balanced tree.</p>
+          <p><b>Red-black tree.</b> A self-balancing BST: smaller left, larger right, with colour rules that keep the height logarithmic. Lookup inside the bucket becomes <b>O(log n)</b>.</p>
+          <p><b>It converts back.</b> If the bucket shrinks to <b>6</b> nodes, it degrades to a linked list again &mdash; trees cost more memory, so Java only pays when it must.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>Load factor <b>0.75</b> triggers a <b>double-and-reindex</b>. A chain of <b>8</b> triggers <b>treeification</b> to a red-black tree, so the worst case went from <b>O(n) to O(log n)</b> in Java 8.</p></div>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11" data-budget="60">
+      <div class="s-head"><span class="s-num">11</span><h2>LinkedHashSet &amp; TreeSet</h2><span class="budget">60s</span></div>
+      <p class="s-why">The "which one do you use" question</p>
+      <ul class="facts">
+        <li><b>LinkedHashSet</b> = the same hash table plus a <b>doubly linked list</b> threaded through every node (<code>before</code> / <code>after</code>), so iteration returns <b>insertion order</b> at no lookup cost.</li>
+        <li><b>TreeSet / TreeMap</b> = no hashing at all. A <b>self-balancing BST (red-black tree)</b>: smaller left, larger right. Everything is O(log n).</li>
+        <li>What TreeSet buys you: sorted iteration, <code>first()</code> / <code>last()</code>, <code>ceiling floor higher lower</code>, and range queries <code>headSet tailSet subSet</code>.</li>
+        <li>Strings sort <b>lexicographically</b>. Elements must be <code>Comparable</code> or you must supply a <code>Comparator</code>.</li>
+      </ul>
+      <div class="tbl"><table>
+        <tr><th></th><th>HashSet</th><th>LinkedHashSet</th><th>TreeSet</th></tr>
+        <tr><td>Backed by</td><td>HashMap</td><td>LinkedHashMap</td><td>TreeMap</td></tr>
+        <tr><td>Order</td><td>none</td><td>insertion</td><td>sorted</td></tr>
+        <tr><td>Cost</td><td>O(1) avg</td><td>O(1) avg</td><td>O(log n)</td></tr>
+        <tr><td>null</td><td>one</td><td>one</td><td><b>none</b> &mdash; it must compare</td></tr>
+      </table></div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12" data-budget="45">
+      <div class="s-head"><span class="s-num">12</span><h2>The map zoo</h2><span class="budget">45s</span></div>
+      <p class="s-why">One line each &mdash; that is all they want</p>
+      <div class="tbl"><table>
+        <tr><th>Map</th><th>The one thing to say</th></tr>
+        <tr><td><code>Hashtable</code></td><td>Legacy, every method synchronized so it is slow, no null key or value. Do not use.</td></tr>
+        <tr><td><code>ConcurrentHashMap</code></td><td>The modern thread-safe map &mdash; locks a bin, not the whole table.</td></tr>
+        <tr><td><code>Properties</code></td><td>Extends Hashtable; String-to-String config (<code>username=admin</code>).</td></tr>
+        <tr><td><code>WeakHashMap</code></td><td>Weak keys &mdash; GC removes the entry when nothing else refers to the key. Cache-like.</td></tr>
+        <tr><td><code>IdentityHashMap</code></td><td>Compares with <code>==</code> instead of <code>equals()</code>. Reference equality, not value equality.</td></tr>
+        <tr><td><code>EnumMap</code></td><td>Enum keys, backed by a plain array indexed by ordinal. Fast, compact, ordinal iteration order, no null key.</td></tr>
+      </table></div>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13" data-budget="80">
+      <div class="s-head"><span class="s-num">13</span><h2>Iterable &amp; Iterator <span class="star">&#9733;</span></h2><span class="budget">80s</span></div>
+      <p class="s-why">Ends in ConcurrentModificationException &mdash; asked constantly</p>
+      <ul class="facts">
+        <li><b>Iterable</b> means "I can hand out a cursor" &mdash; one method, <code>iterator()</code>. <b>Iterator</b> is the cursor: <code>hasNext()</code>, <code>next()</code>, <code>remove()</code>.</li>
+        <li><code>next()</code> does <b>two</b> things: returns the current element <em>and</em> advances the pointer.</li>
+        <li><b>The state lives in the iterator, not the collection</b> &mdash; two calls to <code>iterator()</code> give two independent cursors.</li>
+        <li>A for-each loop <b>is</b> an iterator loop; the compiler rewrites it. Arrays are <i>not</i> Iterable, but for-each still works on them because the compiler indexes instead.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="4" id="it">
+        <div class="anim-stage">
+          <div class="cells">
+            <div class="caret" data-i="caret">&#9660;<br>it</div>
+            <div class="cell" data-e="0">"A"</div>
+            <div class="cell" data-e="1">"B"</div>
+            <div class="cell" data-e="2">"C"</div>
+            <div class="cell" data-e="3">"D"</div>
+          </div>
+          <div class="flow" style="margin-top:16px">
+            <div class="chip" data-e="mc">modCount = <span data-e="mcv">0</span></div>
+            <div class="chip" data-e="ec">expectedModCount = <span data-e="ecv">0</span></div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>A fresh cursor.</b> <code>Iterator&lt;String&gt; it = list.iterator();</code> &mdash; it sits <em>before</em> the first element, and copies the list's <code>modCount</code> into its own <code>expectedModCount</code>.</p>
+          <p><b>hasNext() &rarr; true, next() &rarr; "A".</b> Returns the element and steps forward. Nothing about the list changed.</p>
+          <p><b>next() &rarr; "B".</b> Same again. This is exactly what your for-each loop is compiled into.</p>
+          <p><b>Now call list.remove("C") inside the loop.</b> The list bumps <code>modCount</code> to 1 &mdash; but the iterator is still holding <code>expectedModCount = 0</code>.</p>
+          <p><b>Next call to next() throws ConcurrentModificationException.</b> It compares the two counters, sees the mismatch, and fails fast. Fix: <code>it.remove()</code>, or <code>removeIf()</code>, or iterate a CopyOnWriteArrayList.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <ul class="facts">
+        <li><b>Fail-fast</b> (ArrayList, HashMap) throws CME. <b>Fail-safe</b> (CopyOnWriteArrayList, ConcurrentHashMap) iterates a snapshot and never throws.</li>
+        <li><b>ListIterator</b> is the List-only upgrade: bidirectional, plus <code>add()</code>, <code>set()</code>, <code>nextIndex()</code>.</li>
+        <li>A Map is not Iterable &mdash; you iterate <code>entrySet()</code>, <code>keySet()</code> or <code>values()</code>.</li>
+      </ul>
+    </section>
+
+    <!-- 14 -->
+    <section id="s14" data-budget="60">
+      <div class="s-head"><span class="s-num">14</span><h2>I/O, enum, casting</h2><span class="budget">60s</span></div>
+      <p class="s-why">The last sweep &mdash; short answers, quick marks</p>
+      <ul class="facts">
+        <li><b>The input chain:</b> <code>new BufferedReader(new InputStreamReader(System.in))</code> &mdash; <code>System.in</code> gives raw <b>bytes</b>, InputStreamReader decodes them to <b>chars</b>, BufferedReader adds a <b>buffer</b> and <code>readLine()</code>.</li>
+        <li><code>readLine()</code> always returns a String, so you parse it yourself: <code>Integer.parseInt(br.readLine())</code>.</li>
+        <li><b>BufferedReader vs Scanner:</b> BufferedReader is faster and buffered but has no parsing; Scanner parses tokens for you but is slower. Use BufferedReader for competitive input.</li>
+        <li><code>throws IOException</code> exists because it is a <b>checked</b> exception &mdash; the compiler forces you to catch it or declare it. Unchecked (NPE, ArithmeticException) needs neither.</li>
+        <li><b>enum</b> is a class extending <code>java.lang.Enum</code>, so it <b>cannot extend anything else</b>. Gives you <code>values()</code>, <code>ordinal()</code>, <code>valueOf()</code>, and type safety that <code>int</code> constants never had.</li>
+        <li><b>Casting:</b> widening is implicit and safe; narrowing needs an explicit cast and can silently overflow. For objects: upcast is implicit, downcast is explicit and can throw <code>ClassCastException</code> &mdash; guard with <code>instanceof</code>.</li>
+      </ul>
+      <div class="gap"><b>Note the boundary:</b> exceptions appear here only as "checked vs unchecked", because that is all your I/O notes cover. The full hierarchy, custom exceptions and try-with-resources are course sections&nbsp;#43&ndash;44 &mdash; still ahead of you.</div>
+    </section>
+
+    <div class="end">
+      <h2>What this drill deliberately does not cover</h2>
+      <p style="max-width:64ch;color:var(--ink-soft);margin:0">Fifteen minutes buys you everything already written up in the repo. These four are the heavyweights still pending &mdash; and together they carry more interview weight than everything above.</p>
+      <div class="end-grid">
+        <div class="end-card"><h4>Streams &amp; lambdas</h4><p>Course #37&ndash;42. Asked in roughly nine of ten interviews.</p></div>
+        <div class="end-card"><h4>Concurrency</h4><p>Course #47&ndash;57. The single biggest rejection reason for career switchers.</p></div>
+        <div class="end-card"><h4>Exceptions, in depth</h4><p>Course #43&ndash;44. Hierarchy, custom exceptions, try-with-resources.</p></div>
+        <div class="end-card"><h4>JVM memory &amp; GC</h4><p>Course #45&ndash;46. Stack vs heap, generations, collectors.</p></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- sections + rail ---------------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main section"));
+  var railList = document.getElementById("railList");
+  var cum = [], running = 0;
+
+  sections.forEach(function(sec, i){
+    var budget = parseInt(sec.getAttribute("data-budget"), 10);
+    running += budget;
+    cum.push(running);
+    var title = sec.querySelector("h2").textContent.replace("★","").trim();
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + sec.id;
+    a.innerHTML = '<span class="n">' + String(i+1).padStart(2,"0") + '</span>' +
+                  '<span class="t">' + title + '</span>' +
+                  '<span class="s">' + budget + 's</span>';
+    li.appendChild(a);
+    railList.appendChild(li);
+  });
+  var railLinks = Array.prototype.slice.call(railList.querySelectorAll("a"));
+  var TOTAL = running;
+
+  /* ---------------- drill clock ---------------- */
+  var clockEl = document.getElementById("clock");
+  var startBtn = document.getElementById("startBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var paceEl = document.getElementById("pace");
+  var fillEl = document.getElementById("trackFill");
+  var elapsed = 0, ticker = null, live = false;
+
+  function mmss(s){
+    var m = Math.floor(s/60), r = s%60;
+    return String(m).padStart(2,"0") + ":" + String(r).padStart(2,"0");
+  }
+
+  function paceIndex(){
+    for (var i = 0; i < cum.length; i++) if (elapsed < cum[i]) return i;
+    return cum.length - 1;
+  }
+
+  function render(){
+    var left = Math.max(0, TOTAL - elapsed);
+    clockEl.textContent = mmss(left);
+    fillEl.style.width = Math.min(100, (elapsed / TOTAL) * 100) + "%";
+
+    var pi = paceIndex();
+    railLinks.forEach(function(a, i){
+      a.classList.toggle("pace", live && left > 0 && i === pi);
+      a.classList.toggle("past", live && i < pi);
+    });
+
+    if (left === 0){
+      clockEl.className = "clock done";
+      paceEl.innerHTML = "<b>Time.</b> Anything you could not say out loud goes back into the notes file.";
+      stop();
+    } else if (live){
+      clockEl.className = "clock run";
+      var sec = sections[pi];
+      var name = sec.querySelector("h2").textContent.replace("★","").trim();
+      var secLeft = cum[pi] - elapsed;
+      paceEl.innerHTML = "<b>" + String(pi+1).padStart(2,"0") + " &middot; " + name + "</b>" +
+                         secLeft + "s left on this card";
+    }
+  }
+
+  function stop(){
+    live = false;
+    clearInterval(ticker); ticker = null;
+    startBtn.textContent = elapsed >= TOTAL ? "Start" : "Resume";
+  }
+
+  startBtn.addEventListener("click", function(){
+    if (live){ stop(); clockEl.className = "clock"; return; }
+    if (elapsed >= TOTAL) elapsed = 0;
+    live = true;
+    startBtn.textContent = "Pause";
+    render();
+    ticker = setInterval(function(){ elapsed++; render(); }, 1000);
+  });
+
+  resetBtn.addEventListener("click", function(){
+    stop(); elapsed = 0;
+    clockEl.className = "clock";
+    clockEl.textContent = mmss(TOTAL);
+    fillEl.style.width = "0%";
+    paceEl.innerHTML = "<b>Reset</b>Press Start and let the pace marker pull you along";
+    railLinks.forEach(function(a){ a.classList.remove("pace","past"); });
+  });
+
+  /* ---------------- which section am I reading ---------------- */
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){
+          var i = sections.indexOf(e.target);
+          railLinks.forEach(function(a, j){ a.classList.toggle("here", j === i); });
+        }
+      });
+    }, { rootMargin: "-90px 0px -65% 0px", threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ---------------- generic step player ---------------- */
+  var renderers = {};
+
+  document.querySelectorAll("[data-anim]").forEach(function(fig){
+    var max = parseInt(fig.getAttribute("data-max"), 10);
+    var caps = Array.prototype.slice.call(fig.querySelectorAll(".anim-cap p"));
+    var dots = fig.querySelector("[data-dots]");
+    var timer = null;
+    var step = 0;
+
+    for (var d = 0; d <= max; d++) dots.appendChild(document.createElement("i"));
+    var dotEls = Array.prototype.slice.call(dots.children);
+
+    function draw(){
+      fig.setAttribute("data-step", step);
+      caps.forEach(function(p, i){ p.classList.toggle("on", i === step); });
+      dotEls.forEach(function(el, i){ el.classList.toggle("on", i === step); });
+      var fn = renderers[fig.id];
+      if (fn) fn(fig, step);
+    }
+    function go(n){
+      step = Math.max(0, Math.min(max, n));
+      draw();
+    }
+    function halt(){
+      if (timer){ clearInterval(timer); timer = null; }
+      fig.querySelector('[data-act="play"]').textContent = "Play";
+    }
+
+    fig.querySelector('[data-act="prev"]').addEventListener("click", function(){ halt(); go(step - 1); });
+    fig.querySelector('[data-act="next"]').addEventListener("click", function(){ halt(); go(step + 1); });
+    fig.querySelector('[data-act="play"]').addEventListener("click", function(){
+      if (timer){ halt(); return; }
+      this.textContent = "Stop";
+      go(0);
+      timer = setInterval(function(){
+        if (step >= max){ halt(); return; }
+        go(step + 1);
+      }, 2100);
+    });
+
+    fig._go = go;
+    go(0);
+  });
+
+  function q(fig, attr, val){ return fig.querySelector("[data-" + attr + '="' + val + '"]'); }
+  function setCls(el, on, cls){ if (el) el.classList.toggle(cls, !!on); }
+
+  /* --- call by value --- */
+  renderers["cbv"] = function(f, s){
+    var a = q(f,"s","a"), b = q(f,"s","b"), c = q(f,"s","c"), d = q(f,"s","d"), e = q(f,"s","e");
+    [c,d].forEach(function(el){ el.style.opacity = s >= 1 ? "1" : "0.25"; });
+    e.style.opacity = "1";
+    c.textContent = s >= 2 ? "copy x = 99" : "copy x = 10";
+    setCls(c, s === 2, "hot");
+    setCls(a, s === 2, "bad");
+    a.textContent = "x = 10" + (s === 2 ? "   (unchanged)" : "");
+    e.textContent = 'Heap @1f4a  name = "' + (s >= 3 ? "CHANGED" : "Abhi") + '"';
+    setCls(e, s === 3, "hot");
+    d.textContent = s >= 4 ? "copy s &rarr; @9c22 (new)" : "copy s &rarr; @1f4a";
+    d.innerHTML = s >= 4 ? "copy s &rarr; @9c22 <em>(new object)</em>" : "copy s &rarr; @1f4a";
+    setCls(d, s === 4, "hot");
+    setCls(b, s === 4, "bad");
+  };
+
+  /* --- upcasting --- */
+  renderers["upc"] = function(f, s){
+    var m = q(f,"u","m"), fl = q(f,"u","f"), dz = q(f,"u","d");
+    [["m",1],["f",2],["d",3]].forEach(function(pair){
+      var el = q(f,"u",pair[0]);
+      el.classList.toggle("dim", s < pair[1]);
+      el.classList.remove("hot","bad");
+    });
+    if (s === 1){ m.classList.add("hot"); m.textContent = "p.speak() → Child"; }
+    else m.textContent = "p.speak()";
+    if (s === 2){ fl.classList.add("hot"); fl.textContent = "p.name → Parent"; }
+    else fl.textContent = "p.name";
+    if (s === 3){ dz.classList.add("bad"); dz.textContent = "p.childOnly() ✗"; }
+    else dz.textContent = "p.childOnly()";
+  };
+
+  /* --- integer cache --- */
+  renderers["cache"] = function(f, s){
+    var lo = q(f,"c","lo"), lr = q(f,"c","lores"), hi = q(f,"c","hi"), hr = q(f,"c","hires"),
+        pool = q(f,"c","pool"), note = q(f,"c","note");
+    [lo,lr,hi,hr,pool,note].forEach(function(el){ el.classList.remove("hot","bad"); });
+    pool.classList.toggle("dim", s < 1);
+    note.classList.toggle("dim", s < 1);
+    lr.textContent = s >= 1 ? "a == b → true" : "a == b → ?";
+    hr.textContent = s >= 2 ? "c == d → false" : "c == d → ?";
+    if (s === 1){ lr.classList.add("hot"); pool.classList.add("hot"); }
+    if (s === 2){ hr.classList.add("bad"); }
+    if (s === 3){ lr.classList.add("hot"); hr.classList.add("bad"); }
+  };
+
+  /* --- hashmap --- */
+  renderers["hm"] = function(f, s){
+    var key = q(f,"h","key"), hash = q(f,"h","hash"), idx = q(f,"h","idx");
+    key.classList.toggle("dim", s < 1 ? false : false);
+    hash.classList.toggle("dim", s < 1);
+    idx.classList.toggle("dim", s < 2);
+    setCls(key, s >= 4, "hot");
+    key.textContent = s >= 4 ? '"Raj"' : '"Abhishek"';
+    hash.textContent = "hashCode() = 203";
+    idx.innerHTML = "203 % 6 = <b>5</b>";
+    setCls(hash, s === 1, "hot");
+    setCls(idx, s === 2, "hot");
+    var row5 = f.querySelector('[data-b="5"]');
+    row5.classList.toggle("hot", s >= 2);
+    q(f,"n","n1").classList.toggle("in", s >= 3);
+    q(f,"n","l1").classList.toggle("in", s >= 4);
+    q(f,"n","n2").classList.toggle("in", s >= 4);
+    var n2 = q(f,"n","n2");
+    n2.style.borderColor = s === 5 ? "var(--accent)" : "";
+    n2.textContent = s === 5 ? '"Raj" | PRESENT  (updated)' : '"Raj" | PRESENT';
+  };
+
+  /* --- treeify --- */
+  var chainPos = [[8,50],[20,50],[32,50],[44,50],[56,50],[68,50],[80,50],[92,50]];
+  var treePos  = [[50,14],[26,44],[74,44],[14,76],[38,76],[62,76],[86,76],[50,96]];
+  renderers["tf"] = function(f, s){
+    var nodes = Array.prototype.slice.call(f.querySelectorAll("[data-t]"));
+    var pos = s >= 2 ? treePos : chainPos;
+    nodes.forEach(function(n, i){
+      n.style.left = pos[i][0] + "%";
+      n.style.top  = pos[i][1] + "%";
+      n.classList.remove("red","blk");
+      if (s >= 2){
+        if (i === 0) n.classList.add("blk");
+        else if (i % 2 === 1) n.classList.add("red");
+        else n.classList.add("blk");
+      }
+      if (s === 1) n.classList.add("blk");
+      if (s === 3 && i > 5) n.style.opacity = "0.25"; else n.style.opacity = "1";
+    });
+  };
+
+  /* --- iterator --- */
+  renderers["it"] = function(f, s){
+    var caret = q(f,"e","caret");
+    var cells = [0,1,2,3].map(function(i){ return q(f,"e",String(i)); });
+    var mc = q(f,"e","mcv"), ec = q(f,"e","ecv");
+    var mcChip = q(f,"e","mc"), ecChip = q(f,"e","ec");
+    caret.style.setProperty("--i", s === 0 ? 0 : Math.min(s - 1, 3));
+    caret.classList.toggle("off", s >= 4);
+    cells.forEach(function(c, i){
+      c.classList.toggle("hot", (s === 1 && i === 0) || (s === 2 && i === 1));
+      c.classList.toggle("gone", s >= 3 && i === 2);
+    });
+    mc.textContent = s >= 3 ? "1" : "0";
+    ec.textContent = "0";
+    mcChip.classList.toggle("bad", s >= 3);
+    ecChip.classList.toggle("bad", s >= 4);
+    ecChip.innerHTML = s >= 4
+      ? 'expectedModCount = <span data-e="ecv">0</span> → CME thrown'
+      : 'expectedModCount = <span data-e="ecv">0</span>';
+  };
+
+  document.querySelectorAll("[data-anim]").forEach(function(f){ f._go(0); });
+})();
+</script>

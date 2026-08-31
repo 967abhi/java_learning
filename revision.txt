@@ -6,11 +6,13 @@
 FOLDER MAP - where each topic lives
 ---------------------------------------------------------
   Autoboxing/      -> wrapper classes, autoboxing/unboxing   [revision.txt]
+  Comparable/      -> Comparable, Comparator, sorting        [note.txt + revision.txt]
   Grid/            -> enum + package practice (tic-tac-toe)  [revision.txt]
   Headfirstjava/   -> Head First Java book exercises         [revision.txt]
   JavaI/o/         -> input in Java, BufferedReader          [revision.txt]
   NestedClasses/   -> static nested / inner / local / anon   [revision.txt + notes.txt]
   oops/            -> the whole OOPs series                  [revision.txt + ReviseConcept.txt]
+  Queue/           -> queue, deque, stack, ArrayDeque        [Note.txt + revision.txt]
   ImmutableClass.java -> immutable classes (notes below)
 
 

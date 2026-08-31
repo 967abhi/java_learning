@@ -1,0 +1,117 @@
+So how we implement the queue the 
+queue is implement by the array and the linkedlist 
+now the array implementations
+cREATE A N size of the array and trhe array is having two pointer that array 
+front and rear and they both are pointing on the -1 and just like when we fill some item in the array and then rear increase++ rear and the deletion happes lifo so what ever 
+the last entry will be that will ended first 
+and then suppose that rear is pointing on the lasdt index and then from the front some element delete then the front++ and in the empty place the element will come and then rear point 
+when ever the rear points next to the front means after rear the front is there then we get to know that the array is full and then the we can do multiple thing first is that 
+we can copy it and then we can make a new array of the array and coopyt all the element and we will give the rear and front some gap 
+
+Now make digram also 
+
+
+
+Now implemention using the linkedlist 
+clas node{
+    int data;
+    node next;
+
+}
+
+
+
+suppose that first element and on that the front and rear is pointniung the same node and the rear++ 
+so the time qcompplextit is o1 only and the code is clean also 
+
+Now implement using stack 
+Lifo 
+pop and push in the array and there increase the rear and pointing the front 
+write all this using the implement of the stack 
+and trhe java insiude it using the double linkedlist only the top is denoting the new node
+push(int i){
+    temp=new node (i,new);
+    temp.node=top;
+    top=temp;
+
+}
+Hireechy 
+Iterbale->collection 
+abnd the collection extends queue->dequeue
+Array dequeue and this is class 
+we can use the stack using the array deque like this 
+offerfirst
+offerlast
+pollfirst
+Internal Implementatioj of the 
+Dequeue interface
+so either arraydequeue or linkedlist inside they both are using the dequeue implement 
+ 
+
+ arraydequeue
+
+
+ rear and front =-1 
+ add and then  rear and front goes to the 0 index and then again some one add the value then again the rear increase and the front pointing to 0 only 
+ rear++ 
+ rear =1 reear =2  so this uses the array implementations 
+ Linkedlist implementations 
+
+ Which is the better class for the dequeu? 
+ arraydequeu or linkedlist 
+ so the linkelist is better to implementation by seeing 
+ but the javadocs say arraydequeu is best implementations
+ because array is contiquous and cache friendly 
+ just for the queue and stack 
+ if arraydequeue is used for the implementations then null is not allowed but the linkedlist is allowed 
+ stack we donot prefer we use arraydequeue because the stack is the legacy class 
+        queue
+        Insert->add(E e),offer(Ee);
+        Remive-> Remove(E e),poll(E e);
+        Inspect ->element() peek()
+        sO FOR THE Dequeue
+        Insert->addfirst(Ee),addlast(Ee),offerfirst(Ee),offerlast(e)
+        Remove-> removefirst(),removelast(),pollfirst()polllast()
+        Inspect-> getfirst() getlast() peekfirst() peeklast()
+
+        stack 
+        push pop peek offerfirst as push pollfirst() peek as peekfirst()
+queue->dequeuq->arraydequue
+           |
+           linkedlist
+           and from the queue there is one more queue came that is priority queue 
+and it does not olow the fifo
+so for the priority queue there is no any front or rear 
+they are index 
+so if we do the pq.poll then the most heighest priorit will be remove first
+so the jobscheduling we use priority queue 
+Internal Implementatiosn of the Priority queue 
+so it uses the HEAP DATASTRUCUTRE 
+Heap data structure->binary heap->complete binary tree implement using array 
+Complete binary tree-> har node ke do child hote h level by level insertion 
+left ->right left->right like this 
+Heap data strucutre 
+so for this we use array to store the data 
+so if the parent is present at the i index then the left is become at the 2i+1 and the right is become at the 2i+2 
+so the heap data structure is also two type the min heap and the max heap 
+so in the min heap the parent is smaller then there both child and the max heap there the parent is bigger then there both child 
+by default priority queue is uses the min heap 
+prioirty queue->heap ds->
+so suppose that if we build a tree like 
+              10
+            20   30
+           40 50
+
+           so this is the tree and that is stored like this 10,20,30,40,50 
+           and if in that suppose that if the parent node is deleted thant the close bond will not break 
+that;s why we uses the algorithm which we called 
+Heapify-> 
+Up heafit 
+so suppose that how you can add value of the heap so suppose that if i have to add the 5 at the right child of the 30 then in the heapify there is a formulat j-1/2 or k-1/2 and there floor value is giving the parent index of that and then we check the parent and the child if the parent is greater then child then we will swap it 
+and similary again it will check to the parent and till then where the parent is smaller then there child 
+so in the array that will check the j-1/2 value when we store into the array 
+Down heapify:- so the parent will swap with the last and then we do downheapify 2i+1 2i+2 and thenwe check which is small 
+then there timecomplexity will be the o(logn)
+
+
+

@@ -1,0 +1,68 @@
+as we n=know that woth the lexicolgraphy method we uses the and then compare the string but suppose that 
+there is class 
+Class Student{
+    int marks;
+    string name;
+}
+Student s1=new Student(109,"ABhishek");
+Student s2=new Student(108,"Raj");
+so know the java will go the confussions when we compare the both above object 
+so like this problem only we are not able to store the value of treeset because itnernally it uses the bst and then we know the bst compare the value  
+so int his conditions java gives us a Comparable Interface 
+so it uses to comparable the interface
+so it gives contract 
+I know how to compare myself with another object of my same type 
+How comparable interface see?
+interface comparable <T>{
+    int comparable(T,o);
+}
+so there is only one method 
+so if the interface is only one method then we called a functional Interfaces 
+
+s1.compareTo(s2);
+(-ve) s1 comes before s2
++ve s1 comes after s2
+0 [s1,s2] is same 
+java inside call compare to 
+Student
+->sorte
+->Treeset/treemap
+then it call the compare to inside 
+jitni bhi inbuilt class h java me they are calling the comparable class inside
+string or wrapper class 
+Comparable Interface comes it natural orderign  
+comparebymarks
+comparebyname
+so there it generaly call only one natural ordering 
+one class one natural ordering 
+int compareto(T,o){
+
+}
+
+
+Danger of 0 ?
+so here the treeset and treemap uses the set where duplicate is not allowed and then they are inside implemeting the compareTo so there they thought s1 is equals to s2 then there is chance of loss of the data 
+Rule :- 
+if a.compareTo=0 then make sure a.equals(b)->true
+
+When we have to use the comparable Interface?
+custom class and natural ordering is obvious
+Collections class
+utility class 
+and we know there are many static method 
+collections.sort
+collections.list
+collections.max
+collections.min
+collections.shuffle
+collections.reverse
+collection.fill(0)
+collections.swap
+collections.binarysearch
+collections.frequency()
+collections.unmodifiablelist(list)
+unmodifiableset
+unmodifiablemap
+emptylist so this is also immutable and that are used where we got the null then we use this 
+emptyset 
+emptymap
