@@ -330,8 +330,8 @@ td b{font-weight:700;color:var(--ink)}
   </div>
   <div class="tabs" role="tablist" aria-label="Note tracks">
     <button class="tab" role="tab" id="tab-core" aria-controls="p-core" data-panel="p-core" data-track="core" aria-selected="true">Core Java <em>14</em></button>
-    <button class="tab" role="tab" id="tab-adv" aria-controls="p-adv" data-panel="p-adv" data-track="adv" aria-selected="false">Advanced Java <em>10</em></button>
-    <button class="tab" role="tab" id="tab-col" aria-controls="p-col" data-panel="p-col" data-track="col" aria-selected="false">Collections <em>13</em></button>
+    <button class="tab" role="tab" id="tab-adv" aria-controls="p-adv" data-panel="p-adv" data-track="adv" aria-selected="false">Advanced Java <em>13</em></button>
+    <button class="tab" role="tab" id="tab-col" aria-controls="p-col" data-panel="p-col" data-track="col" aria-selected="false">Collections <em>14</em></button>
     <button class="tab" role="tab" id="tab-rec" aria-controls="p-rec" data-panel="p-rec" data-track="rec" aria-selected="false">Recall &amp; Gaps <em>04</em></button>
   </div>
 </header>
@@ -944,10 +944,10 @@ Student(Student other){
       <div class="kicker">Track two &middot; the language beyond the four pillars</div>
       <h1>The parts that turn code into working code.</h1>
       <p>Wrappers, generics, casting, String, enum, I/O, exceptions, lambdas &mdash; the layer where the compiler is doing something on your behalf and the traps live inside that hidden work. Autoboxing inserts <code>valueOf()</code>; generics erase to <code>Object</code> and leave bridge methods behind; concatenation compiles to <code>invokedynamic</code>; the input chain wraps three objects to read one line.</p>
-      <p>Two cards are marked as thin in the repo and written out in full anyway, because the interview does not care which folder is short. The last three &mdash; exceptions in depth, functional interfaces, and modern Java &mdash; go past the syllabus you have covered, because they are what a three-year candidate is expected to have met.</p>
+      <p>Two cards are marked as thin in the repo and written out in full anyway, because the interview does not care which folder is short. Cards&nbsp;10&ndash;12 are the newest folder in the repo, <code>Lambda/</code>, taken all the way down: three comparator classes collapsing into one arrow, the four kinds of method reference, and the composition that turns small functions into one. The last card goes past the syllabus you have covered, because it is what a three-year candidate is expected to have met.</p>
       <div class="lede-meta">
-        <span><b>10</b> cards</span>
-        <span><b>2</b> animated mechanisms</span>
+        <span><b>13</b> cards</span>
+        <span><b>3</b> animated mechanisms</span>
         <span><b>Thin in repo:</b> Strings, generics</span>
       </div>
     </div>
@@ -1343,8 +1343,233 @@ Comparator.comparingInt(Student::getMarks).thenComparing(Student::getName)   <b>
     </section>
 
     <!-- adv 10 -->
-    <section id="a10">
-      <div class="s-head"><span class="s-num">10</span><h2>Modern Java, briefly</h2><span class="src">Java 8 &rarr; 21</span></div>
+    <section id="a10" data-key="1">
+      <div class="s-head"><span class="s-num">10</span><h2>Three classes collapse into one arrow <span class="star">&#9733;</span></h2><span class="src">Lambda/Demo.java</span></div>
+      <p class="s-why">Your own file holds every stage of the journey &mdash; three commented-out classes above one live lambda</p>
+      <ul class="facts">
+        <li><b>The problem the lambda solves is duplication of ceremony, not of logic.</b> <code>SortByName</code>, <code>SortByRoll_No</code> and <code>SortByMarks</code> are three classes&rsquo; worth of <code>implements Comparator&lt;Student&gt;</code> wrapping one line of comparison each. The ratio of noise to meaning is about six to one.</li>
+        <li><b>An anonymous class is a declaration and an instantiation in one expression.</b> <code>new Comparator&lt;Student&gt;(){ &hellip; }</code> says &ldquo;define a class with no name that implements this, and give me one instance of it, here&rdquo;. It still produces a real class file &mdash; <code>Demo$1.class</code>, numbered in the order the compiler meets them.</li>
+        <li><b>A lambda is narrower and cheaper.</b> Narrower because it only works where a <b>functional interface</b> is expected &mdash; an anonymous class can extend an abstract class or implement a two-method interface, a lambda cannot. Cheaper because there is no class file and, when it captures nothing, no repeated allocation.</li>
+        <li><b>The target type does the work.</b> <code>(s1, s2) -&gt; s1.marks - s2.marks</code> has no type of its own. It becomes a <code>Comparator&lt;Student&gt;</code> only because <code>Collections.sort(List&lt;T&gt;, Comparator&lt;? super T&gt;)</code> is what it was handed to. The same text in a different parameter slot would compile to a different interface.</li>
+        <li><b>Your <code>Student</code> carries both kinds of ordering at once</b> &mdash; <code>implements Comparable&lt;Student&gt;</code> for the one natural order (by marks), plus comparators for every other order. Passing a comparator to <code>sort</code> <b>overrides</b> the natural one; passing none <b>requires</b> it, and fails with <code>ClassCastException</code> at runtime if the element type is not Comparable.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="4" id="lmb">
+        <div class="anim-stage">
+          <div class="mem">
+            <div class="pane">
+              <h4>What you write</h4>
+              <div class="slot" data-l="0">class SortByMarks implements Comparator&lt;Student&gt;{&hellip;}</div>
+              <div class="slot" data-l="1">new Comparator&lt;Student&gt;(){ public int compare&hellip; }</div>
+              <div class="slot" data-l="2">(s1, s2) -&gt; s1.marks - s2.marks</div>
+              <div class="slot" data-l="3">Comparator.comparingInt(s -&gt; s.marks)</div>
+              <div class="slot" data-l="4">Comparator.comparingInt(Student::getMarks)</div>
+            </div>
+            <div class="pane">
+              <h4>What the JVM actually gets</h4>
+              <div class="slot" data-l="cls">SortByMarks.class</div>
+              <div class="slot" data-l="emit">a named class file, written by you</div>
+              <div class="slot" data-l="cost">a new instance per <code>new SortByMarks()</code></div>
+            </div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>Three named classes, one ordering each.</b> This is the version sitting commented out in your <code>Lambda/Demo.java</code>. It works, and it is tightly coupled: a fourth ordering means a fourth class.</p>
+          <p><b>Anonymous class.</b> The declaration moves down to the call site, so the ordering lives where it is used. A class file is still generated &mdash; <code>Demo$1.class</code> &mdash; and a fresh instance is created every time the expression is evaluated.</p>
+          <p><b>Lambda.</b> No class file at all. <code>javac</code> emits a <code>private static</code> method named <code>lambda$main$0</code> holding the body, plus an <code>invokedynamic</code> instruction. On first execution <code>LambdaMetafactory</code> spins the implementation in memory and the call site is linked once, for good.</p>
+          <p><b><code>comparingInt</code>.</b> Now you supply only the <b>key</b>, and the JDK writes the two-argument compare for you &mdash; correctly, with <code>Integer.compare</code> rather than subtraction. This is also the form you can chain <code>thenComparing</code> onto.</p>
+          <p><b>Method reference.</b> It captures nothing, so the same instance is reused for every call &mdash; effectively a singleton. And the only thing left on the line is the intent: sort by marks.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <pre><i>// the same ordering, five ways &mdash; the last two need getters on Student; with your</i>
+<i>// public fields the key extractor is s -&gt; s.marks instead of Student::getMarks</i>
+Collections.sort(list, new SortByMarks());                         <i>// a named class</i>
+Collections.sort(list, new Comparator&lt;Student&gt;(){                   <i>// anonymous</i>
+        public int compare(Student a, Student b){ return a.marks - b.marks; } });
+Collections.sort(list, (s1, s2) -&gt; s1.marks - s2.marks);           <i>// lambda &mdash; your line</i>
+list.sort(Comparator.comparingInt(s -&gt; s.marks));                  <i>// key extractor</i>
+list.sort(Comparator.comparingInt(Student::getMarks));             <b>// method reference</b></pre>
+
+      <div class="trap"><span class="lbl">The bug hiding inside your lambda</span>
+        <ul>
+          <li><code>s1.marks - s2.marks</code> is a <b>subtraction comparator</b>, and subtraction of <code>int</code> overflows. With marks of 85 and 88 it is fine forever; the moment the same habit reaches a timestamp, an id or anything that can go negative, <code>2000000000 - (-2000000000)</code> wraps to a <b>negative</b> number and the sort quietly produces the wrong order.</li>
+          <li>Since Java 7 the sort is <b>TimSort</b>, which validates its own assumptions while merging runs. An inconsistent comparator then throws <code>IllegalArgumentException: Comparison method violates its general contract</code> &mdash; but only once the list is large enough to trigger a merge, which is why it never appears on a three-element demo and always appears in production.</li>
+          <li>The fix is one word: <code>Integer.compare(s1.marks, s2.marks)</code>, or let <code>Comparator.comparingInt</code> do it. Never <code>-</code>, and never <code>a.marks &gt; b.marks ? 1 : -1</code> either &mdash; that one never returns 0, so equal elements are reported as unequal and stability is lost.</li>
+          <li>The same trap eats doubles: subtracting two <code>double</code>s and returning it as an <code>int</code> truncates 0.4 to 0, so near-equal values compare equal. Use <code>Double.compare</code>.</li>
+        </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">One level down &mdash; what <code>Collections.sort</code> actually does with your lambda</span>
+        <p><code>Collections.sort(list, c)</code> has been a one-line delegation to <code>list.sort(c)</code> since Java 8, and <code>ArrayList.sort</code> does three things: sort the backing <code>elementData</code> array in place with <code>Arrays.sort(a, 0, size, c)</code>, bump <code>modCount</code>, and check it afterwards &mdash; so mutating the list from inside your comparator throws <code>ConcurrentModificationException</code>.</p>
+        <p><code>Arrays.sort</code> with a comparator is <b>TimSort</b>: a stable, adaptive merge sort that finds already-ordered runs, extends short ones by binary insertion, then merges. Stability matters here &mdash; it is the reason <code>thenComparing</code> works at all, and the reason sorting by name and then by marks yields &ldquo;by marks, ties broken by name&rdquo;. Primitive arrays get a different algorithm (dual-pivot quicksort, not stable) because identical <code>int</code>s have no identity to preserve.</p>
+        <p>Your comparator is called O(n&nbsp;log&nbsp;n) times, so it must be <b>cheap and pure</b>. A comparator that hits a database, allocates, or reads mutable state is a performance bug and a correctness bug at the same time.</p>
+      </div>
+
+      <div class="deep"><span class="lbl">Anonymous class vs lambda &mdash; the differences that decide which you write</span>
+        <div class="tbl"><table>
+          <tr><th></th><th>Anonymous class</th><th>Lambda</th></tr>
+          <tr><td>Compiles to</td><td><code>Demo$1.class</code> on disk</td><td>a private method + <code>invokedynamic</code></td></tr>
+          <tr><td>Instances</td><td>a new one per evaluation</td><td>reused if it captures nothing</td></tr>
+          <tr><td><code>this</code></td><td>the anonymous instance</td><td>the <b>enclosing</b> instance</td></tr>
+          <tr><td>Own fields / state</td><td>allowed</td><td>impossible</td></tr>
+          <tr><td>Extra methods</td><td>allowed</td><td>exactly one body</td></tr>
+          <tr><td>Target</td><td>any interface or abstract class</td><td>functional interface only</td></tr>
+          <tr><td>Recursion on itself</td><td>possible</td><td>needs a field or a named variable</td></tr>
+          <tr><td>Shadowing an enclosing local</td><td>allowed &mdash; it opens a new scope</td><td>compile error &mdash; same scope</td></tr>
+        </table></div>
+        <p>Practical rule: reach for a lambda first; drop back to an anonymous class only when you need state, a second method, or a supertype that is not functional. Neither is &ldquo;more object-oriented&rdquo; than the other &mdash; both end as an object implementing <code>Comparator</code>.</p>
+      </div>
+
+      <div class="gap"><span class="lbl">Repo note</span>The comment at the bottom of <code>Lambda/Demo.java</code> reads &ldquo;so this is tight coupled to sort this&rdquo;, and that is the right diagnosis written in the right place. What the file still wants is the last stage: delete the subtraction, replace the lambda with <code>Comparator.comparingInt(Student::getMarks).thenComparing(s -&gt; s.name)</code>, and three classes and one bug disappear together. <code>Lambda/Demo1.java</code> is still an empty <code>main</code> &mdash; that is where the two cards below want to be typed out.</div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>A named class, an anonymous class and a lambda all produce <b>an object implementing one method</b>. Only the lambda skips the class file &mdash; and only <code>comparingInt</code> skips the overflow bug.</p></div>
+    </section>
+
+    <!-- adv 11 -->
+    <section id="a11" data-key="1">
+      <div class="s-head"><span class="s-num">11</span><h2>Method references, all four kinds <span class="star">&#9733;</span></h2><span class="src">Lambda/note.txt</span></div>
+      <p class="s-why">Your note lists them &mdash; this is the version that compiles, plus the rule for telling them apart</p>
+      <ul class="facts">
+        <li><b>A method reference is a lambda whose entire body is one call, with the arguments passed straight through.</b> That is the whole test. <code>x -&gt; Math.abs(x)</code> passes <code>x</code> through untouched, so it collapses. <code>x -&gt; Math.abs(x) + 1</code> does not.</li>
+        <li>It is <b><code>::</code>, two colons</b>, and there is <b>never an argument list</b>. <code>String::isEmpty</code> is a reference; <code>String::isEmpty()</code> does not compile, because the parentheses would mean you are calling it now.</li>
+        <li><b>The same reference can become different interfaces.</b> <code>String::isEmpty</code> is a <code>Predicate&lt;String&gt;</code> in <code>filter</code> and a <code>Function&lt;String,Boolean&gt;</code> elsewhere. The <b>target type decides the interface</b>; the <b>shape decides which of the four kinds it is</b>. Those are two independent questions, and confusing them is what makes the list of kinds look endless.</li>
+        <li><b>They are not limited to JDK methods.</b> <code>Student::getMarks</code>, <code>this::validate</code> and <code>MyUtils::clean</code> all work. The only requirement is that the signature lines up with the functional interface.</li>
+        <li>Method references are <b>resolved at compile time</b> but <b>linked on first use</b>, exactly like a lambda &mdash; the same <code>invokedynamic</code> and <code>LambdaMetafactory</code> machinery, so there is no reflection and no per-call overhead.</li>
+        <li><b>There is no field reference in Java.</b> <code>Student::marks</code> does not compile, no matter that <code>marks</code> is public &mdash; <code>::</code> names a <i>method</i>. This is the concrete, non-dogmatic reason to give your <code>Student</code> getters: <code>Comparator.comparingInt(Student::getMarks)</code> only exists once <code>getMarks()</code> does. Until then the key extractor stays a lambda, <code>s -&gt; s.marks</code>, which works and reads fine.</li>
+      </ul>
+
+      <div class="tbl"><table>
+        <tr><th>#</th><th>Kind</th><th>Form</th><th>The lambda it replaces</th><th>Typical target</th></tr>
+        <tr><td>1</td><td><b>Static</b></td><td><code>Math::abs</code></td><td><code>x -&gt; Math.abs(x)</code></td><td><code>IntUnaryOperator</code></td></tr>
+        <tr><td>2</td><td><b>Bound instance</b> &mdash; a receiver you already hold</td><td><code>System.out::println</code></td><td><code>x -&gt; System.out.println(x)</code></td><td><code>Consumer&lt;T&gt;</code></td></tr>
+        <tr><td>3</td><td><b>Unbound instance</b> &mdash; the receiver arrives as the first argument</td><td><code>String::isEmpty</code><br><code>String::compareTo</code></td><td><code>s -&gt; s.isEmpty()</code><br><code>(a,b) -&gt; a.compareTo(b)</code></td><td><code>Predicate&lt;String&gt;</code><br><code>Comparator&lt;String&gt;</code></td></tr>
+        <tr><td>4</td><td><b>Constructor</b></td><td><code>ArrayList::new</code><br><code>int[]::new</code></td><td><code>() -&gt; new ArrayList&lt;&gt;()</code><br><code>n -&gt; new int[n]</code></td><td><code>Supplier&lt;T&gt;</code><br><code>IntFunction&lt;int[]&gt;</code></td></tr>
+      </table></div>
+
+      <div class="deep"><span class="lbl">Kinds 2 and 3 look identical &mdash; this is how you tell them apart</span>
+        <p>Both are written <code>something::method</code>. The difference is entirely in what stands on the left:</p>
+        <pre>PrintStream ps = System.out;
+Consumer&lt;String&gt; c = ps::println;        <u>// 2 &mdash; left side is an OBJECT, receiver already chosen</u>
+Predicate&lt;String&gt; p = String::isEmpty;   <u>// 3 &mdash; left side is a TYPE, receiver arrives at call time</u></pre>
+        <p>In kind 2 the receiver is fixed when the reference is created, so the interface method&rsquo;s parameters map one-to-one onto the method&rsquo;s parameters. In kind 3 there is <b>an extra parameter at the front</b>, and it becomes the receiver. That is why <code>String::compareTo</code>, a one-argument method, satisfies the two-argument <code>Comparator</code>: <code>compare(a, b)</code> becomes <code>a.compareTo(b)</code>.</p>
+        <p>A consequence worth carrying: a bound reference evaluates its left-hand side <b>eagerly</b>. <code>obj::method</code> throws <code>NullPointerException</code> at the moment the reference is created if <code>obj</code> is null &mdash; not later, on first call. The lambda <code>x -&gt; obj.method(x)</code> defers it. Same-looking code, different failure time.</p>
+      </div>
+
+      <pre><i>// all four kinds, applied to the classes actually in your repo</i>
+list.forEach(System.out::println);                       <i>// 2 &mdash; bound instance</i>
+list.sort(Comparator.comparingInt(Student::getMarks));   <i>// 3 &mdash; unbound, on your own class</i>
+list.removeIf(Objects::isNull);                          <i>// 1 &mdash; static</i>
+Supplier&lt;List&lt;Student&gt;&gt; make = ArrayList::new;           <i>// 4 &mdash; constructor</i>
+List&lt;Student&gt; fresh = make.get();                        <b>// a NEW list on every get() &mdash; that is the point</b>
+
+<i>// unbound on your own type, both arities</i>
+Function&lt;Student,String&gt; name  = Student::getName;        <i>// receiver -&gt; result</i>
+Comparator&lt;String&gt;      alpha = String::compareTo;        <i>// receiver + arg -&gt; result</i>
+
+<i>// where it stops working &mdash; the body is no longer a bare pass-through</i>
+<s>s -&gt; s.getName().toUpperCase()</s>   <i>// two calls: stays a lambda</i>
+<s>x -&gt; Math.abs(x) + 1</s>            <i>// call plus arithmetic: stays a lambda</i></pre>
+
+      <div class="trap"><span class="lbl">Fixes to <code>Lambda/note.txt</code> &mdash; small edits, every one of them a compile error</span>
+        <ul>
+          <li><code>math:abs</code> &rarr; <b><code>Math::abs</code></b>. Two colons, and the class name is capitalised &mdash; <code>math</code> does not exist.</li>
+          <li><code>system.out:println</code> &rarr; <b><code>System.out::println</code></b>. Same two fixes.</li>
+          <li><code>string::isempty()</code> &rarr; <b><code>String::isEmpty</code></b>. No parentheses, and Java method names are camelCase &mdash; <code>isempty</code> is a different, non-existent method.</li>
+          <li><b>&ldquo;Predicate method reference&rdquo; is not a separate kind.</b> <code>String::isEmpty</code> is kind 3, an unbound instance reference; it merely <i>lands in</i> a <code>Predicate</code> slot. Name a reference by its shape, not by the interface it happens to fill, or the list never closes.</li>
+          <li><code>Supplier&lt;T&gt;</code> as <code>void -&gt; T</code> is the right idea; the exact shape is <code>T get()</code> &mdash; no input, one output. Its mirror image is <code>Consumer&lt;T&gt;</code>, <code>void accept(T)</code>.</li>
+          <li>The comment in <code>Demo.java</code> &mdash; &ldquo;we can use it only in the inbuilt reference&rdquo; &mdash; is the one line worth deleting. <code>Student::getMarks</code> is your own class, and it is the most useful reference on the page.</li>
+        </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">One level down &mdash; the two places method references genuinely bite</span>
+        <ul>
+          <li><b>Ambiguity between kind 1 and kind 3.</b> If a class has both a static and an instance method of the same name, <code>Type::name</code> is a compile error: the compiler cannot tell whether the first parameter is an argument or the receiver. <code>Integer::toString</code> is the textbook case &mdash; there is a static <code>toString(int)</code> and an instance <code>toString()</code>.</li>
+          <li><b>Constructor references pick an overload by arity.</b> <code>ArrayList::new</code> is <code>() -&gt; new ArrayList&lt;&gt;()</code> as a <code>Supplier</code> and <code>n -&gt; new ArrayList&lt;&gt;(n)</code> as an <code>IntFunction</code>. The target type chooses, silently. Array constructors are their own form &mdash; <code>String[]::new</code> &mdash; which is exactly what <code>toArray(String[]::new)</code> asks for.</li>
+          <li><b>A reference to a generic method can carry its type argument:</b> <code>Type::&lt;String&gt;method</code> is legal syntax, needed only when inference fails.</li>
+          <li><b>Readability, not only correctness.</b> <code>Student::getMarks</code> is clearer than <code>s -&gt; s.getMarks()</code>. But <code>map(Foo::bar)</code> where <code>bar</code> is a poorly named method is <i>worse</i> than the lambda, because the lambda at least names its parameter. Use the reference when the method name reads like the intent.</li>
+        </ul>
+      </div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>Four kinds: <b>static</b>, <b>bound instance</b>, <b>unbound instance</b>, <b>constructor</b>. If the left side is a type and the method needs a receiver, <b>the first parameter becomes the receiver</b> &mdash; that one sentence is the whole of kind three.</p></div>
+    </section>
+
+    <!-- adv 12 -->
+    <section id="a12">
+      <div class="s-head"><span class="s-num">12</span><h2>Functional composition</h2><span class="src">Lambda/note.txt &middot; the last two lines</span></div>
+      <p class="s-why">&ldquo;Break the code into multiple functions and then <code>andThen()</code>&rdquo; &mdash; this is what that buys you</p>
+      <ul class="facts">
+        <li><b>Composition is how small functions become one function without anybody writing glue.</b> Each built-in functional interface carries <code>default</code> methods that return <i>a new instance of the same interface</i>, so the result can be composed again. The chain is a value you can name, store and pass around.</li>
+        <li><b>Nothing runs while you compose.</b> <code>f.andThen(g).andThen(h)</code> allocates wrappers and calls none of them. Execution happens on <code>apply</code> &mdash; the same lazy shape streams are built on, which is why this card is the door into <code>filter</code> / <code>map</code> / <code>collect</code>.</li>
+        <li><b><code>andThen</code> reads left to right; <code>compose</code> reads right to left.</b> <code>f.andThen(g).apply(x)</code> is <code>g(f(x))</code>. <code>f.compose(g).apply(x)</code> is <code>f(g(x))</code>. If you remember only one, remember <code>andThen</code> and never write <code>compose</code>.</li>
+        <li><code>Predicate</code> composes with <b><code>and</code>, <code>or</code>, <code>negate</code></b>, and they <b>short-circuit</b> exactly like <code>&amp;&amp;</code> and <code>||</code> &mdash; so put the cheap test first.</li>
+        <li><code>Comparator</code> is the composition you already use: <b><code>comparing</code> &rarr; <code>thenComparing</code> &rarr; <code>reversed</code></b>, which replaces your three <code>SortBy&hellip;</code> classes with a single expression.</li>
+      </ul>
+
+      <div class="tbl"><table>
+        <tr><th>Interface</th><th>Composers</th><th>Result</th></tr>
+        <tr><td><code>Function&lt;T,R&gt;</code></td><td><code>andThen(g)</code> / <code>compose(g)</code></td><td><code>g(f(x))</code> / <code>f(g(x))</code></td></tr>
+        <tr><td><code>Predicate&lt;T&gt;</code></td><td><code>and</code>, <code>or</code>, <code>negate</code>, static <code>not</code> (Java&nbsp;11+)</td><td>short-circuiting boolean logic</td></tr>
+        <tr><td><code>Consumer&lt;T&gt;</code></td><td><code>andThen(c2)</code></td><td>both run, on the <b>same</b> input, in order</td></tr>
+        <tr><td><code>Comparator&lt;T&gt;</code></td><td><code>thenComparing</code>, <code>reversed</code>, <code>nullsFirst</code>, <code>nullsLast</code></td><td>tie-breaking chains</td></tr>
+        <tr><td><code>Function</code> (static)</td><td><code>Function.identity()</code></td><td><code>x -&gt; x</code>, with a name</td></tr>
+        <tr><td><code>UnaryOperator&lt;T&gt;</code></td><td>&mdash;</td><td>a <code>Function&lt;T,T&gt;</code>, shorter to write</td></tr>
+      </table></div>
+
+      <pre><i>// your three comparator classes, as one composed value</i>
+Comparator&lt;Student&gt; order =
+        Comparator.comparingInt(Student::getMarks)       <i>// primary key</i>
+                  .reversed()                            <i>// highest marks first</i>
+                  .thenComparing(Student::getName)       <i>// ties broken alphabetically</i>
+                  .thenComparingInt(Student::getRollNo); <i>// and then, deterministically</i>
+list.sort(order);
+
+<i>// predicates compose into a rule you can name and reuse</i>
+Predicate&lt;Student&gt; passed   = s -&gt; s.getMarks() &gt;= 40;
+Predicate&lt;Student&gt; topper   = s -&gt; s.getMarks() &gt;= 85;
+Predicate&lt;Student&gt; ordinary = passed.and(topper.negate());
+Predicate&lt;Student&gt; failed   = passed.negate();           <i>// or Predicate.not(passed)</i>
+list.removeIf(failed);
+
+<i>// functions chain in reading order</i>
+Function&lt;Student,String&gt; label =
+        ((Function&lt;Student,String&gt;) Student::getName)
+                .andThen(String::trim)
+                .andThen(String::toUpperCase);           <i>// name -&gt; trim -&gt; upper</i>
+
+<i>// consumers do not chain values, they chain effects</i>
+Consumer&lt;Student&gt; log   = s -&gt; System.out.println(s.getName());
+Consumer&lt;Student&gt; audit = s -&gt; store.record(s);
+list.forEach(log.andThen(audit));                        <b>// both see the same Student</b></pre>
+
+      <div class="trap"><span class="lbl">The three composition traps</span>
+        <ul>
+          <li><b><code>reversed()</code> reverses the whole chain built so far</b>, not the last key. <code>comparing(A).thenComparing(B).reversed()</code> reverses <i>both</i> keys. To reverse only B: <code>comparing(A).thenComparing(B, Comparator.reverseOrder())</code>. This is the most common comparator bug after subtraction.</li>
+          <li><b><code>compose</code> runs its argument first.</b> Reading <code>f.compose(g)</code> left to right gives the wrong order and a silent bug &mdash; the code still compiles, because both sides are <code>Function</code>. Prefer <code>andThen</code>; it is the same operation written in the order it executes.</li>
+          <li><b>A composed comparator is still called O(n&nbsp;log&nbsp;n) times.</b> <code>comparing(s -&gt; expensive(s))</code> recomputes the key on <i>every comparison</i>, not once per element. If the key costs anything, compute it into a field first &mdash; or accept paying for it roughly 2n&nbsp;log&nbsp;n times.</li>
+        </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">One level down &mdash; <code>default</code> methods are what made all of this possible</span>
+        <p>Every composer above is a <code>default</code> method on an interface. Before Java 8 an interface could hold no bodies, so <code>Comparator</code> could not have grown <code>thenComparing</code> without breaking every class that already implemented it &mdash; and <code>Collection</code> could not have grown <code>removeIf</code>, nor <code>Iterable</code> its <code>forEach</code>. <b>Default methods exist so interfaces can evolve</b>; lambdas are what made the new methods worth adding.</p>
+        <p>This is also why default methods do not break the &ldquo;one abstract method&rdquo; rule from card&nbsp;09: <code>Comparator</code> declares a dozen methods and stays functional because only <code>compare</code> is abstract.</p>
+        <p>The one collision rule worth carrying: if a class inherits the same default method from two interfaces it <b>must</b> override it, and inside that override <code>InterfaceName.super.method()</code> picks a side. A class method always wins over any inherited default.</p>
+      </div>
+
+      <div class="gap"><span class="lbl">What comes next</span>Composition, laziness and the built-in interfaces are three quarters of the Stream API. <code>filter</code> takes the <code>Predicate</code>, <code>map</code> takes the <code>Function</code>, <code>forEach</code> takes the <code>Consumer</code>, <code>sorted</code> takes the <code>Comparator</code> &mdash; and nothing executes until a terminal operation asks for a result, the same &ldquo;build now, run later&rdquo; you just saw. Streams are course #39&ndash;42 and still the largest gap in the repo; every functional interface they need is already on this page.</div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><code>andThen</code> is left to right, <code>compose</code> is right to left, and <code>reversed()</code> reverses <b>everything before it</b>. Composing builds a value; nothing runs until you call it.</p></div>
+    </section>
+
+    <!-- adv 13 -->
+    <section id="a13">
+      <div class="s-head"><span class="s-num">13</span><h2>Modern Java, briefly</h2><span class="src">Java 8 &rarr; 21</span></div>
       <p class="s-why">You will be asked which version you use and what you use from it &mdash; have an answer</p>
 
       <div class="tbl"><table>
@@ -1395,7 +1620,7 @@ if (o instanceof Student s &amp;&amp; s.marks() &gt; 90) { ... }   <i>// test an
       <p>This is the part of your notes that already answers at a level above your experience &mdash; &ldquo;a Set is a HashMap with a dummy PRESENT value&rdquo; is the internal explanation, not the textbook definition, and that is exactly what gets asked. Everything here is rebuilt from <code>set/note1.txt</code>, <code>Interable/Iterable_Notes.md</code> and <code>Queue/Note.txt</code>.</p>
       <p>Collections internals show up in about nine interviews out of ten. Starred cards are the ones that turn into a ten-minute conversation &mdash; and the blue blocks are where that conversation goes: bitmasks instead of modulo, why 8 is the treeify threshold, why fail-fast is documented as best-effort.</p>
       <div class="lede-meta">
-        <span><b>13</b> cards</span>
+        <span><b>14</b> cards</span>
         <span><b>3</b> animated mechanisms</span>
         <span><b>Asked in</b> ~90% of interviews</span>
       </div>
@@ -1726,12 +1951,119 @@ IdentityHashMap &rarr; a and b are <b>different</b> keys  <i>// == says they are
     </section>
 
     <!-- col 8 -->
+    <section id="k14" data-key="1">
+      <div class="s-head"><span class="s-num">08</span><h2>The Map API, method by method <span class="star">&#9733;</span></h2><span class="src">set/Demo2.java</span></div>
+      <p class="s-why">Your file walks the whole surface &mdash; here is the cost and the return value of every line on it</p>
+      <ul class="facts">
+        <li><b><code>containsKey</code> is O(1); <code>containsValue</code> is O(n).</b> The comments in your file already say so, and the reason is the structure: a key is <i>hashed</i> straight to a bucket, a value has no hash to work with, so the map walks every bucket and every node in it. If you find yourself calling <code>containsValue</code> in a loop, what you actually needed was a second map keyed the other way round.</li>
+        <li><b><code>get()</code> returning <code>null</code> is ambiguous.</b> It means &ldquo;no such key&rdquo; <i>or</i> &ldquo;this key maps to null&rdquo;. Only <code>containsKey</code> separates the two &mdash; which is exactly why <code>getOrDefault(k, fallback)</code> exists, and why <code>ConcurrentHashMap</code> bans null values outright.</li>
+        <li><b><code>put</code> returns the <i>previous</i> value, or null.</b> Almost nobody reads it, and it is free: <code>if (map.put(k, v) != null)</code> tells you it was an overwrite, with no second lookup.</li>
+        <li><b><code>keySet()</code>, <code>values()</code> and <code>entrySet()</code> are live views, not copies.</b> Obtaining one is O(1) &mdash; nothing is built, nothing is copied. They read through to the same table, and removing from a view removes from the map.</li>
+        <li><b><code>values()</code> is a <code>Collection</code>, not a <code>Set</code></b>, because two keys may map to the same value. <code>keySet()</code> is a <code>Set</code> because keys are unique by definition. The return types are telling you about the data structure.</li>
+      </ul>
+
+      <div class="tbl"><table>
+        <tr><th>Call</th><th>Cost</th><th>Returns</th><th>The part people miss</th></tr>
+        <tr><td><code>put(k, v)</code></td><td>O(1)</td><td>previous value or <code>null</code></td><td>overwrites silently &mdash; there is no &ldquo;insert only&rdquo; put</td></tr>
+        <tr><td><code>putIfAbsent(k, v)</code></td><td>O(1)</td><td>existing value or <code>null</code></td><td>&ldquo;absent&rdquo; includes <b>mapped to null</b>; <code>null</code> back means it wrote</td></tr>
+        <tr><td><code>get(k)</code></td><td>O(1)</td><td>value or <code>null</code></td><td>null is ambiguous &mdash; see above</td></tr>
+        <tr><td><code>getOrDefault(k, d)</code></td><td>O(1)</td><td>value or <code>d</code></td><td>does <b>not</b> store <code>d</code>; the map is unchanged</td></tr>
+        <tr><td><code>containsKey(k)</code></td><td>O(1)</td><td>boolean</td><td>hash lookup, same path as <code>get</code></td></tr>
+        <tr><td><code>containsValue(v)</code></td><td><b>O(n)</b></td><td>boolean</td><td>full scan of every bucket</td></tr>
+        <tr><td><code>remove(k)</code></td><td>O(1)</td><td>removed value or <code>null</code></td><td>removing an absent key is not an error</td></tr>
+        <tr><td><code>remove(k, v)</code></td><td>O(1)</td><td>boolean</td><td>conditional &mdash; removes only if the value matches too</td></tr>
+        <tr><td><code>replace(k, v)</code></td><td>O(1)</td><td>old value or <code>null</code></td><td>only if the key is <b>already present</b> &mdash; unlike <code>put</code></td></tr>
+        <tr><td><code>replace(k, old, new)</code></td><td>O(1)</td><td>boolean</td><td>a <b>compare-and-set</b>, not a three-argument put</td></tr>
+        <tr><td><code>merge(k, v, fn)</code></td><td>O(1)</td><td>new value or <code>null</code></td><td>the counter idiom; a <code>null</code> result <b>removes</b> the key</td></tr>
+        <tr><td><code>computeIfAbsent(k, fn)</code></td><td>O(1)</td><td>existing or newly computed value</td><td>the multimap idiom; <code>fn</code> is skipped when the key exists</td></tr>
+      </table></div>
+
+      <div class="deep"><span class="lbl">The line in your file that means something different from how it reads</span>
+        <p><code>mpp.replace(101, "Abhishek", "Singh")</code> is <b>not</b> &ldquo;replace key 101, which held Abhishek, with Singh&rdquo; in the sense of appending or renaming. It is the three-argument overload <code>replace(key, oldValue, newValue)</code>, which is a <b>compare-and-set</b>: <i>if</i> 101 currently maps to something equal to <code>"Abhishek"</code>, write <code>"Singh"</code> and return <code>true</code>; otherwise change nothing and return <code>false</code>.</p>
+        <p>In your file 101 does map to <code>"Abhishek"</code>, so it succeeds and <code>get(101)</code> then prints <b>Singh</b>. But the whole value of that overload is in the <code>false</code> branch &mdash; it is the single-threaded shape of the atomic update, and on <code>ConcurrentHashMap</code> it is the real thing: &ldquo;only if nobody changed it under me&rdquo;. Reading it as a plain <code>put</code> is how people write update code that silently overwrites a concurrent change.</p>
+        <p>Same family, same reasoning: <code>remove(k, v)</code> is conditional remove, and the two-argument <code>replace(k, v)</code> writes only when the key <b>already exists</b> &mdash; which is exactly the guarantee <code>put</code> does not give you.</p>
+      </div>
+
+      <pre><i>// the three views &mdash; windows onto the same table, not copies of it</i>
+Set&lt;Integer&gt;                  keys = mpp.keySet();     <i>// unique -&gt; a Set</i>
+Collection&lt;String&gt;            vals = mpp.values();     <i>// may repeat -&gt; a Collection</i>
+Set&lt;Map.Entry&lt;Integer,String&gt;&gt; ents = mpp.entrySet();  <b>// key + value in one object</b>
+
+keys.remove(102);          <i>// removes the ENTRY from mpp &mdash; views write through</i>
+keys.add(103);             <s>// UnsupportedOperationException &mdash; a key with what value?</s>
+
+<i>// one pass, one lookup per element &mdash; the right way to iterate</i>
+for (Map.Entry&lt;Integer,String&gt; e : mpp.entrySet()){
+    System.out.println(e.getKey() + " = " + e.getValue());
+    e.setValue(e.getValue().trim());     <i>// writes straight into the node</i>
+}
+
+<i>// two lookups per element &mdash; the hash is computed twice</i>
+for (Integer k : mpp.keySet()) System.out.println(k + " = " + mpp.get(k));
+
+<i>// and the lambda form, which is the entrySet loop with the ceremony removed</i>
+mpp.forEach((k, v) -&gt; System.out.println(k + " = " + v));</pre>
+
+      <div class="deep"><span class="lbl">One level down &mdash; what a &ldquo;view&rdquo; actually is</span>
+        <p><code>keySet()</code> does not build a set. It returns an instance of <code>HashMap.KeySet</code>, an inner class holding no data at all: its <code>size()</code> calls the map&rsquo;s <code>size()</code>, its <code>contains()</code> calls <code>containsKey()</code>, and its <code>iterator()</code> walks the same bucket array your entries live in. The object is created once and cached in a field, so calling <code>keySet()</code> in a loop is free.</p>
+        <p>Three consequences fall out of that, and they are the ones asked about:</p>
+        <ul>
+          <li><b>Removal writes through, addition is impossible.</b> <code>keys.remove(k)</code> and <code>it.remove()</code> delete the real entry. <code>keys.add(k)</code> throws <code>UnsupportedOperationException</code> &mdash; there is no value to store alongside it.</li>
+          <li><b>Structural change during iteration is the same CME as card&nbsp;11.</b> The view&rsquo;s iterator checks the map&rsquo;s <code>modCount</code>, so <code>mpp.put(&hellip;)</code> inside a <code>for</code> over <code>entrySet()</code> fails fast on the next step. <code>it.remove()</code> and <code>values().removeIf(&hellip;)</code> are the legal ways out.</li>
+          <li><b><code>entrySet()</code> is one lookup, <code>keySet()</code>+<code>get()</code> is two.</b> On a hot loop over a large map that is a measurable difference, and it costs nothing to write the better one.</li>
+        </ul>
+        <p>For <code>HashMap</code> the <code>Map.Entry</code> you receive <i>is</i> the live <code>Node</code>, so <code>setValue</code> updates the map. For some maps (and for <code>Map.entry(k,v)</code>, and the entries copied out by <code>Map.of</code>) the entry is an immutable snapshot and <code>setValue</code> throws. Never hold an entry past the iteration that produced it.</p>
+      </div>
+
+      <h3>The two idioms that replace half of your map code</h3>
+      <pre><i>// counting &mdash; merge: current value + 1, or 1 if absent</i>
+Map&lt;String,Integer&gt; freq = new HashMap&lt;&gt;();
+for (String w : words) freq.merge(w, 1, Integer::sum);
+<s>if (freq.containsKey(w)) freq.put(w, freq.get(w)+1); else freq.put(w, 1);</s>  <i>// three lookups</i>
+
+<i>// grouping &mdash; computeIfAbsent: build the list only when the key is new</i>
+Map&lt;Integer,List&lt;Student&gt;&gt; byMarks = new HashMap&lt;&gt;();
+for (Student s : list) byMarks.computeIfAbsent(s.marks, k -&gt; new ArrayList&lt;&gt;()).add(s);
+<s>if (!byMarks.containsKey(k)) byMarks.put(k, new ArrayList&lt;&gt;()); byMarks.get(k).add(s);</s>
+
+<i>// the whole Java 8 set, for reference</i>
+map.getOrDefault(k, "none");
+map.putIfAbsent(k, v);
+map.compute(k, (key, old) -&gt; old == null ? v : old + v);
+map.computeIfPresent(k, (key, old) -&gt; old.isEmpty() ? null : old);   <b>// null result deletes the key</b>
+map.replaceAll((k, v) -&gt; v.trim());
+map.forEach((k, v) -&gt; &hellip;);</pre>
+
+      <div class="trap"><span class="lbl">Traps on this card &mdash; two of them are in your file</span>
+        <ul>
+          <li><b>The wrong <code>Entry</code>.</b> <code>set/Demo2.java</code> carried <code>import java.security.KeyStore.Entry;</code> &mdash; an IDE auto-import that picked the first <code>Entry</code> on the list. The one you want is <b><code>java.util.Map.Entry</code></b>, and it arrives free with <code>import java.util.*</code>; written as <code>Map.Entry&lt;K,V&gt;</code> it needs no import at all. Commenting it out was the right call; the lesson is to read what the auto-import chose.</li>
+          <li><b>Calling a query and discarding the answer.</b> <code>mpp.size();</code> and <code>mpp.isEmpty();</code> on their own lines compute a value and throw it away &mdash; the compiler allows it, and nothing happens. Every method on this card except the mutators is only useful for its return value.</li>
+          <li><b>A mutable key.</b> Put an object in as a key, then change a field <code>hashCode</code> depends on, and the entry is now in the wrong bucket: <code>containsKey</code> says false while the entry sits in the table, unreachable and un-removable. Map keys should be immutable &mdash; <code>String</code>, a wrapper, a record, or a class with final fields.</li>
+          <li><b><code>computeIfAbsent</code> whose function touches the same map.</b> <code>map.computeIfAbsent(k, x -&gt; map.put(other, v))</code> modifies the table mid-operation; since Java 9 HashMap detects this and throws <code>ConcurrentModificationException</code>, and before that it could corrupt the table silently.</li>
+        </ul>
+      </div>
+
+      <details class="qa"><summary>Why does <code>ConcurrentHashMap</code> forbid null keys <i>and</i> null values?</summary>
+      <div class="ans"><p>Because of the ambiguity in fact two, made unfixable by concurrency. In a <code>HashMap</code>, <code>get(k) == null</code> can be disambiguated with <code>containsKey(k)</code>. In a concurrent map another thread can insert or remove <b>between</b> those two calls, so the pair of calls proves nothing &mdash; and there is no atomic way to ask both questions at once.</p>
+      <p>The designers&rsquo; answer was to remove the ambiguity at the source: no nulls, so <code>null</code> from <code>get</code> means exactly one thing. <code>Hashtable</code> does the same. Plain <code>HashMap</code> allows <b>one</b> null key &mdash; special-cased into bucket 0, since <code>null.hashCode()</code> cannot be called &mdash; and any number of null values. <code>TreeMap</code> allows no null key at all, because it must call <code>compareTo</code> on it.</p></div></details>
+
+      <details class="qa"><summary>Why is <code>Map.of()</code> not just a shorter <code>HashMap</code>?</summary>
+      <div class="ans"><p>Three real differences. It is <b>immutable</b> &mdash; every mutator throws <code>UnsupportedOperationException</code>, so it is safe to return from a getter with no defensive copy. It <b>rejects nulls</b> in keys and values, at construction. And its <b>iteration order is deliberately randomised per JVM run</b>, so code that accidentally depends on the order fails in testing rather than in production.</p>
+      <p><code>Map.of</code> takes up to ten pairs; beyond that use <code>Map.ofEntries(Map.entry(k, v), &hellip;)</code>. <code>Map.copyOf(existing)</code> takes a real copy &mdash; unlike <code>Collections.unmodifiableMap</code>, which is only a read-only <b>view</b> that still changes when whoever holds the original mutates it.</p></div></details>
+
+      <div class="gap"><span class="lbl">Repo note</span><code>set/Demo2.java</code> touches almost every method above, which makes it the best map file in the repo &mdash; but every call except the two <code>put</code>s is commented out or discarded, so running it prints nothing. Uncommenting one block at a time and printing the <b>return value</b> of each call is what turns it from an API list into the table on this card. The Java 8 methods at the bottom of your file (<code>getOrDefault</code>, <code>putIfAbsent</code>) are the ones actually worth typing.</div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><code>containsKey</code> is O(1), <code>containsValue</code> is O(n). <code>keySet</code>, <code>values</code> and <code>entrySet</code> are <b>live views of the same table</b> &mdash; removing from a view removes from the map, and iterating <code>entrySet</code> is one lookup instead of two.</p></div>
+    </section>
+
+    <!-- col 9 -->
     <section id="k8">
-      <div class="s-head"><span class="s-num">08</span><h2>Queue, Deque &amp; ArrayDeque</h2><span class="src">Queue/Note.txt &middot; Queue/Demo1.java</span></div>
+      <div class="s-head"><span class="s-num">09</span><h2>Queue, Deque &amp; ArrayDeque</h2><span class="src">Queue/Note.txt &middot; Queue/Demo1.java</span></div>
       <p class="s-why">FIFO, the circular array trick, and why <code>Stack</code> is the wrong class</p>
       <ul class="facts">
         <li><b>Queue is FIFO</b> &mdash; first in, first out. <code>Deque</code> (double-ended queue) extends it so you can add and remove at <b>both</b> ends, which is how it doubles as a stack.</li>
         <li>Hierarchy: <code>Iterable &rarr; Collection &rarr; Queue &rarr; Deque</code>, implemented by <b><code>ArrayDeque</code></b> and <b><code>LinkedList</code></b>.</li>
+        <li><b><code>LinkedList</code> hangs off two branches at once</b> &mdash; it implements <code>List</code> <i>and</i> <code>Deque</code>, which is the pair circled in <code>Queue/implements.png</code>. That is why the same object can be indexed like a list and polled like a queue, and why <code>Deque&lt;Integer&gt; d = new LinkedList&lt;&gt;()</code> and <code>List&lt;Integer&gt; l = new LinkedList&lt;&gt;()</code> both compile. <code>ArrayDeque</code> implements only <code>Deque</code> &mdash; no <code>get(i)</code>, by design.</li>
         <li><b>Array implementation:</b> two pointers, <code>front</code> and <code>rear</code>, both starting at &minus;1. Adding moves <code>rear</code> forward, removing moves <code>front</code> forward. Both wrap around &mdash; a <b>circular array</b> &mdash; so the freed slots at the front get reused instead of wasted.</li>
         <li><b>Full</b> is when <code>(rear + 1) % n == front</code>. Then you allocate a bigger array and copy everything across, exactly like ArrayList growth.</li>
         <li><b>Linked-list implementation:</b> <code>front</code> and <code>rear</code> node pointers; add and remove are O(1) with no resize ever &mdash; but every element costs an extra node object and its pointers.</li>
@@ -1808,9 +2140,9 @@ q.poll();        <i>// 10 &mdash; FIFO</i></pre>
       <div class="gap"><span class="lbl">Repo gap</span><code>Queue/Demo1.java</code> declares an <code>ArrayDeque</code> and stops there. The notes now go deep &mdash; <code>Note.txt</code> plus the expanded <code>Queue/revision.txt</code> cover the array, linked-list and stack implementations, the circular wrap and the full/empty checks. What is left is writing all three by hand and timing ArrayDeque against LinkedList, so the cache argument above stops being something you were told.</div>
     </section>
 
-    <!-- col 9 -->
+    <!-- col 10 -->
     <section id="k9" data-key="1">
-      <div class="s-head"><span class="s-num">09</span><h2>Iterable &amp; Iterator <span class="star">&#9733;</span></h2><span class="src">Interable/Iterable_Notes.md</span></div>
+      <div class="s-head"><span class="s-num">10</span><h2>Iterable &amp; Iterator <span class="star">&#9733;</span></h2><span class="src">Interable/Iterable_Notes.md</span></div>
       <p class="s-why">One traversal interface for structures that share nothing internally</p>
       <ul class="facts">
         <li><b>The problem it solves:</b> an array is a contiguous block, a LinkedList is nodes chained by <code>next</code>, a HashSet is buckets with no index at all. Without a common interface you would need a different loop for each.</li>
@@ -1876,9 +2208,9 @@ while (it.hasNext()) { String name = it.next(); ... }</pre>
       <div class="say"><span class="lbl">Say it out loud</span><p><b>Iterable is the thing you can walk; Iterator is the walker.</b> The position belongs to the walker, which is why one collection can hand out many independent cursors.</p></div>
     </section>
 
-    <!-- col 10 -->
+    <!-- col 11 -->
     <section id="k10" data-key="1">
-      <div class="s-head"><span class="s-num">10</span><h2>Removing safely &amp; ConcurrentModificationException <span class="star">&#9733;</span></h2><span class="src">Interable/Demo3.java</span></div>
+      <div class="s-head"><span class="s-num">11</span><h2>Removing safely &amp; ConcurrentModificationException <span class="star">&#9733;</span></h2><span class="src">Interable/Demo3.java</span></div>
       <p class="s-why">Three bugs in four lines &mdash; and every one of them is an interview question</p>
 
       <pre><i>// the buggy loop, exactly as written</i>
@@ -1944,9 +2276,9 @@ for (int i = list.size() - 1; i &gt;= 0; i--)
       <div class="say"><span class="lbl">Say it out loud</span><p>CME comes from <b><code>modCount != expectedModCount</code></b> &mdash; the collection changed under a live cursor. Fix it with <b><code>it.remove()</code></b> or <b><code>removeIf()</code></b>.</p></div>
     </section>
 
-    <!-- col 11 -->
+    <!-- col 12 -->
     <section id="k12" data-key="1">
-      <div class="s-head"><span class="s-num">11</span><h2>Comparable vs Comparator <span class="star">&#9733;</span></h2><span class="src">Comparable/Demo.java &middot; Comparable/note.txt</span></div>
+      <div class="s-head"><span class="s-num">12</span><h2>Comparable vs Comparator <span class="star">&#9733;</span></h2><span class="src">Comparable/Demo.java &middot; Comparable/note.txt</span></div>
       <p class="s-why">Your note gets the reason exactly right: Java has no idea how to order <i>your</i> class</p>
       <ul class="facts">
         <li><b>The problem, as your note puts it:</b> Java can order Strings lexicographically and numbers naturally, but given two <code>Student</code> objects it has no rule. <code>Collections.sort(list)</code> will not even compile, and a <code>TreeSet</code> of them throws <code>ClassCastException</code> at the first insert &mdash; because internally it is a BST and a BST must compare.</li>
@@ -1994,9 +2326,9 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       <div class="say"><span class="lbl">Say it out loud</span><p><b>Comparable is the class's one natural order; Comparator is any number of external orders.</b> Both return negative, zero or positive &mdash; never a boolean, never a subtraction.</p></div>
     </section>
 
-    <!-- col 12 -->
+    <!-- col 13 -->
     <section id="k13">
-      <div class="s-head"><span class="s-num">12</span><h2>Views, immutability &amp; the gotcha list</h2><span class="src">the things that bite after the interview</span></div>
+      <div class="s-head"><span class="s-num">13</span><h2>Views, immutability &amp; the gotcha list</h2><span class="src">the things that bite after the interview</span></div>
       <p class="s-why">Half the collections API returns a window onto something else, not a copy</p>
       <ul class="facts">
         <li><b>A view shares storage with its source.</b> <code>subList</code>, <code>keySet</code>, <code>values</code>, <code>entrySet</code>, <code>Arrays.asList</code>, <code>headSet</code>/<code>tailSet</code>, and everything from <code>Collections.unmodifiable*</code> are all views. Writes propagate; structural changes to the source invalidate the view.</li>
@@ -2029,9 +2361,9 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       <div class="say"><span class="lbl">Say it out loud</span><p>Most of the collections API hands back <b>views, not copies</b> &mdash; and &ldquo;unmodifiable&rdquo; means <b>you</b> cannot change it, not that it cannot change.</p></div>
     </section>
 
-    <!-- col 13 -->
+    <!-- col 14 -->
     <section id="k11">
-      <div class="s-head"><span class="s-num">13</span><h2>The one-page comparison sheet</h2><span class="src">set/note1.txt &sect;19</span></div>
+      <div class="s-head"><span class="s-num">14</span><h2>The one-page comparison sheet</h2><span class="src">set/note1.txt &sect;19</span></div>
       <p class="s-why">If you can reproduce this table, the collections round is finished</p>
 
       <div class="tbl"><table>
@@ -2069,8 +2401,8 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       <p>The first card is rapid-fire recall: read the question, answer it out loud, <i>then</i> open it. The second is the mistakes log pulled out of your own notes files &mdash; those are the errors you have already made once, which makes them the ones most likely to come back.</p>
       <p>The last two are the honest map: what the repo covers, and the four heavyweight topics still ahead that carry more interview weight than everything above them combined.</p>
       <div class="lede-meta">
-        <span><b>32</b> recall questions</span>
-        <span><b>16</b> folders mapped</span>
+        <span><b>39</b> recall questions</span>
+        <span><b>18</b> folders mapped</span>
         <span><b>4</b> tracks still ahead</span>
       </div>
     </div>
@@ -2145,6 +2477,22 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       <details class="qa"><summary>Why should a method never return <code>null</code> for a collection?</summary><div class="ans"><p>Because it pushes a null check onto every caller, forever, and one of them will forget. Return <code>List.of()</code>. The same instinct applies to <code>Optional</code> as a return type for a single value &mdash; and to never using <code>Optional</code> as a field or a parameter.</p></div></details>
 
       <details class="qa"><summary>What does try-with-resources add over <code>finally</code>?</summary><div class="ans"><p>It closes in <b>reverse declaration order</b>, before any catch or finally runs, and it fixes a real bug: if the body throws and <code>close()</code> also throws, hand-written <code>finally</code> loses the original. Try-with-resources keeps the body's exception as primary and attaches the close failure as a <b>suppressed</b> exception.</p></div></details>
+
+      <h3>The third round &mdash; lambdas, references and the map surface</h3>
+
+      <details class="qa"><summary>Name the four kinds of method reference.</summary><div class="ans"><p><b>Static</b> (<code>Math::abs</code>), <b>bound instance</b> (<code>System.out::println</code> &mdash; the receiver is an object you already hold), <b>unbound instance</b> (<code>String::isEmpty</code> &mdash; the receiver arrives as the first argument) and <b>constructor</b> (<code>ArrayList::new</code>, <code>String[]::new</code>). &ldquo;Predicate reference&rdquo; is not a fifth kind &mdash; that is an unbound reference that happens to land in a <code>Predicate</code> slot.</p></div></details>
+
+      <details class="qa"><summary><code>s -&gt; s.isEmpty()</code> becomes <code>String::isEmpty</code> &mdash; where did the parameter go?</summary><div class="ans"><p>It became the <b>receiver</b>. In an unbound reference the left side is a <i>type</i>, so the functional interface&rsquo;s first parameter is the object the method is invoked on. The same rule explains why <code>String::compareTo</code>, a one-argument method, satisfies the two-argument <code>Comparator</code>: <code>compare(a,b)</code> runs as <code>a.compareTo(b)</code>.</p></div></details>
+
+      <details class="qa"><summary><code>andThen</code> or <code>compose</code> &mdash; which one runs first?</summary><div class="ans"><p><code>f.andThen(g)</code> is <b><code>g(f(x))</code></b> &mdash; reading order. <code>f.compose(g)</code> is <b><code>f(g(x))</code></b> &mdash; the argument runs first. They compile to the same type, so getting it backwards is a silent bug. Use <code>andThen</code>.</p></div></details>
+
+      <details class="qa"><summary>What exactly does <code>.reversed()</code> reverse in a comparator chain?</summary><div class="ans"><p><b>Everything built before it</b>, not the last key. <code>comparing(A).thenComparing(B).reversed()</code> flips both. To reverse only the second key: <code>comparing(A).thenComparing(B, Comparator.reverseOrder())</code>.</p></div></details>
+
+      <details class="qa"><summary>Why is <code>containsKey</code> O(1) but <code>containsValue</code> O(n)?</summary><div class="ans"><p>A key is hashed straight to its bucket, so the lookup touches one bucket. A value has no hash and no index &mdash; the map must walk every bucket and every node in each chain. Needing <code>containsValue</code> often means you wanted a second map keyed the other way round.</p></div></details>
+
+      <details class="qa"><summary>What does <code>map.computeIfAbsent(k, x -&gt; new ArrayList&lt;&gt;()).add(v)</code> save you?</summary><div class="ans"><p>Two extra hash lookups and a branch &mdash; it replaces <code>containsKey</code> + <code>put</code> + <code>get</code> with one operation, and the new list is allocated <b>only when the key is genuinely new</b>. Its sibling <code>map.merge(k, 1, Integer::sum)</code> is the same trick for counting. Do not modify the same map inside the function: since Java 9 that throws <code>ConcurrentModificationException</code>.</p></div></details>
+
+      <details class="qa"><summary>Why can&rsquo;t <code>ConcurrentHashMap</code> store <code>null</code>?</summary><div class="ans"><p>Because <code>get(k) == null</code> would be ambiguous &mdash; absent, or present with a null value &mdash; and the usual fix, a follow-up <code>containsKey</code>, proves nothing when another thread can change the map between the two calls. Banning null removes the ambiguity at the source. <code>HashMap</code> allows one null key (special-cased to bucket 0) and any number of null values; <code>TreeMap</code> allows no null key because it must call <code>compareTo</code> on it.</p></div></details>
     </section>
 
     <!-- rec 2 -->
@@ -2163,6 +2511,12 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <li><b>A local class declared but never instantiated</b> (<code>NestedClasses/Local.java</code>) &mdash; the program runs and prints nothing.</li>
         <li><b>Lowercase class names</b> &mdash; <code>class outer</code>, <code>class school</code>. Java class names start with a capital.</li>
         <li><b>Trusting HashSet iteration order</b> because small integers happened to come out sorted. There is no guarantee.</li>
+        <li><b>The wrong <code>Entry</code>.</b> <code>set/Demo2.java</code> imported <code>java.security.KeyStore.Entry</code> &mdash; an auto-import that took the first suggestion. The one you want is <code>java.util.Map.Entry</code>, and writing <code>Map.Entry&lt;K,V&gt;</code> needs no import at all.</li>
+        <li><b>Calling a query and discarding the answer.</b> <code>mpp.size();</code> and <code>mpp.isEmpty();</code> as statements compute a value and drop it. Every non-mutating method on a Map is useful only for what it returns.</li>
+        <li><b>A subtraction comparator.</b> <code>(s1,s2) -&gt; s1.marks - s2.marks</code> works on marks and overflows on anything that can go negative. <code>Integer.compare</code>, or <code>Comparator.comparingInt</code>.</li>
+        <li><b>One colon and lowercase class names</b> in <code>Lambda/note.txt</code> &mdash; <code>math:abs</code> and <code>system.out:println</code>. It is <code>Math::abs</code> and <code>System.out::println</code>.</li>
+        <li><b>Parentheses on a method reference.</b> <code>String::isEmpty()</code> does not compile &mdash; the parentheses would mean you are calling it, and a reference is never called at the point it is written.</li>
+        <li><b>&ldquo;Method references only work for inbuilt methods.&rdquo;</b> Written in <code>Lambda/Demo.java</code>, and not true &mdash; <code>Student::getMarks</code> is your own class and the most useful reference in the file.</li>
       </ul>
     </section>
 
@@ -2173,10 +2527,12 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
 
       <div class="tbl"><table>
         <tr><th>Folder</th><th>Covers</th><th>Depth</th></tr>
-        <tr><td><code>set/</code></td><td>HashSet internals, hashing, collisions, load factor, treeification, LinkedHashSet, TreeSet, the whole map zoo</td><td><b>Strongest &mdash; above 3-year level</b></td></tr>
+        <tr><td><code>set/</code></td><td>HashSet internals, hashing, collisions, load factor, treeification, LinkedHashSet, TreeSet, the map zoo, and the full Map API surface in <code>Demo2.java</code></td><td><b>Strongest &mdash; above 3-year level</b></td></tr>
         <tr><td><code>Interable/</code></td><td>Iterator vs Iterable, for-each internals, custom Iterable, CME, ListIterator, map iteration</td><td><b>Very good</b></td></tr>
         <tr><td><code>oops/</code></td><td>Class/object, constructors, chaining, call by value, static, packages, encapsulation, inheritance, abstraction, interfaces</td><td><b>Very good</b></td></tr>
         <tr><td><code>ImmutableClass.java</code></td><td>Five rules, both leaks, defensive copy</td><td><b>Very good</b></td></tr>
+        <tr><td><code>Lambda/</code></td><td>Anonymous class &rarr; lambda &rarr; method reference on a real Comparator; the four reference kinds; composition</td><td><b>Newest, and already deep</b> &mdash; notes ahead of the code</td></tr>
+        <tr><td><code>Comparable/</code></td><td>Comparable vs Comparator, the danger of returning 0, the <code>Collections</code> utility set</td><td><b>Very good</b> &mdash; it reached functional interfaces on its own</td></tr>
         <tr><td><code>Queue/</code></td><td>Array and linked-list queues, circular wrap, Deque, ArrayDeque vs LinkedList, why not Stack</td><td>Good notes, code still a stub</td></tr>
         <tr><td><code>NestedClasses/</code></td><td>Static nested, inner, local &mdash; access rules and why</td><td>Good &mdash; anonymous class pending</td></tr>
         <tr><td><code>JavaI/o/</code></td><td>Stream concept, the BufferedReader chain, checked vs unchecked</td><td>Good on input; output side missing</td></tr>
@@ -2186,6 +2542,7 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <tr><td><code>List/</code></td><td>ArrayList API calls only</td><td><b>Thin &mdash; no internals</b></td></tr>
         <tr><td><code>Strings/</code></td><td>String constructors only</td><td><b>Thin &mdash; pool and methods missing</b></td></tr>
         <tr><td><code>Grid/</code>, <code>Headfirstjava/</code></td><td>Practice &mdash; enum + package, book exercises</td><td>Practice only</td></tr>
+        <tr><td><code>Framework/</code></td><td>&mdash;</td><td><b>Empty</b> &mdash; the folder is made, the Collections-framework overview is not written</td></tr>
       </table></div>
 
       <div class="gap"><span class="lbl">The habit worth keeping</span>Every folder has a <code>revision.txt</code> and a &ldquo;mistakes I made&rdquo; section, and the notes explain the <b>internal mechanism</b> rather than the definition. &ldquo;A Set is a HashMap with a dummy PRESENT object&rdquo; is the answer an interviewer wants; &ldquo;a Set does not allow duplicates&rdquo; is the one everybody gives.</div>
@@ -2193,19 +2550,42 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
 
     <!-- rec 4 -->
     <section id="r4">
-      <div class="s-head"><span class="s-num">04</span><h2>What is still ahead</h2><span class="src">course #37&ndash;57</span></div>
+      <div class="s-head"><span class="s-num">04</span><h2>What is still ahead</h2><span class="src">course #39&ndash;57 &middot; from your own playlist screenshots</span></div>
       <p class="s-why">These four carry more interview weight than every card in this notebook</p>
       <p style="max-width:64ch;color:var(--ink-soft)">Nobody grills a three-year candidate on &ldquo;what is a class&rdquo;. The base above is solid; these are the scoring topics, and they are the ones still unwritten.</p>
+
+      <h3>The rest of the course, video by video</h3>
+      <p style="max-width:64ch;color:var(--ink-soft)">Read off your own playlist screenshots, so the numbers are the real ones. Everything above #38 is now in this notebook; everything below it is not.</p>
+
+      <div class="tbl"><table>
+        <tr><th>#</th><th>Video</th><th>Status here</th></tr>
+        <tr><td>35</td><td>Queue deep dive &middot; PriorityQueue &amp; heap</td><td>Collections&nbsp;09 &mdash; <b>covered</b></td></tr>
+        <tr><td>36</td><td>Comparable, Comparator, the <code>Collections</code> class</td><td>Collections&nbsp;12 &mdash; <b>covered</b></td></tr>
+        <tr><td>37</td><td>Lambdas &amp; functional interfaces &middot; Comparator</td><td>Advanced&nbsp;09&ndash;10 &mdash; <b>covered</b></td></tr>
+        <tr><td>38</td><td>Deep dive &middot; method references &amp; composition</td><td>Advanced&nbsp;11&ndash;12 &mdash; <b>covered</b></td></tr>
+        <tr><td>39</td><td>Streams &mdash; creation &amp; architecture</td><td><b>Next</b> &mdash; the pipeline: source, intermediate, terminal</td></tr>
+        <tr><td>40</td><td>Stream methods &mdash; intermediate &amp; terminal</td><td><b>Ahead</b> &mdash; <code>map</code>, <code>filter</code>, <code>collect</code>, <code>reduce</code>, <code>groupingBy</code></td></tr>
+        <tr><td>41</td><td><code>Optional</code> &mdash; all methods, stream integration</td><td>Advanced&nbsp;13 has the rules; the methods are ahead</td></tr>
+        <tr><td>42</td><td>Parallel streams &middot; primitive Optionals</td><td><b>Ahead</b> &mdash; and the one to be careful about in interviews</td></tr>
+        <tr><td>43&ndash;44</td><td>Exceptions &middot; hierarchy, <code>throw</code> vs <code>throws</code>, custom</td><td>Advanced&nbsp;07&ndash;08 &mdash; <b>covered</b></td></tr>
+        <tr><td>45&ndash;46</td><td>Memory &middot; stack, heap, method area, GC algorithms</td><td>Core&nbsp;13 &mdash; <b>covered</b></td></tr>
+        <tr><td>47&ndash;48</td><td>Multithreading intro &middot; thread creation &amp; lifecycle</td><td><b>Ahead</b></td></tr>
+        <tr><td>49&ndash;51</td><td>Thread methods &middot; race conditions &amp; visibility &middot; monitor locks</td><td><b>Ahead</b> &mdash; <code>synchronized</code>, <code>volatile</code></td></tr>
+        <tr><td>52&ndash;53</td><td><code>wait</code>/<code>notify</code> &middot; <code>ReentrantLock</code>, <code>ReadWriteLock</code>, <code>Semaphore</code></td><td><b>Ahead</b></td></tr>
+        <tr><td>54&ndash;55</td><td>Lock-free &middot; atomics, CAS, the ABA problem</td><td><b>Ahead</b></td></tr>
+        <tr><td>56&ndash;57</td><td>Executors, <code>Future</code>, <code>CompletableFuture</code>, fork-join, virtual threads</td><td><b>Ahead</b> &mdash; and the most quotable in an interview</td></tr>
+      </table></div>
+
       <div class="end-grid">
-        <div class="end-card"><h4>Streams</h4><p>Course #37&ndash;42. The one genuine gap left. Asked in roughly nine interviews out of ten &mdash; <code>filter</code>/<code>map</code>/<code>collect</code>, laziness, <code>Collectors.groupingBy</code>, and why a stream is single-use.</p></div>
-        <div class="end-card"><h4>Concurrency</h4><p>Course #47&ndash;57. The single biggest rejection reason for people switching into Java backend. Threads, <code>synchronized</code>, <code>volatile</code>, the executor framework, and the memory model the <code>final</code>-field card touches.</p></div>
+        <div class="end-card"><h4>Streams</h4><p>Course #39&ndash;42. Still the one genuine gap &mdash; but the groundwork is now in Advanced&nbsp;09&ndash;12. What is left is <code>filter</code>/<code>map</code>/<code>collect</code>, why a pipeline does nothing until a terminal operation, <code>Collectors.groupingBy</code> and <code>toMap</code>, and why a stream is single-use.</p></div>
+        <div class="end-card"><h4>Concurrency</h4><p>Course #47&ndash;57, eleven videos &mdash; the single biggest rejection reason for people switching into Java backend. Thread lifecycle, race conditions and visibility, monitor locks, <code>wait</code>/<code>notify</code>, the lock family, atomics and CAS, the executor framework, <code>CompletableFuture</code> and virtual threads.</p></div>
         <div class="end-card"><h4>Spring &amp; JPA</h4><p>A separate track, and the one job specs actually list. Dependency injection, the bean lifecycle, transactions, and the entity <code>equals</code>/<code>hashCode</code> problem from card&nbsp;10.</p></div>
         <div class="end-card"><h4>SQL &amp; two DSA problems</h4><p>The rest of a three-year loop. Joins, indexes and <code>EXPLAIN</code>; and enough DSA to talk through a HashMap-based solution out loud.</p></div>
       </div>
 
       <div class="deep"><span class="lbl">Now covered here, not pending</span>
-        <p>Three items that were on this list have moved into the notebook: <b>exceptions in depth</b> (Advanced&nbsp;08 &mdash; <code>finally</code>, try-with-resources, suppression, the four production failures), <b>functional interfaces and lambdas</b> (Advanced&nbsp;09 &mdash; the door into streams, and the piece your Comparable note already reached on its own), and <b>JVM memory and GC</b> (Core&nbsp;13 &mdash; stack, heap, metaspace, generational collection).</p>
-        <p>They are written to the level a three-year candidate is expected to hold, not to course depth. Working through #43&ndash;46 will still be worth it &mdash; but you are no longer starting those topics from zero in an interview.</p>
+        <p>Six items that were on this list have moved into the notebook: <b>exceptions in depth</b> (Advanced&nbsp;08), <b>functional interfaces and lambdas</b> (Advanced&nbsp;09), <b>the anonymous-class-to-method-reference journey</b> (Advanced&nbsp;10, rebuilt from <code>Lambda/Demo.java</code>), <b>the four kinds of method reference</b> (Advanced&nbsp;11), <b>functional composition</b> (Advanced&nbsp;12) and <b>JVM memory and GC</b> (Core&nbsp;13). Collections gained a fourteenth card, <b>the Map API method by method</b> (Collections&nbsp;08), from <code>set/Demo2.java</code>.</p>
+        <p>Cards 10&ndash;12 are course #37 and #38 (&ldquo;Comparator Interface&rdquo; and &ldquo;Method References &amp; Composition&rdquo;), written up the day after you took them. That leaves Streams as the one genuine hole rather than a whole missing layer: <code>filter</code> takes a <code>Predicate</code>, <code>map</code> a <code>Function</code>, <code>sorted</code> a <code>Comparator</code>, <code>forEach</code> a <code>Consumer</code> &mdash; every one of those is now written out above, along with the laziness that makes a pipeline work. Course #37&ndash;42 is the next thing to type, and you will not be starting it from zero.</p>
       </div>
 
       <div class="end">
@@ -2490,6 +2870,29 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       el.classList.toggle("dim", !on);
       el.classList.toggle("hot", on && lit[i] - 1 === s && s > 0);
     });
+  };
+
+
+  /* --- named class -> anonymous -> lambda -> comparingInt -> method ref --- */
+  var lmbRight = [
+    ["SortByMarks.class", "a named class file, written by you", "a new instance per <code>new SortByMarks()</code>"],
+    ["Demo$1.class", "still a class file &mdash; javac just named it", "a new instance per evaluation"],
+    ["no class file", "private static lambda$main$0 + invokedynamic", "linked once by LambdaMetafactory"],
+    ["no class file", "the JDK writes compare() from your key", "Integer.compare &mdash; no overflow"],
+    ["no class file", "non-capturing &rarr; one shared instance", "reused for every call"]
+  ];
+  renderers["lmb"] = function(f, s){
+    for (var i = 0; i < 5; i++){
+      var el = q(f,"l",String(i));
+      el.classList.toggle("hot", i === s);
+      el.style.opacity = i <= s ? "1" : "0.32";
+    }
+    var r = lmbRight[s];
+    q(f,"l","cls").innerHTML  = r[0];
+    q(f,"l","emit").innerHTML = r[1];
+    q(f,"l","cost").innerHTML = r[2];
+    q(f,"l","cls").classList.toggle("bad", s <= 1);
+    q(f,"l","cls").classList.toggle("hot", s >= 2);
   };
 
   /* --- circular queue --- */

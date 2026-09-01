@@ -1,0 +1,139 @@
+Streams in java 
+so streams in java we are using for the data processing 
+suppose that there are multiple employee in a office and then we have to some data processing like if the employee salary is >50,000 then we have to do some thing like the name we have to find the name of the employee and then we have to sort int he java 
+so for that we can do it streams in the java 
+we do in java how 
+class Employee{
+    int empid,
+    name,
+    salary 
+
+}
+List<String>result=new ArrayList<>();
+for(Employee e i employee ){
+    if(e.getsalary>50000){
+        result.add(e.name);
+    }
+}
+so it will give the employee name whoose salary is more that 50000
+and then we can do the collections.sort();
+ so the above code is implerative code and we have to convert this code into the declarative code 
+ then we can not write the extra code from the 
+ so if the code i  have to write in the streams then i can write like this 
+ collections ->stream->parrallelstream()
+ List<string>result=
+ employee.stream();
+ .filter(x->x>50000);
+ .map(x->x.getName());
+ .sorted()
+
+ .tolist();
+so by using this we are making functional programming lanugaye
+Stream Definition in java
+A STREAM is a tool for processing a sequence of data thorugh a chain of operations
+Water pipeline imageing and one part is source and there mutliple fileter and the water flow from this all filter 
+so the filter is like the chain of the operation 
+so we can do multiple things like the 
+java streams 
+number.stream()
+.filter(x->x>10)
+.filter(x->x%2==0)
+.map(x->x*x);
+.forEach(sout.println);
+.foreach(System.out::println )
+we can do with this java streams so the stram is used for the data process 
+Stream Pipeline architecture :- 
+source ,Intermidate operation and Terminal operation 
+list.stream()
+.filter(x->x>10);
+.map(x->x
+*2);
+.toList();
+the way when i write this code on that time java happen three things then java itself create three things source,Intermidate operation and then terminal operation 
+list=[1,3,7,5,9]
+the time when i write the list.stream then i say to java that create a source and then in the filer and the map operation that we called the intermidate operation 
+so the tolist is the terminal operation and i have to write the terminal list till then it will not executable 
+so there are lot of the stream operation and we consume or finish with the terminal operation 
+
+Source of the stream :- collection 
+array 
+Stream.of()
+Infintestream()
+Intermidate Operation:- so this Intermidate operation we call transformation 
+filter()
+map()
+functiona l and it change some thing 
+sort limit skip distinct()
+
+
+so there intermidate operation return the stream only 
+Terminal Operation :- 
+So the final triggering 
+ForEach() it accept consumer 
+tolist()
+collect()
+find()
+finfirst()
+so they give some value 
+No terminal operation then no stream executed 
+so it gives us the lazy loading 
+list=[5,12,7,20]
+list.stream then it make the source 
+list.stream()
+.filter(x->x>10);
+.map(x->x
+*2);
+.toList();
+so inside the java first thing works the split 5 pass the filter then 12 came and check that value in the filter 
+and gives in the result array =24 40
+so this type of processing first 5 and then 12 and then 7 and then 20 so this type of the processing we called vertical processing 
+And there are horizontally processing also 
+lazy evaluation :- by default that are lazy 
+and then terminal without terminal it will not working 
+it used to help the short circuiting 
+ So then it came stream is dead 
+Stream<Integer>s=list.stream()
+s.for.each(system.out::println)
+Stream Source:- 
+collection
+array
+stream.of
+InFINITE sTREA,
+primitive stream 
+
+
+cOLLECTION STREAM :-
+list.stream or list.parrallelstream 
+so normal stream is sequential and parrallelstream is parallel processing 
+
+Array :- 
+string[] arr=["ADITYA","ROHAN","RAJ"];
+arr.stream(arr);
+and it return stream<string>s =arr.stram(arr);
+Stream.of method 
+stream<integer>s=stream.of(1,2,3,4,5,60);
+EmptyStream
+stream.empty()
+Infintestream 
+yasi stream that will not end 
+ITERATE() GENERATE()stream.iterate()
+(seed,nextfunction);
+stream.iterate(1,x->x+1);
+this is like the infinete and there is limit also .limit(10).foreach(systemout::println)
+stream.generate(supplier);
+stream.generate(Math::random);
+iterate()->depends on the previous value 
+generate()->no dependency
+
+    WHy we need infinte stream?
+    so we donot know how much data we get to data process so that why we need it 
+Primitive stream :- 
+when ever we create a stream then we need
+Stream<Integer>=list.stream().filter(x->x>10);
+.map(x->x+20;
+)
+Intstream doubleStream longStream 
+int double long
+Basestream<T>
+stream longstream intstream Doublestream 
+-

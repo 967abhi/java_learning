@@ -66,3 +66,4 @@ class Student implements Comparable<Student>{
 }
 
 // so this is tight coupled to sort this 
+//methid reference system.out::println and then is used int he we can use it only in the inbuilt reference 
