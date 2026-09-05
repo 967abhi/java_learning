@@ -1,6 +1,6 @@
 package Stream;
 import java.util.*;
-import java.util.stream.Stream;
+// import java.util.stream.Stream;
 public class Demo {
     public static void main(String[] args) {
         // Boilerplate generated

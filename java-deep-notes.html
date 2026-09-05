@@ -25,6 +25,7 @@
   --t-core:var(--accent);
   --t-adv:var(--accent);
   --t-col:var(--accent);
+  --t-str:var(--accent);
   --t-rec:var(--accent);
   --track:var(--accent);
 
@@ -53,6 +54,7 @@
     --t-core:var(--accent);
     --t-adv:var(--accent);
     --t-col:var(--accent);
+    --t-str:var(--accent);
     --t-rec:var(--accent);
   }
 }
@@ -76,6 +78,7 @@
   --t-core:var(--accent);
   --t-adv:var(--accent);
   --t-col:var(--accent);
+  --t-str:var(--accent);
   --t-rec:var(--accent);
 }
 
@@ -331,7 +334,8 @@ td b{font-weight:700;color:var(--ink)}
   <div class="tabs" role="tablist" aria-label="Note tracks">
     <button class="tab" role="tab" id="tab-core" aria-controls="p-core" data-panel="p-core" data-track="core" aria-selected="true">Core Java <em>14</em></button>
     <button class="tab" role="tab" id="tab-adv" aria-controls="p-adv" data-panel="p-adv" data-track="adv" aria-selected="false">Advanced Java <em>13</em></button>
-    <button class="tab" role="tab" id="tab-col" aria-controls="p-col" data-panel="p-col" data-track="col" aria-selected="false">Collections <em>14</em></button>
+    <button class="tab" role="tab" id="tab-col" aria-controls="p-col" data-panel="p-col" data-track="col" aria-selected="false">Collections <em>15</em></button>
+    <button class="tab" role="tab" id="tab-str" aria-controls="p-str" data-panel="p-str" data-track="str" aria-selected="false">Streams <em>07</em></button>
     <button class="tab" role="tab" id="tab-rec" aria-controls="p-rec" data-panel="p-rec" data-track="rec" aria-selected="false">Recall &amp; Gaps <em>04</em></button>
   </div>
 </header>
@@ -1562,7 +1566,7 @@ list.forEach(log.andThen(audit));                        <b>// both see the same
         <p>The one collision rule worth carrying: if a class inherits the same default method from two interfaces it <b>must</b> override it, and inside that override <code>InterfaceName.super.method()</code> picks a side. A class method always wins over any inherited default.</p>
       </div>
 
-      <div class="gap"><span class="lbl">What comes next</span>Composition, laziness and the built-in interfaces are three quarters of the Stream API. <code>filter</code> takes the <code>Predicate</code>, <code>map</code> takes the <code>Function</code>, <code>forEach</code> takes the <code>Consumer</code>, <code>sorted</code> takes the <code>Comparator</code> &mdash; and nothing executes until a terminal operation asks for a result, the same &ldquo;build now, run later&rdquo; you just saw. Streams are course #39&ndash;42 and still the largest gap in the repo; every functional interface they need is already on this page.</div>
+      <div class="gap"><span class="lbl">What comes next</span>Composition, laziness and the built-in interfaces are three quarters of the Stream API. <code>filter</code> takes the <code>Predicate</code>, <code>map</code> takes the <code>Function</code>, <code>forEach</code> takes the <code>Consumer</code>, <code>sorted</code> takes the <code>Comparator</code> &mdash; and nothing executes until a terminal operation asks for a result, the same &ldquo;build now, run later&rdquo; you just saw. That is the <b>Streams</b> tab, course #39&ndash;42 &mdash; seven cards built on exactly the interfaces on this page. Read this card, then go straight there.</div>
 
       <div class="say"><span class="lbl">Say it out loud</span><p><code>andThen</code> is left to right, <code>compose</code> is right to left, and <code>reversed()</code> reverses <b>everything before it</b>. Composing builds a value; nothing runs until you call it.</p></div>
     </section>
@@ -1620,7 +1624,7 @@ if (o instanceof Student s &amp;&amp; s.marks() &gt; 90) { ... }   <i>// test an
       <p>This is the part of your notes that already answers at a level above your experience &mdash; &ldquo;a Set is a HashMap with a dummy PRESENT value&rdquo; is the internal explanation, not the textbook definition, and that is exactly what gets asked. Everything here is rebuilt from <code>set/note1.txt</code>, <code>Interable/Iterable_Notes.md</code> and <code>Queue/Note.txt</code>.</p>
       <p>Collections internals show up in about nine interviews out of ten. Starred cards are the ones that turn into a ten-minute conversation &mdash; and the blue blocks are where that conversation goes: bitmasks instead of modulo, why 8 is the treeify threshold, why fail-fast is documented as best-effort.</p>
       <div class="lede-meta">
-        <span><b>14</b> cards</span>
+        <span><b>15</b> cards</span>
         <span><b>3</b> animated mechanisms</span>
         <span><b>Asked in</b> ~90% of interviews</span>
       </div>
@@ -1657,6 +1661,22 @@ if (o instanceof Student s &amp;&amp; s.marks() &gt; 90) { ... }   <i>// test an
         <li>The pairing to memorise: <b>HashSet&harr;HashMap, LinkedHashSet&harr;LinkedHashMap, TreeSet&harr;TreeMap</b>. Each Set is just its Map's key side.</li>
         <li>Because Map is not Iterable, <code>for (x : map)</code> does not compile &mdash; you iterate <code>map.entrySet()</code>, which <i>is</i> a Set.</li>
       </ul>
+
+      <div class="deep"><span class="lbl">What <code>Collection</code> itself guarantees &mdash; the methods every one of them has</span>
+        <p><code>Interable/Demo4.java</code> declares <code>Collection&lt;Integer&gt; col = new HashSet&lt;&gt;()</code> and then calls only interface methods &mdash; which is the right instinct: <b>program to the interface</b>, and the same code runs over an ArrayList, a HashSet or a LinkedList by changing one word.</p>
+        <div class="tbl"><table>
+          <tr><th>Method</th><th>Returns</th><th>The part worth knowing</th></tr>
+          <tr><td><code>add(e)</code></td><td><code>boolean</code></td><td><b>false</b> when a Set rejects a duplicate &mdash; on a List it is always true</td></tr>
+          <tr><td><code>remove(o)</code></td><td><code>boolean</code></td><td>false if it was not there; removes <b>one</b> occurrence</td></tr>
+          <tr><td><code>contains(o)</code></td><td><code>boolean</code></td><td>uses <code>equals</code>. <b>O(n) on a List, O(1) on a HashSet</b> &mdash; the single best reason to pick the right type</td></tr>
+          <tr><td><code>size()</code> / <code>isEmpty()</code></td><td><code>int</code> / <code>boolean</code></td><td>prefer <code>isEmpty()</code> &mdash; it reads better and is O(1) everywhere</td></tr>
+          <tr><td><code>addAll</code> / <code>removeAll</code> / <code>retainAll</code></td><td><code>boolean</code></td><td>union, difference and intersection, in place</td></tr>
+          <tr><td><code>toArray()</code></td><td><code>Object[]</code></td><td>loses the type &mdash; you get Objects back</td></tr>
+          <tr><td><code>toArray(new Integer[0])</code></td><td><code>Integer[]</code></td><td><b>the typed version</b>; pass a zero-length array and let it allocate</td></tr>
+          <tr><td><code>iterator()</code> / <code>forEach</code> / <code>stream</code></td><td>&mdash;</td><td>inherited from <code>Iterable</code> &mdash; cards&nbsp;10 and the Streams track</td></tr>
+        </table></div>
+        <p>Two things that fall out of the boolean returns: <code>col.add(3)</code> on a <code>HashSet</code> that already holds 3 returns <b>false</b> and changes nothing, which is the cheapest way to ask &ldquo;was this new?&rdquo;; and <code>retainAll</code> is set intersection written as a method, so <code>a.retainAll(b)</code> leaves <code>a</code> holding only what both had.</p>
+      </div>
 
       <div class="say"><span class="lbl">Say it out loud</span><p>Everything iterable descends from <b>Iterable &rarr; Collection</b>. <b>Map sits outside it</b> because it stores pairs, not elements.</p></div>
     </section>
@@ -2051,6 +2071,42 @@ map.forEach((k, v) -&gt; &hellip;);</pre>
       <div class="ans"><p>Three real differences. It is <b>immutable</b> &mdash; every mutator throws <code>UnsupportedOperationException</code>, so it is safe to return from a getter with no defensive copy. It <b>rejects nulls</b> in keys and values, at construction. And its <b>iteration order is deliberately randomised per JVM run</b>, so code that accidentally depends on the order fails in testing rather than in production.</p>
       <p><code>Map.of</code> takes up to ten pairs; beyond that use <code>Map.ofEntries(Map.entry(k, v), &hellip;)</code>. <code>Map.copyOf(existing)</code> takes a real copy &mdash; unlike <code>Collections.unmodifiableMap</code>, which is only a read-only <b>view</b> that still changes when whoever holds the original mutates it.</p></div></details>
 
+      <h3>When the map is sorted &mdash; <code>NavigableMap</code></h3>
+      <p style="max-width:66ch;color:var(--ink-soft)">Everything above is the <code>Map</code> interface, so it works on any map. A <code>TreeMap</code> adds a second layer of methods that only make sense when there <i>is</i> an order &mdash; and <code>set/Demo3.java</code> is entirely about those four.</p>
+
+      <div class="tbl"><table>
+        <tr><th>Method</th><th>Returns</th><th>Cost</th></tr>
+        <tr><td><code>firstKey()</code> / <code>lastKey()</code></td><td>smallest / largest key</td><td>O(log n) &mdash; walk left or right to the end</td></tr>
+        <tr><td><code>firstEntry()</code> / <code>lastEntry()</code></td><td>the whole entry, or <code>null</code></td><td>safer &mdash; <code>firstKey()</code> <b>throws</b> on an empty map</td></tr>
+        <tr><td><code>headMap(k)</code></td><td>a <b>view</b> of everything <b>before</b> k</td><td>O(1) to take, O(log n) to enter</td></tr>
+        <tr><td><code>tailMap(k)</code></td><td>a view of k <b>and everything after</b></td><td>note the asymmetry: head excludes, tail includes</td></tr>
+        <tr><td><code>subMap(a, b)</code></td><td>a view from a (inclusive) to b (exclusive)</td><td>the range query a HashMap simply cannot do</td></tr>
+        <tr><td><code>floorKey(k)</code> / <code>ceilingKey(k)</code></td><td>greatest &le; k / least &ge; k</td><td>&ldquo;nearest match&rdquo; without scanning</td></tr>
+        <tr><td><code>lowerKey(k)</code> / <code>higherKey(k)</code></td><td>strictly less / strictly greater</td><td>the exclusive versions of the pair above</td></tr>
+        <tr><td><code>descendingMap()</code></td><td>a reversed view</td><td>a view, so it costs nothing to take</td></tr>
+        <tr><td><code>pollFirstEntry()</code> / <code>pollLastEntry()</code></td><td>read <b>and remove</b> the end</td><td>how a TreeMap becomes a priority structure</td></tr>
+      </table></div>
+
+      <pre><i>// set/Demo3.java, with the answers written in</i>
+TreeMap&lt;Integer,String&gt; map = new TreeMap&lt;&gt;();
+map.put(101, "Aditya"); map.put(102, "Abhishek"); map.put(103, "Raj");
+
+map.firstKey();      <i>// 101 &mdash; smallest key, NOT insertion order</i>
+map.lastKey();       <i>// 103</i>
+map.headMap(102);    <i>// {101=Aditya}        &mdash; strictly BEFORE 102</i>
+map.tailMap(103);    <i>// {103=Raj}           &mdash; 103 INCLUDED</i>
+map.subMap(101, 103);<i>// {101=Aditya, 102=Abhishek}</i>
+map.floorKey(102);   <i>// 102 &mdash; greatest key &le; 102</i>
+map.higherKey(102);  <b>// 103 &mdash; strictly greater</b>
+
+<i>// these are VIEWS: writing through one writes into the map</i>
+map.headMap(102).clear();      <i>// removes 101 from map itself</i></pre>
+
+      <div class="deep"><span class="lbl">Why this is the whole reason to pick TreeMap</span>
+        <p>A <code>HashMap</code> is faster for <code>get</code> &mdash; O(1) against O(log&nbsp;n). You accept the slower lookup to buy exactly one thing: <b>order-aware queries</b>. &ldquo;All orders between these two dates&rdquo;, &ldquo;the nearest price at or below this one&rdquo;, &ldquo;the next event after now&rdquo; are all one call on a TreeMap and a full scan on a HashMap.</p>
+        <p>Head, tail and sub maps are <b>views</b>, exactly like <code>keySet()</code> above &mdash; taking one copies nothing, and mutating one mutates the map. And the same rule as <code>TreeSet</code> applies to the keys: they must be <code>Comparable</code>, or the map needs a <code>Comparator</code>, and <b>null keys are rejected</b> because there is nothing to compare a null against.</p>
+      </div>
+
       <div class="gap"><span class="lbl">Repo note</span><code>set/Demo2.java</code> touches almost every method above, which makes it the best map file in the repo &mdash; but every call except the two <code>put</code>s is commented out or discarded, so running it prints nothing. Uncommenting one block at a time and printing the <b>return value</b> of each call is what turns it from an API list into the table on this card. The Java 8 methods at the bottom of your file (<code>getOrDefault</code>, <code>putIfAbsent</code>) are the ones actually worth typing.</div>
 
       <div class="say"><span class="lbl">Say it out loud</span><p><code>containsKey</code> is O(1), <code>containsValue</code> is O(n). <code>keySet</code>, <code>values</code> and <code>entrySet</code> are <b>live views of the same table</b> &mdash; removing from a view removes from the map, and iterating <code>entrySet</code> is one lookup instead of two.</p></div>
@@ -2135,6 +2191,18 @@ q.poll();        <i>// 10 &mdash; FIFO</i></pre>
           <li><b><code>ConcurrentLinkedQueue</code></b> is the lock-free, non-blocking option. Note that its <code>size()</code> is O(n) and only approximate &mdash; do not poll it in a loop.</li>
           <li>None of <code>ArrayDeque</code>, <code>LinkedList</code> or <code>PriorityQueue</code> is thread-safe.</li>
         </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">Writing it by hand &mdash; the two details that break people</span>
+        <p><b>1. Growing a circular queue is not a straight copy.</b> When the array is full the elements are <i>wrapped</i> &mdash; the oldest may sit at index 4 and the newest at index 1 &mdash; so <code>System.arraycopy</code> from index 0 gives you the right elements in the <b>wrong order</b>. You have to walk from <code>front</code>, with the modulo, and land them at 0:</p>
+        <pre>for (int i = 0; i &lt; size; i++)
+    neu[i] = old[(front + i) % old.length];   <i>// queue order, not array order</i>
+front = 0;
+rear  = size - 1;</pre>
+        <p><b>2. The linked-list version has an edge case on the last removal.</b> <code>poll()</code> moves <code>front</code> forward, and when the queue empties <code>front</code> becomes <code>null</code> &mdash; but <code>rear</code> is still pointing at the node you just removed. Forget this and the next <code>offer()</code> links onto a node that is no longer in the queue, so elements silently vanish:</p>
+        <pre>front = front.next;
+if (front == null) rear = null;   <b>// without this line, the queue quietly corrupts</b></pre>
+        <p>And one design choice worth being able to justify: with only <code>front</code> and <code>rear</code>, &ldquo;completely full&rdquo; and &ldquo;completely empty&rdquo; both look like <code>front == rear</code>. The classic fix is to <b>sacrifice one slot</b> so full becomes <code>(rear + 1) % n == front</code>. Real code instead keeps a separate <code>size</code> counter &mdash; then empty is <code>size == 0</code>, full is <code>size == n</code>, and all n slots are usable.</p>
       </div>
 
       <div class="gap"><span class="lbl">Repo gap</span><code>Queue/Demo1.java</code> declares an <code>ArrayDeque</code> and stops there. The notes now go deep &mdash; <code>Note.txt</code> plus the expanded <code>Queue/revision.txt</code> cover the array, linked-list and stack implementations, the circular wrap and the full/empty checks. What is left is writing all three by hand and timing ArrayDeque against LinkedList, so the cache argument above stops being something you were told.</div>
@@ -2323,12 +2391,79 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <p>TimSort's contract check is also why the &ldquo;violates its general contract&rdquo; error exists at all: the algorithm relies on transitivity to merge runs, and a broken comparator would otherwise silently corrupt the array.</p>
       </div>
 
+      <div class="deep"><span class="lbl">One level down &mdash; the JDK breaks its own rule, and what a String comparison really compares</span>
+        <p><b><code>BigDecimal</code> is the famous example of <code>compareTo</code> disagreeing with <code>equals</code>,</b> and it is deliberate. <code>new BigDecimal("1.0").equals(new BigDecimal("1.00"))</code> is <b>false</b> &mdash; <code>equals</code> compares value <i>and scale</i>. But <code>compareTo</code> on the same pair returns <b>0</b>, because numerically they are the same. So a <code>HashSet</code> keeps both and a <code>TreeSet</code> keeps one. If you ever need value-equality on money, compare with <code>compareTo(other) == 0</code>, never <code>equals</code>.</p>
+        <p><b><code>String.compareTo</code> compares char codes, not letters.</b> It walks both strings together and returns the first difference as <code>c1 - c2</code>; if one runs out first, it returns the length difference. Since <code>'A'</code> is 65 and <code>'a'</code> is 97, <b>every uppercase letter sorts before every lowercase one</b> &mdash; so sorting <code>"abhishek", "raj", "Rohan"</code> by name puts <b>Rohan first</b>, which is almost never what anybody wants.</p>
+        <p>Two fixes, in increasing order of correctness: <code>String.CASE_INSENSITIVE_ORDER</code> as a ready-made comparator, or <code>Comparator.comparing(Student::getName, String.CASE_INSENSITIVE_ORDER)</code> to apply it to a field. And for genuine human-language ordering &mdash; accents, non-English alphabets &mdash; char codes are simply the wrong tool: use <code>java.text.Collator</code>, which knows locale rules. Worth one sentence in an interview, because it shows you know the default is a byte comparison rather than an alphabet.</p>
+      </div>
+
       <div class="say"><span class="lbl">Say it out loud</span><p><b>Comparable is the class's one natural order; Comparator is any number of external orders.</b> Both return negative, zero or positive &mdash; never a boolean, never a subtraction.</p></div>
     </section>
 
     <!-- col 13 -->
+    <section id="k15">
+      <div class="s-head"><span class="s-num">13</span><h2>The <code>Collections</code> and <code>Arrays</code> utility classes</h2><span class="src">Comparable/note.txt &middot; the list at the bottom</span></div>
+      <p class="s-why">Your note ends with fifteen static methods and no explanation &mdash; this is what each one is actually for</p>
+      <ul class="facts">
+        <li><b><code>Collections</code> (plural) is a utility class of static methods; <code>Collection</code> (singular) is the interface.</b> One letter apart, and they are asked about together precisely because of that. <code>Arrays</code> is the same idea for arrays.</li>
+        <li><b>Almost every method here mutates the list in place and returns <code>void</code></b> &mdash; <code>sort</code>, <code>reverse</code>, <code>shuffle</code>, <code>swap</code>, <code>fill</code>. The ones that return something are the queries (<code>max</code>, <code>min</code>, <code>frequency</code>, <code>binarySearch</code>) and the wrappers (<code>unmodifiableList</code>, <code>emptyList</code>).</li>
+        <li><b><code>binarySearch</code> requires the list to already be sorted</b> in the same order it is searching by. On an unsorted list it does not throw &mdash; it returns a meaningless number. That is the trap.</li>
+        <li><b>The <code>empty*</code> family is the answer to &ldquo;what do I return when there is nothing?&rdquo;</b> &mdash; and your note spots the use case exactly: return <code>Collections.emptyList()</code> instead of <code>null</code>, so no caller ever has to null-check.</li>
+        <li><b>The <code>unmodifiable*</code> family returns a <i>view</i>, not a copy</b> &mdash; the distinction on card&nbsp;14, and the reason <code>List.copyOf()</code> exists.</li>
+      </ul>
+
+      <div class="tbl"><table>
+        <tr><th>Method</th><th>Does</th><th>Worth knowing</th></tr>
+        <tr><td><code>sort(list)</code> / <code>sort(list, cmp)</code></td><td>orders in place</td><td>TimSort; needs <code>Comparable</code> without a comparator &mdash; card&nbsp;12</td></tr>
+        <tr><td><code>max(c)</code> / <code>min(c)</code></td><td>largest / smallest</td><td>throws <code>NoSuchElementException</code> on an empty collection</td></tr>
+        <tr><td><code>reverse(list)</code></td><td>flips the order</td><td><b>not</b> a sort &mdash; it reverses whatever order is there now</td></tr>
+        <tr><td><code>shuffle(list)</code></td><td>randomises</td><td><code>shuffle(list, new Random(seed))</code> makes it repeatable for tests</td></tr>
+        <tr><td><code>swap(list, i, j)</code></td><td>exchanges two positions</td><td>O(1) on ArrayList, O(n) on LinkedList</td></tr>
+        <tr><td><code>fill(list, x)</code></td><td>every slot becomes <code>x</code></td><td>does <b>not</b> change the size &mdash; it overwrites</td></tr>
+        <tr><td><code>frequency(c, x)</code></td><td>how many times <code>x</code> occurs</td><td>uses <code>equals</code>; O(n)</td></tr>
+        <tr><td><code>binarySearch(list, key)</code></td><td>index of the key</td><td><b>list must be sorted first</b>; a negative return is <code>-(insertionPoint) - 1</code></td></tr>
+        <tr><td><code>unmodifiableList/Set/Map</code></td><td>read-only <b>view</b></td><td>the backing collection can still change &mdash; card&nbsp;14</td></tr>
+        <tr><td><code>emptyList/Set/Map</code></td><td>an immutable empty one</td><td>allocates nothing &mdash; a shared singleton</td></tr>
+        <tr><td><code>singletonList(x)</code></td><td>an immutable one-element list</td><td>cheaper than a one-element <code>ArrayList</code></td></tr>
+        <tr><td><code>nCopies(n, x)</code></td><td>n references to the same object</td><td>immutable, and stores one reference, not n</td></tr>
+        <tr><td><code>addAll(c, a, b, c)</code></td><td>varargs bulk add</td><td>shorter than a loop of <code>add</code></td></tr>
+        <tr><td><code>disjoint(a, b)</code></td><td>true if they share nothing</td><td>reads better than an empty <code>retainAll</code></td></tr>
+      </table></div>
+
+      <pre><i>// the five that come up most, on a list of Students</i>
+Collections.sort(list, Comparator.comparingInt(Student::getMarks));
+Student top     = Collections.max(list, Comparator.comparingInt(Student::getMarks));
+int     howMany = Collections.frequency(marks, 85);
+Collections.reverse(list);                     <i>// flips whatever order is there now</i>
+Collections.shuffle(list, new Random(42));     <i>// seeded &rarr; the same shuffle every run</i>
+
+<i>// the return-nothing idiom, from your own note</i>
+return results.isEmpty() ? Collections.emptyList() : results;   <i>// never return null</i>
+
+<i>// binarySearch &mdash; and the negative return nobody reads</i>
+List&lt;Integer&gt; sorted = List.of(10, 20, 30, 40);
+Collections.binarySearch(sorted, 30);   <i>// 2  &mdash; found at index 2</i>
+Collections.binarySearch(sorted, 25);   <b>// -3 &mdash; not found; it belongs at index 2</b>
+<i>// -(insertionPoint) - 1, so insertionPoint = -(-3) - 1 = 2. That is how you</i>
+<i>// insert into a sorted list in one step instead of scanning for the position.</i></pre>
+
+      <div class="deep"><span class="lbl">One level down &mdash; <code>Arrays</code>, the same idea one layer lower</span>
+        <ul>
+          <li><code>Arrays.sort</code>, <code>Arrays.fill</code>, <code>Arrays.binarySearch</code>, <code>Arrays.copyOf</code>, <code>Arrays.equals</code>, <code>Arrays.toString</code>, <code>Arrays.stream</code> &mdash; the array-shaped twins of everything above.</li>
+          <li><b><code>Arrays.toString(arr)</code> is the one to remember</b>, because printing an array directly gives <code>[I@1b6d3586</code> &mdash; arrays never override <code>toString</code>. For nested arrays use <code>Arrays.deepToString</code>.</li>
+          <li><b><code>Arrays.equals</code> compares contents; <code>==</code> compares references.</b> The same distinction as <code>String</code>, for the same reason.</li>
+          <li><b><code>Arrays.asList(arr)</code> is a fixed-size view over the array</b>, not a real list: <code>add</code> and <code>remove</code> throw <code>UnsupportedOperationException</code>, and writing through <code>set</code> changes the original array. If you want a real list, wrap it: <code>new ArrayList&lt;&gt;(Arrays.asList(arr))</code>. And on an <code>int[]</code> it produces a <code>List&lt;int[]&gt;</code> of size one &mdash; the same varargs trap as <code>Stream.of</code>.</li>
+        </ul>
+      </div>
+
+      <div class="gap"><span class="lbl">Repo note</span>The list at the bottom of <code>Comparable/note.txt</code> is exactly right and completely unexplained &mdash; it reads as fifteen names. The version worth having in the copy is the three columns above: what it does, whether it mutates, and the one gotcha. <code>binarySearch</code> on an unsorted list and <code>Arrays.asList</code> being fixed-size are the two that cost real debugging time.</div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><code>Collection</code> is the interface, <code>Collections</code> is the toolbox. Most of its methods <b>mutate in place and return void</b>; <code>binarySearch</code> needs a sorted list; and <code>emptyList()</code> is what you return instead of <code>null</code>.</p></div>
+    </section>
+
+    <!-- col 14 -->
     <section id="k13">
-      <div class="s-head"><span class="s-num">13</span><h2>Views, immutability &amp; the gotcha list</h2><span class="src">the things that bite after the interview</span></div>
+      <div class="s-head"><span class="s-num">14</span><h2>Views, immutability &amp; the gotcha list</h2><span class="src">the things that bite after the interview</span></div>
       <p class="s-why">Half the collections API returns a window onto something else, not a copy</p>
       <ul class="facts">
         <li><b>A view shares storage with its source.</b> <code>subList</code>, <code>keySet</code>, <code>values</code>, <code>entrySet</code>, <code>Arrays.asList</code>, <code>headSet</code>/<code>tailSet</code>, and everything from <code>Collections.unmodifiable*</code> are all views. Writes propagate; structural changes to the source invalidate the view.</li>
@@ -2361,9 +2496,9 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       <div class="say"><span class="lbl">Say it out loud</span><p>Most of the collections API hands back <b>views, not copies</b> &mdash; and &ldquo;unmodifiable&rdquo; means <b>you</b> cannot change it, not that it cannot change.</p></div>
     </section>
 
-    <!-- col 14 -->
+    <!-- col 15 -->
     <section id="k11">
-      <div class="s-head"><span class="s-num">14</span><h2>The one-page comparison sheet</h2><span class="src">set/note1.txt &sect;19</span></div>
+      <div class="s-head"><span class="s-num">15</span><h2>The one-page comparison sheet</h2><span class="src">set/note1.txt &sect;19</span></div>
       <p class="s-why">If you can reproduce this table, the collections round is finished</p>
 
       <div class="tbl"><table>
@@ -2392,18 +2527,398 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
     </section>
 
   </div><!-- /collections -->
+  <!-- ============================================================ STREAMS -->
+  <div class="panel" id="p-str" role="tabpanel" aria-labelledby="tab-str" hidden>
+
+    <div class="lede">
+      <div class="kicker">Track four &middot; the newest folder, and the one interviews ask about</div>
+      <h1>Streams: a pipeline, not a loop.</h1>
+      <p>Everything here is rebuilt from <code>Stream/Note.txt</code> and <code>Stream/Demo.java</code> &mdash; course #39&ndash;42. Your note already lands the three things that matter: a stream is <b>a tool for processing a sequence of data through a chain of operations</b>, the pipeline is <b>source &rarr; intermediate &rarr; terminal</b>, and <b>nothing runs until the terminal operation</b>. This track takes each of those down a level.</p>
+      <p>The water-pipeline picture in your note is the right mental model and worth keeping: one source, a chain of filters, and a tap at the end. Until somebody opens the tap, no water moves &mdash; and no filter is ever asked a question.</p>
+      <p><b>This was listed as the largest gap in the repo until this folder appeared.</b> It is asked in roughly nine backend interviews out of ten, usually as &ldquo;rewrite this loop with streams&rdquo; followed by &ldquo;now what does <code>parallel()</code> change?&rdquo;</p>
+      <div class="lede-meta">
+        <span><b>7</b> cards</span>
+        <span><b>1</b> animated mechanism</span>
+        <span><b>Course</b> #39&ndash;42</span>
+      </div>
+    </div>
+
+    <!-- str 1 -->
+    <section id="s1" data-key="1">
+      <div class="s-head"><span class="s-num">01</span><h2>Imperative to declarative <span class="star">&#9733;</span></h2><span class="src">Stream/Note.txt &middot; the Employee example</span></div>
+      <p class="s-why">The exact rewrite your note opens with &mdash; and what the second version actually buys you</p>
+      <ul class="facts">
+        <li><b>The loop describes the machinery; the pipeline describes the result.</b> Your imperative version has to declare a result list, manage a loop variable, write the branch, and remember to sort afterwards. None of those four things is the requirement &mdash; the requirement is &ldquo;names of employees earning over 50,000, sorted&rdquo;.</li>
+        <li><b>A stream is not a data structure.</b> It holds no elements, it allocates no storage for them, and it <b>never modifies its source</b>. It is a description of work to be done over a sequence, which is why <code>list.stream()</code> is O(1) no matter how large the list is.</li>
+        <li><b>Every stage takes one of the functional interfaces from Advanced&nbsp;09&ndash;12.</b> <code>filter</code> takes a <code>Predicate</code>, <code>map</code> takes a <code>Function</code>, <code>sorted</code> takes a <code>Comparator</code>, <code>forEach</code> takes a <code>Consumer</code>. There is nothing new to learn about the arguments &mdash; you already wrote all four.</li>
+        <li><b>Declarative does not mean shorter, it means the <i>what</i> is on the page and the <i>how</i> is in the library.</b> That is also the cost: when the pipeline is wrong, the stack trace is inside the JDK rather than inside your loop.</li>
+        <li><b>A stream is single-use.</b> The loop can be run twice; a stream cannot. Your note calls it &ldquo;stream is dead&rdquo;, which is exactly right &mdash; card&nbsp;03 has the exception it throws.</li>
+      </ul>
+
+      <pre><i>// your imperative version, tidied so it compiles</i>
+List&lt;String&gt; result = new ArrayList&lt;&gt;();
+for (Employee e : employees){
+    if (e.getSalary() &gt; 50000) result.add(e.getName());
+}
+Collections.sort(result);
+
+<i>// the same requirement as a pipeline</i>
+List&lt;String&gt; result = employees.stream()
+        .filter(e -&gt; e.getSalary() &gt; 50000)   <i>// Predicate&lt;Employee&gt;</i>
+        .map(Employee::getName)               <i>// Function&lt;Employee,String&gt;</i>
+        .sorted()                             <i>// natural order of String</i>
+        .toList();                            <b>// terminal &mdash; only now does anything run</b></pre>
+
+      <div class="trap"><span class="lbl">Four fixes to the draft in <code>Stream/Note.txt</code></span>
+        <ul>
+          <li><b>The stages are joined by dots, not separated by semicolons.</b> <code>.filter(&hellip;);</code> followed by <code>.map(&hellip;);</code> ends the statement at the first semicolon &mdash; the next line then starts with a dot and does not compile. One statement, one semicolon, at the very end.</li>
+          <li><b><code>.filter(x -&gt; x &gt; 50000)</code> compares an <code>Employee</code> to a number.</b> The element flowing through is the whole object, so it has to be <code>e -&gt; e.getSalary() &gt; 50000</code>. This is the single most common streams slip: forgetting <i>what type is in the pipe at this stage</i>.</li>
+          <li><b><code>.tolist()</code> &rarr; <code>.toList()</code></b>, and it needs Java&nbsp;16+. On Java&nbsp;8 write <code>.collect(Collectors.toList())</code>.</li>
+          <li><b><code>collections -&gt; stream -&gt; parrallelstream()</code></b> is <code>parallelStream()</code> &mdash; two r&rsquo;s, two l&rsquo;s, camelCase. Card&nbsp;07 is about when it is worth calling and when it makes things slower.</li>
+        </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">One level down &mdash; what you give up, honestly</span>
+        <p>Streams are not free and not always better. A plain <code>for</code> loop over an <code>ArrayList</code> is usually <b>faster</b> for a small collection and a trivial body, because a stream allocates a pipeline object per stage and goes through a megamorphic call site. The win is readability at three or more stages, and composability &mdash; not speed.</p>
+        <p>Three things a loop can do that a stream cannot: <code>break</code> out early with arbitrary state (streams only short-circuit through <code>findFirst</code>, <code>anyMatch</code>, <code>limit</code>), mutate a local variable (lambdas need effectively final &mdash; Advanced&nbsp;09), and <code>continue</code> based on the index. If you find yourself fighting any of those, the loop was the right answer.</p>
+        <p>And the rule that keeps pipelines correct: the lambdas you pass must be <b>non-interfering</b> (they must not modify the source collection) and <b>stateless</b> (their result must not depend on anything that changes during the run). Break the first and you get <code>ConcurrentModificationException</code>; break the second and you get an answer that changes when the pipeline goes parallel.</p>
+      </div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>A stream is <b>a description of work over a sequence</b> &mdash; it stores nothing and changes nothing. The loop says how; the pipeline says what.</p></div>
+    </section>
+
+    <!-- str 2 -->
+    <section id="s2" data-key="1">
+      <div class="s-head"><span class="s-num">02</span><h2>The pipeline: source, intermediate, terminal <span class="star">&#9733;</span></h2><span class="src">Stream/Note.txt &middot; Stream/Demo.java</span></div>
+      <p class="s-why">Your three-part architecture, and the one rule that follows from it</p>
+      <ul class="facts">
+        <li><b>Every pipeline is exactly three things:</b> a <b>source</b> (<code>list.stream()</code>), zero or more <b>intermediate operations</b> (<code>filter</code>, <code>map</code>, <code>sorted</code>&hellip;), and exactly one <b>terminal operation</b> (<code>toList</code>, <code>forEach</code>, <code>count</code>&hellip;).</li>
+        <li><b>The return type tells you which is which, with no memorising.</b> An intermediate operation returns a <code>Stream</code>, so it can be chained. A terminal operation returns anything else &mdash; a <code>List</code>, a number, an <code>Optional</code>, or <code>void</code> &mdash; so the chain has to stop there.</li>
+        <li><b>No terminal operation, no execution.</b> Not &ldquo;it runs and throws the result away&rdquo; &mdash; the predicate inside <code>filter</code> is <b>never called even once</b>. Your note says &ldquo;i have to write the terminal till then it will not executable&rdquo;, and that is precisely it.</li>
+        <li><b>Intermediate operations only build structure.</b> <code>list.stream().filter(p)</code> allocates a new stream object holding a reference to the previous stage and to <code>p</code>. It is a linked list of stages, assembled cheaply, executed later.</li>
+        <li><b>One terminal operation per pipeline, and it consumes the stream.</b> That is the mechanical reason a stream cannot be reused &mdash; card&nbsp;03.</li>
+      </ul>
+
+      <figure class="anim" data-anim data-max="5" id="str">
+        <div class="anim-stage">
+          <div class="qwrap" style="padding-top:0;min-width:470px">
+            <div class="flow" style="margin-bottom:16px">
+              <span class="chip" data-p="src">list.stream()</span>
+              <span class="arrow">&rarr;</span>
+              <span class="chip" data-p="f">filter(x &gt; 10)</span>
+              <span class="arrow">&rarr;</span>
+              <span class="chip" data-p="m">map(x * 2)</span>
+              <span class="arrow">&rarr;</span>
+              <span class="chip" data-p="t">toList()</span>
+            </div>
+            <div style="font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-faint);margin-bottom:6px">SOURCE</div>
+            <div class="qcells">
+              <div class="qcell" data-p="i0">5</div>
+              <div class="qcell" data-p="i1">12</div>
+              <div class="qcell" data-p="i2">7</div>
+              <div class="qcell" data-p="i3">20</div>
+            </div>
+            <div style="font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-faint);margin:14px 0 6px">RESULT</div>
+            <div class="qcells">
+              <div class="qcell" data-p="o0"></div>
+              <div class="qcell" data-p="o1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="anim-cap">
+          <p><b>The pipeline is built, and nothing has happened.</b> Three objects exist &mdash; source, filter stage, map stage &mdash; wired together. Delete <code>toList()</code> and this is the whole program: no element is read, and the predicate is never called.</p>
+          <p><b><code>toList()</code> opens the tap, and 5 goes in first.</b> <code>filter</code> asks &ldquo;5 &gt; 10?&rdquo; &mdash; no. 5 is dropped <b>here</b>. <code>map</code> never sees it, and no doubling is computed.</p>
+          <p><b>12 travels the whole pipeline before 7 starts.</b> It passes the filter, is doubled to 24, and lands in the result. This is what your note calls <b>vertical processing</b> &mdash; depth first, one element at a time, not stage by stage across the whole list.</p>
+          <p><b>7 is dropped at the filter.</b> Again, no <code>map</code> call. Over a list of a million with a selective filter, that is a million multiplications that never happen &mdash; the reason laziness is a performance feature, not just a curiosity.</p>
+          <p><b>20 passes and becomes 40.</b> Four elements have now been read from the source; the source itself is untouched and still holds <code>[5, 12, 7, 20]</code>.</p>
+          <p><b><code>toList()</code> returns <code>[24, 40]</code>.</b> One pass over the data, no intermediate list allocated between the stages &mdash; the loop version would have built one list for the filtered values and another for the mapped ones.</p>
+        </div>
+        <div class="anim-ctl">
+          <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+          <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+          <button class="play" data-act="play">Play</button>
+          <div class="dots" data-dots></div>
+        </div>
+      </figure>
+
+      <div class="tbl"><table>
+        <tr><th>Stage</th><th>Examples</th><th>Returns</th><th>Runs when?</th></tr>
+        <tr><td><b>Source</b></td><td><code>list.stream()</code>, <code>Arrays.stream(a)</code>, <code>Stream.of(&hellip;)</code>, <code>Stream.iterate</code></td><td><code>Stream&lt;T&gt;</code></td><td>creates the pipeline head, reads nothing</td></tr>
+        <tr><td><b>Intermediate</b></td><td><code>filter</code>, <code>map</code>, <code>flatMap</code>, <code>sorted</code>, <code>distinct</code>, <code>limit</code>, <code>skip</code>, <code>peek</code></td><td><code>Stream&lt;T&gt;</code> &mdash; so it chains</td><td><b>never on its own</b> &mdash; only when a terminal pulls</td></tr>
+        <tr><td><b>Terminal</b></td><td><code>forEach</code>, <code>toList</code>, <code>collect</code>, <code>reduce</code>, <code>count</code>, <code>findFirst</code>, <code>anyMatch</code></td><td>anything but a Stream</td><td>immediately &mdash; and consumes the stream</td></tr>
+      </table></div>
+
+      <pre><i>// the live line in your Stream/Demo.java &mdash; one statement, one terminal</i>
+list.stream().filter(x -&gt; x &gt; 10).map(x -&gt; x * 2).forEach(System.out::println);
+
+<i>// the commented-out version above it does the same thing, stage by stage</i>
+Stream&lt;Integer&gt; s = list.stream();
+s = s.filter(x -&gt; x &gt; 10);      <i>// reassigning is fine &mdash; s now names the NEW stage</i>
+s = s.map(x -&gt; x * 2);
+s.forEach(System.out::println);  <b>// same pipeline, spelled out</b>
+
+<i>// what breaks it: keeping the OLD reference and using it again</i>
+Stream&lt;Integer&gt; a = list.stream();
+Stream&lt;Integer&gt; b = a.filter(x -&gt; x &gt; 10);
+a.forEach(System.out::println);  <s>// IllegalStateException &mdash; a was consumed by filter()</s></pre>
+
+      <div class="deep"><span class="lbl">One level down &mdash; why your commented-out code was correct</span>
+        <p>The block you commented out in <code>Demo.java</code> reassigns <code>s</code> at every stage, and that is the <b>right</b> way to spell a pipeline across several statements. Each intermediate operation returns a <i>new</i> stream and marks the previous one as consumed, so as long as the variable always points at the newest stage, nothing is ever used twice.</p>
+        <p>The trap is the version that keeps both references. Once <code>a.filter(&hellip;)</code> has been called, <code>a</code> is linked into a pipeline and cannot be the source of another one &mdash; touching it throws <code>IllegalStateException: stream has already been operated upon or closed</code>. Streams behave like an iterator here, not like a collection.</p>
+        <p>Under the hood each stage is an instance of an <code>AbstractPipeline</code> subclass holding <code>previousStage</code>, a depth, and a bitmap of characteristics (sorted, distinct, sized, ordered). The terminal operation walks that chain backwards to the source, then pushes elements forward through a chain of <code>Sink</code> objects &mdash; which is literally the filter chain your water-pipe picture draws.</p>
+      </div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><b>Source, intermediate, terminal.</b> Intermediate operations return a Stream and do nothing; the terminal returns something else and runs the whole thing. No terminal, no execution &mdash; not even the predicate.</p></div>
+    </section>
+
+    <!-- str 3 -->
+    <section id="s3" data-key="1">
+      <div class="s-head"><span class="s-num">03</span><h2>Laziness, short-circuiting &amp; the dead stream <span class="star">&#9733;</span></h2><span class="src">Stream/Note.txt &middot; &ldquo;vertical processing&rdquo;</span></div>
+      <p class="s-why">Your note gets this right and it is the part that separates a real answer from a memorised one</p>
+      <ul class="facts">
+        <li><b>Vertical processing is the correct name for it.</b> One element goes all the way through every stage before the next element is read. The alternative &mdash; run <code>filter</code> over the whole list, then <code>map</code> over the whole list &mdash; would allocate an intermediate collection per stage and is exactly what streams avoid.</li>
+        <li><b>Laziness is what makes short-circuiting possible.</b> <code>findFirst</code> on a filtered million-element list stops at the first match, so the filter is called only until then. Element-at-a-time is the mechanism; stopping early is the payoff.</li>
+        <li><b>It is also what makes infinite streams legal.</b> <code>Stream.iterate(1, x -&gt; x + 1).limit(10)</code> works because the source is only asked for the next value when a downstream stage wants one.</li>
+        <li><b>A stream can be traversed once.</b> Reusing one throws <code>IllegalStateException: stream has already been operated upon or closed</code>. Your note&rsquo;s &ldquo;stream is dead&rdquo; is the right instinct &mdash; the fix is to create a new stream from the source, which is cheap.</li>
+        <li><b>Not every operation can be lazy.</b> <code>sorted()</code> cannot emit its first element until it has seen the last one; <code>distinct()</code> has to remember everything it has emitted. Those are <b>stateful</b>, and they are where the pipeline stops streaming and starts buffering &mdash; card&nbsp;05.</li>
+      </ul>
+
+      <pre><i>// laziness, made visible &mdash; run this and read the interleaving</i>
+List.of(5, 12, 7, 20).stream()
+    .filter(x -&gt; { System.out.println("filter " + x); return x &gt; 10; })
+    .map(x -&gt;   { System.out.println("  map  " + x); return x * 2; })
+    .forEach(x -&gt; System.out.println("    out " + x));
+
+<i>// filter 5          &lt;- dropped, map never called for 5</i>
+<i>// filter 12</i>
+<i>//   map  12</i>
+<i>//     out 24        &lt;- 12 finished completely before 7 was read</i>
+<i>// filter 7</i>
+<i>// filter 20 / map 20 / out 40</i>
+
+<i>// short-circuiting: the filter runs twice, not a million times</i>
+Optional&lt;Integer&gt; first = million.stream().filter(x -&gt; x &gt; 10).findFirst();
+
+<i>// the dead stream</i>
+Stream&lt;Integer&gt; s = list.stream();
+s.forEach(System.out::println);
+s.forEach(System.out::println);   <s>// IllegalStateException</s>
+list.stream().forEach(&hellip;);         <b>// correct: a new stream, every time</b></pre>
+
+      <div class="deep"><span class="lbl">One level down &mdash; the operations that can stop early</span>
+        <p>Short-circuiting comes in two flavours, and knowing which is which is a real interview question:</p>
+        <ul>
+          <li><b>Short-circuiting terminal operations:</b> <code>findFirst</code>, <code>findAny</code>, <code>anyMatch</code>, <code>allMatch</code>, <code>noneMatch</code>. They stop as soon as the answer is decided.</li>
+          <li><b>Short-circuiting intermediate operations:</b> <code>limit</code> and <code>takeWhile</code> (Java&nbsp;9). These are what let an infinite source terminate.</li>
+        </ul>
+        <p>Two edge cases worth carrying: <code>allMatch</code> on an <b>empty</b> stream returns <code>true</code> and <code>anyMatch</code> returns <code>false</code> &mdash; vacuous truth, and it is a favourite trick question. And <code>count()</code> since Java&nbsp;9 may <b>skip the pipeline entirely</b> if it can work the count out from the source, so any side effect in a <code>peek</code> or <code>map</code> above it silently does not run.</p>
+      </div>
+
+      <details class="qa"><summary>If streams are lazy, when exactly is my lambda first executed?</summary>
+      <div class="ans"><p>On the <b>terminal operation</b>, and then only for the elements that actually reach that stage. Building the pipeline calls nothing. This matters in real code: a <code>map</code> that performs an HTTP call looks harmless in a method that returns the stream &mdash; the calls happen at whatever point the caller collects, which may be inside a transaction that has already been committed, or after the resource has been closed.</p>
+      <p>That is also the reason a method should return a <code>List</code>, not a <code>Stream</code>, unless the laziness is the point and the caller knows it.</p></div></details>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>Elements flow <b>one at a time, all the way down</b> &mdash; vertical processing. That is why <code>findFirst</code> can stop early, why an infinite stream terminates under <code>limit</code>, and why a stream can only be used once.</p></div>
+    </section>
+
+    <!-- str 4 -->
+    <section id="s4">
+      <div class="s-head"><span class="s-num">04</span><h2>Where a stream comes from</h2><span class="src">Stream/Note.txt &middot; &ldquo;Stream Source&rdquo;</span></div>
+      <p class="s-why">Your list is complete &mdash; collection, array, <code>of</code>, empty, infinite, primitive &mdash; this is each one written correctly</p>
+
+      <div class="tbl"><table>
+        <tr><th>Source</th><th>Code</th><th>Note</th></tr>
+        <tr><td>Collection</td><td><code>list.stream()</code> &middot; <code>list.parallelStream()</code></td><td>on every <code>Collection</code>; a <code>Map</code> has none &mdash; go through <code>entrySet()</code></td></tr>
+        <tr><td>Array</td><td><code>Arrays.stream(arr)</code></td><td><b>not</b> <code>arr.stream(arr)</code> &mdash; an array has no methods</td></tr>
+        <tr><td>Explicit values</td><td><code>Stream.of(1, 2, 3)</code></td><td>varargs; also <code>Stream.of(singleValue)</code></td></tr>
+        <tr><td>Empty</td><td><code>Stream.empty()</code></td><td>for returning &ldquo;no results&rdquo; without a null</td></tr>
+        <tr><td>Infinite, dependent</td><td><code>Stream.iterate(1, x -&gt; x + 1)</code></td><td>each value is computed <b>from the previous one</b></td></tr>
+        <tr><td>Infinite, independent</td><td><code>Stream.generate(Math::random)</code></td><td>a <code>Supplier</code> &mdash; <b>no dependency</b> on what came before</td></tr>
+        <tr><td>Bounded iterate (Java 9+)</td><td><code>Stream.iterate(1, x -&gt; x &lt; 100, x -&gt; x * 2)</code></td><td>seed, condition, next &mdash; a <code>for</code> loop as a stream</td></tr>
+        <tr><td>Primitive range</td><td><code>IntStream.range(0, 5)</code> &middot; <code>rangeClosed(1, 5)</code></td><td>exclusive / inclusive of the end</td></tr>
+        <tr><td>Lines of a file</td><td><code>Files.lines(path)</code></td><td><b>must be closed</b> &mdash; use try-with-resources (Advanced&nbsp;08)</td></tr>
+        <tr><td>Characters</td><td><code>"abc".chars()</code></td><td>gives an <code>IntStream</code> of code points, not chars</td></tr>
+      </table></div>
+
+      <pre><i>// your array line, corrected</i>
+String[] arr = {"ADITYA", "ROHAN", "RAJ"};
+Stream&lt;String&gt; s = Arrays.stream(arr);           <i>// the static method takes the array</i>
+<s>arr.stream(arr);</s>                                <i>// arrays have no methods at all</i>
+
+<i>// infinite, made finite &mdash; limit is the short-circuit</i>
+Stream.iterate(1, x -&gt; x + 1).limit(10).forEach(System.out::println);   <i>// 1..10</i>
+Stream.generate(Math::random).limit(5).forEach(System.out::println);
+
+<i>// why infinite streams are useful at all: you describe the rule, not the size</i>
+Stream.iterate(1, x -&gt; x * 2)    <i>// powers of two, however many are needed</i>
+      .filter(x -&gt; x &gt; 100)
+      .findFirst();               <b>// stops at 128 &mdash; the source is never asked for more</b></pre>
+
+      <div class="trap"><span class="lbl">The array trap that catches everybody once</span>
+        <ul>
+          <li><code>Stream.of(intArray)</code> where <code>intArray</code> is <code>int[]</code> gives you a <b><code>Stream&lt;int[]&gt;</code> containing one element</b> &mdash; the array itself. It compiles, it runs, and <code>count()</code> returns 1. Use <code>Arrays.stream(intArray)</code>, which gives an <code>IntStream</code> of the values. With <code>Integer[]</code> or <code>String[]</code> the varargs form does what you expect, which is why the bug is so easy to miss.</li>
+          <li><code>Stream.generate</code> with no <code>limit</code> is an infinite loop that will not stop. So is <code>Stream.iterate(&hellip;).sorted()</code> &mdash; sorting cannot finish what never ends.</li>
+          <li><code>Files.lines()</code> holds an open file handle. It is one of the few streams that implements <code>AutoCloseable</code>, and forgetting the try-with-resources leaks a descriptor per call.</li>
+        </ul>
+      </div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><code>iterate</code> <b>depends on the previous value</b>; <code>generate</code> takes a <code>Supplier</code> and <b>depends on nothing</b>. Both are infinite, so both need <code>limit</code> or a short-circuiting terminal.</p></div>
+    </section>
+
+    <!-- str 5 -->
+    <section id="s5">
+      <div class="s-head"><span class="s-num">05</span><h2>Intermediate operations</h2><span class="src">Stream/Note.txt &middot; &ldquo;transformation&rdquo;</span></div>
+      <p class="s-why">All of them return a Stream &mdash; but they do not all behave the same way</p>
+      <ul class="facts">
+        <li><b>Stateless operations look at one element and forget it:</b> <code>filter</code>, <code>map</code>, <code>flatMap</code>, <code>peek</code>. They stream in the true sense &mdash; constant memory, no buffering, fully lazy.</li>
+        <li><b>Stateful operations need to remember, or to see more:</b> <code>distinct</code>, <code>sorted</code>, <code>limit</code>, <code>skip</code>. <code>distinct</code> keeps a set of everything it has emitted; <code>sorted</code> is a <b>full barrier</b> &mdash; it must consume the entire stream before releasing a single element.</li>
+        <li><b>That barrier is why order matters for performance.</b> <code>.filter(&hellip;).sorted()</code> sorts only what survives the filter; <code>.sorted().filter(&hellip;)</code> sorts everything and then throws most of it away. Same result, very different cost.</li>
+        <li><code>distinct()</code> uses <b><code>equals</code> and <code>hashCode</code></b> &mdash; so on your own class it does nothing useful until you override both, which is Collections card&nbsp;04 all over again.</li>
+        <li><code>peek</code> is <b>for debugging</b>. The javadoc says so, and since Java&nbsp;9 a <code>count()</code> terminal may skip the pipeline entirely, so a <code>peek</code> that writes to a log can silently never run.</li>
+      </ul>
+
+      <div class="tbl"><table>
+        <tr><th>Operation</th><th>Takes</th><th>Does</th><th>State</th></tr>
+        <tr><td><code>filter(p)</code></td><td><code>Predicate&lt;T&gt;</code></td><td>keeps elements where <code>p</code> is true</td><td>stateless</td></tr>
+        <tr><td><code>map(f)</code></td><td><code>Function&lt;T,R&gt;</code></td><td>one in, one out &mdash; <b>changes the type in the pipe</b></td><td>stateless</td></tr>
+        <tr><td><code>flatMap(f)</code></td><td><code>Function&lt;T,Stream&lt;R&gt;&gt;</code></td><td>one in, <b>many</b> out &mdash; flattens nesting</td><td>stateless</td></tr>
+        <tr><td><code>mapToInt(f)</code></td><td><code>ToIntFunction&lt;T&gt;</code></td><td>leaves the object world &mdash; card&nbsp;07</td><td>stateless</td></tr>
+        <tr><td><code>distinct()</code></td><td>&mdash;</td><td>drops duplicates by <code>equals</code>/<code>hashCode</code></td><td><b>stateful</b></td></tr>
+        <tr><td><code>sorted()</code> / <code>sorted(c)</code></td><td><code>Comparator&lt;T&gt;</code></td><td>orders the stream</td><td><b>stateful, full barrier</b></td></tr>
+        <tr><td><code>limit(n)</code> / <code>skip(n)</code></td><td><code>long</code></td><td>first n / all but the first n</td><td><b>stateful</b>, <code>limit</code> short-circuits</td></tr>
+        <tr><td><code>takeWhile</code> / <code>dropWhile</code> (9+)</td><td><code>Predicate&lt;T&gt;</code></td><td>stop / start at the first failure</td><td><b>stateful</b></td></tr>
+        <tr><td><code>peek(c)</code></td><td><code>Consumer&lt;T&gt;</code></td><td>look without changing &mdash; debugging only</td><td>stateless</td></tr>
+      </table></div>
+
+      <pre><i>// map changes the TYPE flowing through the pipe &mdash; watch it</i>
+list.stream()              <i>// Stream&lt;Employee&gt;</i>
+    .filter(e -&gt; e.getSalary() &gt; 50000)   <i>// Stream&lt;Employee&gt;  &mdash; filter never changes type</i>
+    .map(Employee::getName)               <i>// Stream&lt;String&gt;    &mdash; from here on, strings</i>
+    .filter(n -&gt; n.startsWith("A"))       <i>// so THIS lambda gets a String, not an Employee</i>
+    .toList();
+
+<i>// flatMap: one element becomes many</i>
+List&lt;List&lt;String&gt;&gt; teams = &hellip;;
+teams.stream().flatMap(List::stream).distinct().sorted().toList();
+<s>teams.stream().map(List::stream)</s>   <i>// Stream&lt;Stream&lt;String&gt;&gt; &mdash; nested, and useless</i>
+
+<i>// order changes the work, not the answer</i>
+big.stream().sorted().filter(x -&gt; x &gt; 10).toList();   <i>// sorts 1,000,000</i>
+big.stream().filter(x -&gt; x &gt; 10).sorted().toList();   <b>// sorts only the survivors</b></pre>
+
+      <div class="deep"><span class="lbl">One level down &mdash; <code>map</code> vs <code>flatMap</code>, said once, properly</span>
+        <p><code>map</code> is a one-to-one transform: n elements in, n elements out, of a possibly different type. <code>flatMap</code> is one-to-many: each element is turned into <i>a stream</i>, and those streams are concatenated into a single flat stream. If your mapping function naturally returns a collection &mdash; the orders of a customer, the words of a line, the elements of a nested list &mdash; you want <code>flatMap</code>, otherwise you end up holding a <code>Stream&lt;Stream&lt;T&gt;&gt;</code> that nothing downstream can use.</p>
+        <p>The same distinction shows up in <code>Optional.map</code> vs <code>Optional.flatMap</code>, for exactly the same reason: use <code>flatMap</code> when the function already returns the wrapper type.</p>
+      </div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><b>Stateless</b> ops (<code>filter</code>, <code>map</code>) stream one element at a time; <b>stateful</b> ones (<code>sorted</code>, <code>distinct</code>) buffer, and <code>sorted</code> is a full barrier. So filter first, sort second.</p></div>
+    </section>
+
+    <!-- str 6 -->
+    <section id="s6" data-key="1">
+      <div class="s-head"><span class="s-num">06</span><h2>Terminal operations &amp; collecting <span class="star">&#9733;</span></h2><span class="src">Stream/Note.txt &middot; &ldquo;final triggering&rdquo;</span></div>
+      <p class="s-why">Where the work happens, and where the interview question usually lands</p>
+      <ul class="facts">
+        <li><b>A terminal operation returns anything except a Stream</b> &mdash; a collection, a number, an <code>Optional</code>, a boolean, or nothing. That is the whole definition; there is no list to memorise.</li>
+        <li><b>The ones that can return &ldquo;nothing found&rdquo; return an <code>Optional</code>:</b> <code>findFirst</code>, <code>findAny</code>, <code>reduce</code> without an identity, <code>min</code>, <code>max</code>. This is precisely the return-type use of <code>Optional</code> that Advanced&nbsp;13 argues for.</li>
+        <li><b><code>toList()</code> (Java 16) returns an <i>unmodifiable</i> list</b>; <code>collect(Collectors.toList())</code> makes no promise about mutability, and <code>Collectors.toUnmodifiableList()</code> is the explicit Java&nbsp;10 form. Calling <code>add</code> on the result of <code>toList()</code> throws.</li>
+        <li><b><code>collect</code> is the general one.</b> Everything else is a convenience over it &mdash; and <code>Collectors.groupingBy</code> is the single most useful method in the whole API for backend work.</li>
+        <li><b><code>forEach</code> gives no ordering guarantee on a parallel stream.</b> <code>forEachOrdered</code> does, at a cost. On a sequential stream they behave the same, which is how the bug survives testing.</li>
+      </ul>
+
+      <div class="tbl"><table>
+        <tr><th>Terminal</th><th>Returns</th><th>Note</th></tr>
+        <tr><td><code>forEach(c)</code></td><td><code>void</code></td><td>takes a <code>Consumer</code>; no order guarantee in parallel</td></tr>
+        <tr><td><code>toList()</code></td><td><code>List&lt;T&gt;</code></td><td>Java&nbsp;16+, <b>unmodifiable</b></td></tr>
+        <tr><td><code>collect(&hellip;)</code></td><td>whatever the collector builds</td><td>the general case &mdash; lists, sets, maps, strings, statistics</td></tr>
+        <tr><td><code>reduce(id, f)</code></td><td><code>T</code> (or <code>Optional&lt;T&gt;</code> without id)</td><td><code>f</code> must be <b>associative</b> or parallel gives a different answer</td></tr>
+        <tr><td><code>count()</code></td><td><code>long</code></td><td>may skip the pipeline entirely since Java&nbsp;9</td></tr>
+        <tr><td><code>findFirst()</code> / <code>findAny()</code></td><td><code>Optional&lt;T&gt;</code></td><td>short-circuit; <code>findAny</code> is the parallel-friendly one</td></tr>
+        <tr><td><code>anyMatch</code> / <code>allMatch</code> / <code>noneMatch</code></td><td><code>boolean</code></td><td>short-circuit; on an <b>empty</b> stream <code>allMatch</code> is <code>true</code></td></tr>
+        <tr><td><code>min(c)</code> / <code>max(c)</code></td><td><code>Optional&lt;T&gt;</code></td><td>takes a <code>Comparator</code> &mdash; Advanced&nbsp;12&rsquo;s chains work here</td></tr>
+      </table></div>
+
+      <pre><i>// the collectors worth knowing by name</i>
+Map&lt;Integer,List&lt;Student&gt;&gt; byMarks =
+        list.stream().collect(Collectors.groupingBy(Student::getMarks));
+
+Map&lt;Integer,Long&gt; countByMarks =
+        list.stream().collect(Collectors.groupingBy(Student::getMarks, Collectors.counting()));
+
+Map&lt;Integer,String&gt; nameByRoll =
+        list.stream().collect(Collectors.toMap(Student::getRollNo, Student::getName));
+
+String names  = list.stream().map(Student::getName).collect(Collectors.joining(", "));
+double average = list.stream().mapToInt(Student::getMarks).average().orElse(0);
+
+<i>// reduce: identity + an associative accumulator</i>
+int total = list.stream().mapToInt(Student::getMarks).sum();          <i>// prefer this</i>
+int same  = list.stream().map(Student::getMarks).reduce(0, Integer::sum);</pre>
+
+      <div class="trap"><span class="lbl">The three that bite in production</span>
+        <ul>
+          <li><b><code>Collectors.toMap</code> throws on a duplicate key</b> &mdash; <code>IllegalStateException: Duplicate key</code>. Real data has duplicates, so pass the three-argument form with a merge function: <code>toMap(k, v, (a, b) -&gt; a)</code>. It also <b>throws NullPointerException on a null value</b>, which a plain <code>HashMap</code> would have accepted &mdash; Collections card&nbsp;08.</li>
+          <li><b><code>reduce</code> with a non-associative function.</b> Subtraction is the classic: <code>reduce(0, (a, b) -&gt; a - b)</code> gives one answer sequentially and a different one in parallel, because the JDK is free to split and combine in any order.</li>
+          <li><b>Collecting into a shared mutable list by hand.</b> <code>stream.forEach(list::add)</code> works sequentially and corrupts the list in parallel. <code>collect</code> exists precisely so you never write that &mdash; it handles the per-thread containers and the merge for you.</li>
+        </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">One level down &mdash; what a <code>Collector</code> actually is</span>
+        <p>A <code>Collector</code> is four functions bundled together: a <b>supplier</b> that makes a new empty container, an <b>accumulator</b> that folds one element into it, a <b>combiner</b> that merges two containers (used only in parallel), and a <b>finisher</b> that converts the container to the result. <code>Collectors.toList()</code> is <code>ArrayList::new</code>, <code>List::add</code>, <code>addAll</code>, identity.</p>
+        <p>Seeing it that way explains two things at once: why <code>collect</code> is safe in parallel where a hand-written <code>forEach(list::add)</code> is not &mdash; each thread gets its own container and they are merged &mdash; and why writing a custom collector is rarely necessary, since <code>groupingBy</code>, <code>mapping</code>, <code>counting</code>, <code>summingInt</code> and <code>partitioningBy</code> compose into most of what people need.</p>
+      </div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>A terminal operation returns <b>anything but a stream</b>. The ones that might find nothing return an <code>Optional</code>, <code>toList()</code> is unmodifiable, and <code>collect(groupingBy(&hellip;))</code> is the one to reach for first.</p></div>
+    </section>
+
+    <!-- str 7 -->
+    <section id="s7">
+      <div class="s-head"><span class="s-num">07</span><h2>Primitive streams &amp; going parallel</h2><span class="src">Stream/Note.txt &middot; the last two sections</span></div>
+      <p class="s-why">The boxing tax, and the one-word change that is usually a mistake</p>
+      <ul class="facts">
+        <li><b><code>Stream&lt;Integer&gt;</code> boxes every element.</b> Ten million ints as <code>Integer</code> objects is ten million heap allocations and a pointer chase per element. <code>IntStream</code>, <code>LongStream</code> and <code>DoubleStream</code> carry the primitive directly &mdash; this is Advanced&nbsp;01&rsquo;s autoboxing cost, at scale.</li>
+        <li><b>The hierarchy you sketched is right:</b> <code>BaseStream</code> is the parent of <code>Stream&lt;T&gt;</code>, <code>IntStream</code>, <code>LongStream</code> and <code>DoubleStream</code>. There is no <code>CharStream</code> or <code>BooleanStream</code> &mdash; <code>"abc".chars()</code> gives an <code>IntStream</code>.</li>
+        <li><b>Primitive streams have extra methods object streams do not:</b> <code>sum()</code>, <code>average()</code>, <code>max()</code>, <code>min()</code>, <code>summaryStatistics()</code>. That alone is often the reason to call <code>mapToInt</code>.</li>
+        <li><b>Their returns are primitive Optionals:</b> <code>average()</code> gives <code>OptionalDouble</code>, <code>max()</code> gives <code>OptionalInt</code>. But <code>sum()</code> returns a plain <code>int</code> &mdash; the sum of nothing is 0, so there is nothing to be absent.</li>
+        <li><b><code>parallelStream()</code> is one word and a real decision.</b> It splits the source across the <b>common ForkJoinPool</b>, which is shared by the whole JVM and sized to the number of cores minus one.</li>
+      </ul>
+
+      <pre><i>// crossing between the two worlds</i>
+list.stream().mapToInt(Student::getMarks).sum();          <i>// object -&gt; primitive</i>
+IntStream.rangeClosed(1, 5).boxed().toList();             <i>// primitive -&gt; object (List&lt;Integer&gt;)</i>
+
+IntSummaryStatistics st = list.stream()
+        .mapToInt(Student::getMarks)
+        .summaryStatistics();                             <b>// count, sum, min, max, average in one pass</b>
+
+OptionalDouble avg = list.stream().mapToInt(Student::getMarks).average();
+double value = avg.orElse(0);                             <i>// never call getAsDouble() unguarded</i></pre>
+
+      <div class="deep"><span class="lbl">When <code>parallelStream()</code> actually helps &mdash; and when it quietly hurts</span>
+        <p>It helps when all four of these are true: the data set is <b>large</b> (tens of thousands, not hundreds), the per-element work is <b>expensive</b>, the source <b>splits cheaply</b> (an array or <code>ArrayList</code> can be halved by index; a <code>LinkedList</code> has to be walked, so it splits terribly), and the operations are <b>stateless and associative</b>.</p>
+        <p>It hurts, often badly, when: the pipeline does <b>blocking I/O</b> &mdash; the common pool is shared, so one slow parallel stream starves every other user of it in the JVM, including other libraries; the work per element is tiny, so the splitting and merging cost more than the work; or the pipeline uses <code>findFirst</code> or <code>forEachOrdered</code>, where preserving encounter order forces coordination.</p>
+        <p>And the correctness rules tighten: the lambdas must not touch shared mutable state, <code>reduce</code>&rsquo;s function must be associative, and <code>forEach</code> may run in any order. If you cannot say why parallel is safe for a given pipeline, sequential is the right answer &mdash; <b>measure before and after, or do not do it</b>.</p>
+      </div>
+
+      <div class="gap"><span class="lbl">Repo note</span><code>Stream/Demo.java</code> has the pipeline working &mdash; <code>filter</code>, <code>map</code>, <code>forEach</code> on a list of fifteen integers &mdash; which is the right first program. <code>Stream/Demo1.java</code> is still an empty <code>main</code> labelled &ldquo;java stream method&rdquo;: that is where cards&nbsp;05 and&nbsp;06 belong, one operation per line with the output written next to it. The two worth typing first are <code>collect(Collectors.groupingBy(&hellip;))</code> and <code>mapToInt(&hellip;).summaryStatistics()</code>, because those are the two that turn up in real backend code every week.</div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p>Use <code>IntStream</code> to skip the boxing and to get <code>sum</code> and <code>average</code>. Use <code>parallelStream()</code> only for <b>large data, expensive work, a splittable source and no shared state</b> &mdash; and measure it.</p></div>
+    </section>
+
+  </div><!-- /streams -->
+
   <!-- ============================================================ RECALL -->
   <div class="panel" id="p-rec" role="tabpanel" aria-labelledby="tab-rec" hidden>
 
     <div class="lede">
-      <div class="kicker">Track four &middot; test yourself, then look at the map</div>
+      <div class="kicker">Track five &middot; test yourself, then look at the map</div>
       <h1>What you can answer, and what is still missing.</h1>
       <p>The first card is rapid-fire recall: read the question, answer it out loud, <i>then</i> open it. The second is the mistakes log pulled out of your own notes files &mdash; those are the errors you have already made once, which makes them the ones most likely to come back.</p>
       <p>The last two are the honest map: what the repo covers, and the four heavyweight topics still ahead that carry more interview weight than everything above them combined.</p>
       <div class="lede-meta">
-        <span><b>39</b> recall questions</span>
-        <span><b>18</b> folders mapped</span>
-        <span><b>4</b> tracks still ahead</span>
+        <span><b>46</b> recall questions</span>
+        <span><b>19</b> folders mapped</span>
+        <span><b>3</b> tracks still ahead</span>
       </div>
     </div>
 
@@ -2493,6 +3008,22 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       <details class="qa"><summary>What does <code>map.computeIfAbsent(k, x -&gt; new ArrayList&lt;&gt;()).add(v)</code> save you?</summary><div class="ans"><p>Two extra hash lookups and a branch &mdash; it replaces <code>containsKey</code> + <code>put</code> + <code>get</code> with one operation, and the new list is allocated <b>only when the key is genuinely new</b>. Its sibling <code>map.merge(k, 1, Integer::sum)</code> is the same trick for counting. Do not modify the same map inside the function: since Java 9 that throws <code>ConcurrentModificationException</code>.</p></div></details>
 
       <details class="qa"><summary>Why can&rsquo;t <code>ConcurrentHashMap</code> store <code>null</code>?</summary><div class="ans"><p>Because <code>get(k) == null</code> would be ambiguous &mdash; absent, or present with a null value &mdash; and the usual fix, a follow-up <code>containsKey</code>, proves nothing when another thread can change the map between the two calls. Banning null removes the ambiguity at the source. <code>HashMap</code> allows one null key (special-cased to bucket 0) and any number of null values; <code>TreeMap</code> allows no null key because it must call <code>compareTo</code> on it.</p></div></details>
+
+      <h3>The fourth round &mdash; streams</h3>
+
+      <details class="qa"><summary>What are the three parts of a stream pipeline?</summary><div class="ans"><p><b>Source</b>, zero or more <b>intermediate</b> operations, and exactly one <b>terminal</b> operation. You can tell them apart by return type with no memorising: an intermediate returns a <code>Stream</code> so it chains; a terminal returns anything else, so the chain has to stop.</p></div></details>
+
+      <details class="qa"><summary>What happens if you leave the terminal operation off?</summary><div class="ans"><p><b>Nothing runs at all</b> &mdash; not even once. <code>list.stream().filter(p)</code> builds two objects and never calls <code>p</code>. Streams are lazy: intermediate operations only assemble the pipeline, and the terminal is what pulls elements through it.</p></div></details>
+
+      <details class="qa"><summary>What is vertical processing?</summary><div class="ans"><p>Each element travels through <b>every stage</b> before the next element is read &mdash; 12 is filtered, mapped and collected before 7 is even looked at. It is not &ldquo;filter the whole list, then map the whole list&rdquo;, which would allocate an intermediate collection per stage. It is also what makes short-circuiting and infinite streams possible.</p></div></details>
+
+      <details class="qa"><summary>Why can&rsquo;t you reuse a stream?</summary><div class="ans"><p>Because the terminal operation <b>consumes</b> it, and each intermediate operation marks its upstream stage as linked. Touching it again throws <code>IllegalStateException: stream has already been operated upon or closed</code>. A stream behaves like an iterator, not like a collection &mdash; call <code>list.stream()</code> again, which is cheap.</p></div></details>
+
+      <details class="qa"><summary><code>iterate</code> or <code>generate</code> &mdash; what is the difference?</summary><div class="ans"><p><code>Stream.iterate(seed, f)</code> computes each value <b>from the previous one</b>, so it is ordered and dependent. <code>Stream.generate(supplier)</code> calls a <code>Supplier</code> with <b>no dependency</b> on what came before &mdash; <code>Math::random</code> is the typical case. Both are infinite, so both need <code>limit</code> or a short-circuiting terminal.</p></div></details>
+
+      <details class="qa"><summary>Which stream operations are stateful, and why does it matter?</summary><div class="ans"><p><code>sorted</code>, <code>distinct</code>, <code>limit</code> and <code>skip</code>. <code>sorted</code> is a <b>full barrier</b> &mdash; it must see the last element before releasing the first, so it never terminates on an infinite stream, and it is the reason to <b>filter before you sort</b> rather than after. <code>distinct</code> has to remember everything it has emitted, using <code>equals</code> and <code>hashCode</code>.</p></div></details>
+
+      <details class="qa"><summary>When is <code>parallelStream()</code> the wrong call?</summary><div class="ans"><p>Almost always, unless four things hold: a <b>large</b> data set, <b>expensive</b> per-element work, a source that <b>splits cheaply</b> (an array or ArrayList, not a LinkedList), and lambdas with <b>no shared mutable state</b>. It runs on the shared common ForkJoinPool, so a parallel stream doing blocking I/O starves every other user of that pool in the JVM. And <code>reduce</code>&rsquo;s function must be associative, or sequential and parallel give different answers.</p></div></details>
     </section>
 
     <!-- rec 2 -->
@@ -2516,6 +3047,10 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <li><b>A subtraction comparator.</b> <code>(s1,s2) -&gt; s1.marks - s2.marks</code> works on marks and overflows on anything that can go negative. <code>Integer.compare</code>, or <code>Comparator.comparingInt</code>.</li>
         <li><b>One colon and lowercase class names</b> in <code>Lambda/note.txt</code> &mdash; <code>math:abs</code> and <code>system.out:println</code>. It is <code>Math::abs</code> and <code>System.out::println</code>.</li>
         <li><b>Parentheses on a method reference.</b> <code>String::isEmpty()</code> does not compile &mdash; the parentheses would mean you are calling it, and a reference is never called at the point it is written.</li>
+        <li><b>Semicolons between pipeline stages.</b> <code>Stream/Note.txt</code> writes <code>.filter(&hellip;);</code> then <code>.map(&hellip;);</code> on the next line. The first semicolon ends the statement and the next line starts with a dot &mdash; one pipeline is one statement, with one semicolon at the end.</li>
+        <li><b>Filtering the wrong type.</b> <code>.filter(x -&gt; x &gt; 50000)</code> where <code>x</code> is an <code>Employee</code>. Always know what is in the pipe at that stage &mdash; after a <code>map</code> it is a different type than before it.</li>
+        <li><b><code>arr.stream(arr)</code></b> &mdash; an array has no methods. It is <code>Arrays.stream(arr)</code>. And <code>Stream.of(intArray)</code> gives a stream of <b>one</b> element, the array itself.</li>
+        <li><b><code>.tolist()</code> and <code>.parrallelstream()</code></b> &mdash; <code>toList()</code> (Java&nbsp;16+) and <code>parallelStream()</code>. Java is case-sensitive and these are the two that autocomplete will not rescue.</li>
         <li><b>&ldquo;Method references only work for inbuilt methods.&rdquo;</b> Written in <code>Lambda/Demo.java</code>, and not true &mdash; <code>Student::getMarks</code> is your own class and the most useful reference in the file.</li>
       </ul>
     </section>
@@ -2531,6 +3066,7 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <tr><td><code>Interable/</code></td><td>Iterator vs Iterable, for-each internals, custom Iterable, CME, ListIterator, map iteration</td><td><b>Very good</b></td></tr>
         <tr><td><code>oops/</code></td><td>Class/object, constructors, chaining, call by value, static, packages, encapsulation, inheritance, abstraction, interfaces</td><td><b>Very good</b></td></tr>
         <tr><td><code>ImmutableClass.java</code></td><td>Five rules, both leaks, defensive copy</td><td><b>Very good</b></td></tr>
+        <tr><td><code>Stream/</code></td><td>Imperative vs declarative, the pipeline, laziness and vertical processing, sources, intermediate and terminal ops, primitive and parallel streams</td><td><b>Newest &mdash; and the notes are already strong</b></td></tr>
         <tr><td><code>Lambda/</code></td><td>Anonymous class &rarr; lambda &rarr; method reference on a real Comparator; the four reference kinds; composition</td><td><b>Newest, and already deep</b> &mdash; notes ahead of the code</td></tr>
         <tr><td><code>Comparable/</code></td><td>Comparable vs Comparator, the danger of returning 0, the <code>Collections</code> utility set</td><td><b>Very good</b> &mdash; it reached functional interfaces on its own</td></tr>
         <tr><td><code>Queue/</code></td><td>Array and linked-list queues, circular wrap, Deque, ArrayDeque vs LinkedList, why not Stack</td><td>Good notes, code still a stub</td></tr>
@@ -2543,6 +3079,31 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <tr><td><code>Strings/</code></td><td>String constructors only</td><td><b>Thin &mdash; pool and methods missing</b></td></tr>
         <tr><td><code>Grid/</code>, <code>Headfirstjava/</code></td><td>Practice &mdash; enum + package, book exercises</td><td>Practice only</td></tr>
         <tr><td><code>Framework/</code></td><td>&mdash;</td><td><b>Empty</b> &mdash; the folder is made, the Collections-framework overview is not written</td></tr>
+      </table></div>
+
+      <h3>Where each folder is answered in this notebook</h3>
+      <p style="max-width:66ch;color:var(--ink-soft)">Every folder in the repo, mapped to the cards that cover it. Checked file by file &mdash; if a folder is not listed here, it is not in the notebook.</p>
+
+      <div class="tbl"><table>
+        <tr><th>Folder / file</th><th>Answered by</th></tr>
+        <tr><td><code>oops/</code></td><td>Core&nbsp;01&ndash;09 &mdash; class, constructors, call by value, static, packages, encapsulation, inheritance, polymorphism, abstraction</td></tr>
+        <tr><td><code>ObjectClass/</code></td><td>Core&nbsp;10 &mdash; the <code>Object</code> contract</td></tr>
+        <tr><td><code>ImmutableClass.java</code></td><td>Core&nbsp;11 and Core&nbsp;14 &mdash; the five rules, both leaks, shallow vs deep copy</td></tr>
+        <tr><td><code>NestedClasses/</code></td><td>Core&nbsp;12, plus Advanced&nbsp;10 for the anonymous class the folder never got to</td></tr>
+        <tr><td><code>Autoboxing/</code></td><td>Advanced&nbsp;01</td></tr>
+        <tr><td><code>typecasting/</code></td><td>Advanced&nbsp;02 (generics) and Advanced&nbsp;03 (casting)</td></tr>
+        <tr><td><code>Strings/</code></td><td>Advanced&nbsp;04</td></tr>
+        <tr><td><code>Enum/</code>, <code>Grid/</code></td><td>Advanced&nbsp;05, with packages in Core&nbsp;05</td></tr>
+        <tr><td><code>JavaI/o/</code></td><td>Advanced&nbsp;06&ndash;08 &mdash; the decorator chain, checked vs unchecked, exceptions in depth</td></tr>
+        <tr><td><code>Lambda/</code></td><td>Advanced&nbsp;09&ndash;12 &mdash; functional interfaces, the collapse to one arrow, method references, composition</td></tr>
+        <tr><td><code>Interable/</code></td><td>Collections&nbsp;01 (the family tree and the <code>Collection</code> API), 10 and 11</td></tr>
+        <tr><td><code>List/</code></td><td>Collections&nbsp;02</td></tr>
+        <tr><td><code>set/</code></td><td>Collections&nbsp;03&ndash;08 &mdash; including the Map API and <code>NavigableMap</code> from <code>Demo2</code> and <code>Demo3</code></td></tr>
+        <tr><td><code>Queue/</code></td><td>Collections&nbsp;09 &mdash; including writing both implementations by hand</td></tr>
+        <tr><td><code>Comparable/</code></td><td>Collections&nbsp;12, and Collections&nbsp;13 for the <code>Collections</code> utility list at the end of your note</td></tr>
+        <tr><td><code>Stream/</code></td><td>Streams&nbsp;01&ndash;07 &mdash; the whole track</td></tr>
+        <tr><td><code>Headfirstjava/</code></td><td><b>Deliberately not covered</b> &mdash; while loops, if/else and string concatenation. Book exercises, not interview material</td></tr>
+        <tr><td><code>Framework/</code></td><td><b>Empty folder</b> &mdash; nothing to cover yet</td></tr>
       </table></div>
 
       <div class="gap"><span class="lbl">The habit worth keeping</span>Every folder has a <code>revision.txt</code> and a &ldquo;mistakes I made&rdquo; section, and the notes explain the <b>internal mechanism</b> rather than the definition. &ldquo;A Set is a HashMap with a dummy PRESENT object&rdquo; is the answer an interviewer wants; &ldquo;a Set does not allow duplicates&rdquo; is the one everybody gives.</div>
@@ -2563,10 +3124,10 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
         <tr><td>36</td><td>Comparable, Comparator, the <code>Collections</code> class</td><td>Collections&nbsp;12 &mdash; <b>covered</b></td></tr>
         <tr><td>37</td><td>Lambdas &amp; functional interfaces &middot; Comparator</td><td>Advanced&nbsp;09&ndash;10 &mdash; <b>covered</b></td></tr>
         <tr><td>38</td><td>Deep dive &middot; method references &amp; composition</td><td>Advanced&nbsp;11&ndash;12 &mdash; <b>covered</b></td></tr>
-        <tr><td>39</td><td>Streams &mdash; creation &amp; architecture</td><td><b>Next</b> &mdash; the pipeline: source, intermediate, terminal</td></tr>
-        <tr><td>40</td><td>Stream methods &mdash; intermediate &amp; terminal</td><td><b>Ahead</b> &mdash; <code>map</code>, <code>filter</code>, <code>collect</code>, <code>reduce</code>, <code>groupingBy</code></td></tr>
-        <tr><td>41</td><td><code>Optional</code> &mdash; all methods, stream integration</td><td>Advanced&nbsp;13 has the rules; the methods are ahead</td></tr>
-        <tr><td>42</td><td>Parallel streams &middot; primitive Optionals</td><td><b>Ahead</b> &mdash; and the one to be careful about in interviews</td></tr>
+        <tr><td>39</td><td>Streams &mdash; creation &amp; architecture</td><td>Streams&nbsp;01&ndash;04 &mdash; <b>covered</b></td></tr>
+        <tr><td>40</td><td>Stream methods &mdash; intermediate &amp; terminal</td><td>Streams&nbsp;05&ndash;06 &mdash; <b>covered</b></td></tr>
+        <tr><td>41</td><td><code>Optional</code> &mdash; all methods, stream integration</td><td>Advanced&nbsp;13 has the rules, Streams&nbsp;06 the returns; the full method set is ahead</td></tr>
+        <tr><td>42</td><td>Parallel streams &middot; primitive Optionals</td><td>Streams&nbsp;07 &mdash; <b>covered</b></td></tr>
         <tr><td>43&ndash;44</td><td>Exceptions &middot; hierarchy, <code>throw</code> vs <code>throws</code>, custom</td><td>Advanced&nbsp;07&ndash;08 &mdash; <b>covered</b></td></tr>
         <tr><td>45&ndash;46</td><td>Memory &middot; stack, heap, method area, GC algorithms</td><td>Core&nbsp;13 &mdash; <b>covered</b></td></tr>
         <tr><td>47&ndash;48</td><td>Multithreading intro &middot; thread creation &amp; lifecycle</td><td><b>Ahead</b></td></tr>
@@ -2577,7 +3138,6 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
       </table></div>
 
       <div class="end-grid">
-        <div class="end-card"><h4>Streams</h4><p>Course #39&ndash;42. Still the one genuine gap &mdash; but the groundwork is now in Advanced&nbsp;09&ndash;12. What is left is <code>filter</code>/<code>map</code>/<code>collect</code>, why a pipeline does nothing until a terminal operation, <code>Collectors.groupingBy</code> and <code>toMap</code>, and why a stream is single-use.</p></div>
         <div class="end-card"><h4>Concurrency</h4><p>Course #47&ndash;57, eleven videos &mdash; the single biggest rejection reason for people switching into Java backend. Thread lifecycle, race conditions and visibility, monitor locks, <code>wait</code>/<code>notify</code>, the lock family, atomics and CAS, the executor framework, <code>CompletableFuture</code> and virtual threads.</p></div>
         <div class="end-card"><h4>Spring &amp; JPA</h4><p>A separate track, and the one job specs actually list. Dependency injection, the bean lifecycle, transactions, and the entity <code>equals</code>/<code>hashCode</code> problem from card&nbsp;10.</p></div>
         <div class="end-card"><h4>SQL &amp; two DSA problems</h4><p>The rest of a three-year loop. Joins, indexes and <code>EXPLAIN</code>; and enough DSA to talk through a HashMap-based solution out loud.</p></div>
@@ -2585,7 +3145,8 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
 
       <div class="deep"><span class="lbl">Now covered here, not pending</span>
         <p>Six items that were on this list have moved into the notebook: <b>exceptions in depth</b> (Advanced&nbsp;08), <b>functional interfaces and lambdas</b> (Advanced&nbsp;09), <b>the anonymous-class-to-method-reference journey</b> (Advanced&nbsp;10, rebuilt from <code>Lambda/Demo.java</code>), <b>the four kinds of method reference</b> (Advanced&nbsp;11), <b>functional composition</b> (Advanced&nbsp;12) and <b>JVM memory and GC</b> (Core&nbsp;13). Collections gained a fourteenth card, <b>the Map API method by method</b> (Collections&nbsp;08), from <code>set/Demo2.java</code>.</p>
-        <p>Cards 10&ndash;12 are course #37 and #38 (&ldquo;Comparator Interface&rdquo; and &ldquo;Method References &amp; Composition&rdquo;), written up the day after you took them. That leaves Streams as the one genuine hole rather than a whole missing layer: <code>filter</code> takes a <code>Predicate</code>, <code>map</code> a <code>Function</code>, <code>sorted</code> a <code>Comparator</code>, <code>forEach</code> a <code>Consumer</code> &mdash; every one of those is now written out above, along with the laziness that makes a pipeline work. Course #37&ndash;42 is the next thing to type, and you will not be starting it from zero.</p>
+        <p>Advanced cards 10&ndash;12 are course #37 and #38; the whole <b>Streams track</b> is #39&ndash;42, written from <code>Stream/Note.txt</code> the day the folder appeared. That closes what this card called the largest gap in the repo for as long as it has existed &mdash; streams were listed as pending in every earlier version of this notebook, and they are now seven cards with their own tab.</p>
+        <p>What is genuinely left is <b>concurrency</b>, and it is eleven videos rather than four. That is now the honest answer to &ldquo;what have you not covered yet&rdquo;.</p>
       </div>
 
       <div class="end">
@@ -2916,6 +3477,38 @@ list.sort(Comparator.comparingInt(Student::getMarks).reversed()
     rt.style.opacity = st.r === null ? "0" : "1";
     ft.style.setProperty("--qf", st.f === null ? 0 : st.f);
     rt.style.setProperty("--qr", st.r === null ? 0 : st.r);
+  };
+
+
+  /* --- stream pipeline, element at a time --- */
+  var strSteps = [
+    { cur:null, drop:[],        out:[],          chips:[] },
+    { cur:0,    drop:[0],       out:[],          chips:["f"], bad:true },
+    { cur:1,    drop:[0],       out:["24"],      chips:["f","m","t"] },
+    { cur:2,    drop:[0,2],     out:["24"],      chips:["f"], bad:true },
+    { cur:3,    drop:[0,2],     out:["24","40"], chips:["f","m","t"] },
+    { cur:null, drop:[0,2],     out:["24","40"], chips:["src","f","m","t"] }
+  ];
+  renderers["str"] = function(f, s){
+    var st = strSteps[s];
+    for (var i = 0; i < 4; i++){
+      var c = q(f,"p","i" + i);
+      c.classList.toggle("fill", st.drop.indexOf(i) === -1 && (st.cur === null || i <= st.cur));
+      c.classList.toggle("out",  st.drop.indexOf(i) !== -1);
+      c.style.borderColor = (i === st.cur) ? "var(--accent)" : "";
+    }
+    for (var o = 0; o < 2; o++){
+      var oc = q(f,"p","o" + o);
+      oc.textContent = st.out[o] || "";
+      oc.classList.toggle("fill", !!st.out[o]);
+    }
+    ["src","f","m","t"].forEach(function(name){
+      var el = q(f,"p",name);
+      var on = st.chips.indexOf(name) !== -1;
+      el.classList.toggle("dim", s > 0 && !on && name !== "src");
+      el.classList.toggle("hot", on && !(st.bad && name === "f"));
+      el.classList.toggle("bad", !!st.bad && name === "f");
+    });
   };
 
   /* ---------------- boot ---------------- */
