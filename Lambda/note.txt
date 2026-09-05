@@ -1,0 +1,22 @@
+types of method reference
+1.static method reference 
+x->math.abs(x);
+math:abs
+Instance method reference 
+x->sout(x);
+system.out:println
+3.str->str->/isempty()
+prediate method reference 
+string::isempty()
+Constructor reference 
+Supplier<T>
+void->T
+()->new arraylist <Integer>();
+s.get();
+s=arraylist::new method reference of the constructor reference 
+z
+
+
+Functional composition 
+break the code into the multiple function 
+and tthen()
