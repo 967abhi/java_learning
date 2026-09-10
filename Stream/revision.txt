@@ -1,0 +1,740 @@
+=========================================================
+        JAVA STREAMS - THE STORY VERSION
+   (the same syllabus as Note.txt, told as one story
+    from Monday morning to the finished pipeline)
+=========================================================
+Note.txt is the raw brain-dump. Demo.java is the working
+proof. This file is the story that connects them - read it
+end to end like a chapter book, and the API remembers
+itself because you remember what happened in each scene.
+
+Cast of the story:
+    ABHISHEK  - you, the backend developer
+    THE BOSS  - wants answers, not code
+    RAVI      - the colleague who has to read your code
+    THE PLANT - the water treatment plant, our stream
+
+
+---------------------------------------------------------
+CHAPTER 0 - MONDAY MORNING, 9:40 AM
+---------------------------------------------------------
+The boss walks over with a coffee and one sentence:
+
+    "Give me the NAMES of everyone earning more than
+     50,000. Sorted."
+
+That is the whole requirement. Remember these words,
+because the whole story is about how close the code can
+get to this one English sentence.
+
+You have this class in the project:
+
+    class Employee {
+        int    empId;
+        String name;
+        double salary;
+    }
+
+And a List<Employee> called employees.
+
+
+---------------------------------------------------------
+CHAPTER 1 - HOW YOU WOULD HAVE WRITTEN IT IN 2007
+---------------------------------------------------------
+You open the editor and your hands write what they have
+written a thousand times:
+
+    List<String> result = new ArrayList<>();
+    for (Employee e : employees) {
+        if (e.getSalary() > 50000) {
+            result.add(e.getName());
+        }
+    }
+    Collections.sort(result);
+
+It works. The boss gets the list. Everyone is happy.
+
+But look at what you actually typed:
+
+    line 1  - make an empty box
+    line 2  - walk the list yourself
+    line 3  - ask the question
+    line 4  - put it in the box
+    line 5  - sort the box
+
+Four of those five lines are MACHINERY. Not one of them is
+the boss's sentence. The requirement - "salary above
+50,000, take the name, sort" - is hidden between a
+declaration, a loop and a bracket.
+
+This style has a name. It is called IMPERATIVE code:
+code that says HOW.
+
+
+---------------------------------------------------------
+CHAPTER 2 - RAVI OPENS YOUR FILE SIX MONTHS LATER
+---------------------------------------------------------
+Ravi has never seen this file. He reads:
+
+    List<String> result = new ArrayList<>();
+
+and immediately his brain has to hold a question open:
+"what goes into result, and when?" He cannot answer it
+until he has read all five lines and mentally run the loop.
+
+That is the real cost of imperative code. Not length -
+UNDERSTANDING TIME. Ravi has to SIMULATE your loop in his
+head to find out what it produces.
+
+So you rewrite it:
+
+    List<String> result =
+        employees.stream()
+                 .filter(e -> e.getSalary() > 50000)
+                 .map(Employee::getName)
+                 .sorted()
+                 .toList();
+
+Now read it out loud: "take the employees, keep the ones
+earning over 50000, take their names, sort them, give me
+a list."
+
+That is the boss's sentence. Word for word.
+Ravi does not simulate anything. He reads.
+
+This style is called DECLARATIVE: code that says WHAT.
+
+    IMPERATIVE               DECLARATIVE
+    ---------------------    -----------------------
+    I write the loop         Java writes the loop
+    I mutate a result list   Java builds the result
+    logic + plumbing mixed   only the logic is visible
+    hard to parallelise      .parallelStream() and done
+    read line by line        read top to bottom as a rule
+
+A WARNING BEFORE YOU FALL IN LOVE
+    Streams do not make code FASTER by magic. On twenty
+    elements a plain for-loop usually wins, because every
+    stage of a pipeline is an object and a virtual call.
+    What streams buy is INTENT ON THE PAGE. Speed only
+    arrives with parallel streams, on big data
+    (chapter 13).
+
+
+---------------------------------------------------------
+CHAPTER 3 - THE FIELD TRIP TO THE WATER PLANT
+---------------------------------------------------------
+To explain what just happened, your senior takes you to a
+water treatment plant.
+
+       SOURCE            FILTERS / TRANSFORMS          TAP
+    +-----------+     +--------+   +--------+     +---------+
+    |  tank     | --> | mesh   | ->| heater | --> |  tap    |
+    | [1..15]   |     | x>10   |   | x*2    |     | toList  |
+    +-----------+     +--------+   +--------+     +---------+
+
+He points at each part:
+
+    "That tank is the SOURCE. Your list.
+     Those meshes in the middle are the OPERATIONS. Your
+     filter and map.
+     And that tap at the end - that is the only thing in
+     the whole plant that matters."
+
+You ask why the tap matters most. He turns and says the
+line that this entire topic hangs on:
+
+    "Because until somebody OPENS THE TAP, no water moves.
+     Not one drop. The meshes are installed, the pipes are
+     joined, the plant is BUILT - and nothing is flowing."
+
+That is a Java stream. Written down properly:
+
+    A STREAM is a tool for processing a SEQUENCE of data
+    through a CHAIN of operations.
+
+Three words, three rules:
+    SEQUENCE   -> elements arrive one after another
+    CHAIN      -> operations stack, they do not nest
+    PROCESSING -> the stream STORES NOTHING, it only moves
+
+And the sentence to say in an interview:
+
+    A List HOLDS elements. A Stream holds a PLAN.
+    A stream is not a data structure.
+
+
+---------------------------------------------------------
+CHAPTER 4 - THE THREE PEOPLE WHO RUN THE PLANT
+---------------------------------------------------------
+Every plant, and every stream you will ever write, has
+exactly three roles:
+
+    list.stream()              // 1. THE SOURCE
+        .filter(x -> x > 10)   // 2. THE MIDDLE MEN
+        .map(x -> x * 2)       // 2. THE MIDDLE MEN
+        .toList();             // 3. THE TAP
+
+    1. SOURCE       - where the water comes from
+    2. INTERMEDIATE - transformation. Returns a Stream
+                      again, so the next one can be joined.
+                      LAZY - installs a mesh, moves nothing.
+    3. TERMINAL     - opens the tap. Returns something that
+                      is NOT a stream (List, long, Optional,
+                      void) and the plant runs.
+
+HOW TO TELL THEM APART WITHOUT MEMORISING ANYTHING
+
+    "Returns a Stream"        -> intermediate -> lazy
+    "Returns anything else"   -> terminal     -> runs now
+
+That single rule replaces the whole method list. You never
+have to remember which is which again.
+
+This is literally the live line in your Demo.java:
+
+    list.stream().filter(x -> x > 10).map(x -> x * 2)
+        .forEach(System.out::println);
+
+    source -> intermediate -> intermediate -> terminal.
+
+
+---------------------------------------------------------
+CHAPTER 5 - WHERE THE WATER CAN COME FROM
+---------------------------------------------------------
+The senior walks you around the back of the plant and
+shows you five different inlets.
+
+INLET 1 - A COLLECTION (the one you use 90% of the time)
+
+    list.stream()            // sequential
+    list.parallelStream()    // parallel, many threads
+    set.stream()
+    map.entrySet().stream()  // Map itself has no .stream()
+
+    That last one catches everybody. A Map is not a
+    Collection, so it has no stream() of its own. You go
+    through entrySet(), keySet() or values().
+
+INLET 2 - AN ARRAY
+
+    String[] arr = {"ADITYA", "ROHAN", "RAJ"};
+    Stream<String> s = Arrays.stream(arr);
+
+    THE TRAP FROM Note.txt
+        You wrote  arr.stream(arr).
+        An array is not an object with methods - it has a
+        .length field and nothing else. The helper class
+        java.util.Arrays does the work:  Arrays.stream(arr).
+
+INLET 3 - Stream.of(...) - a handful of values
+
+    Stream<Integer> s = Stream.of(1, 2, 3, 4, 5, 60);
+
+INLET 4 - Stream.empty() - deliberately nothing
+
+    Stream<String> s = Stream.empty();
+    The polite way to return "no data" without returning
+    null. Remember this one - it comes back in the Optional
+    story.
+
+INLET 5 - AN INFINITE SOURCE - chapter 6.
+
+Extra inlets you will meet in real code:
+
+    "a,b,c".chars()                    -> IntStream
+    Files.lines(Path.of("data.txt"))   -> Stream<String>
+    new Random().ints(5)               -> IntStream
+    Pattern.compile(",").splitAsStream(text)
+
+
+---------------------------------------------------------
+CHAPTER 6 - THE WELL THAT NEVER RUNS DRY
+---------------------------------------------------------
+Behind the plant there is a well with no bottom. The
+senior says: "this one never stops giving water. If you
+connect it, YOU decide when to stop drinking."
+
+    Stream.iterate(1, x -> x + 1)      // 1,2,3,4,5,...
+          .limit(10)
+          .forEach(System.out::println);
+
+    Stream.generate(Math::random)      // random forever
+          .limit(5)
+          .forEach(System.out::println);
+
+THE ONE DIFFERENCE INTERVIEWERS ASK FOR
+
+    iterate()  - each value is built FROM THE PREVIOUS ONE.
+                 It needs a seed. Order matters.
+    generate() - calls a Supplier again and again with NO
+                 dependency on what came before. No seed.
+
+    Say it as: iterate REMEMBERS, generate FORGETS.
+
+Since Java 9 iterate can also carry its own stop rule and
+becomes a for-loop with a nicer face:
+
+    Stream.iterate(1, x -> x <= 10, x -> x + 1)
+    // seed, condition, next  - no .limit() needed
+
+WHY WOULD ANYBODY WANT AN ENDLESS WELL
+    Because often you do not know how much data is coming -
+    a live feed, a file being tailed, an id generator,
+    random test data. You describe the RULE, and .limit()
+    or a short-circuiting terminal decides where to stop.
+
+THE ACCIDENT WAITING TO HAPPEN
+    Connect the endless well to a tap with no limit -
+    forEach(), count(), sorted() - and your program hangs
+    forever. Infinite source ALWAYS needs limit(),
+    findFirst() or anyMatch() somewhere in the chain.
+
+
+---------------------------------------------------------
+CHAPTER 7 - THE WORKERS IN THE MIDDLE
+---------------------------------------------------------
+These are the meshes. All of them return a Stream. All of
+them are lazy. None of them touch your original list.
+
+    filter(Predicate)   keep the ones that pass the test
+    map(Function)       change each one into something else
+    flatMap(Function)   one becomes many, then flatten
+    sorted()            natural order (Comparable)
+    sorted(Comparator)  my own order
+    distinct()          drop duplicates (uses equals)
+    limit(n)            keep the first n   (short-circuits)
+    skip(n)             throw away the first n
+    peek(Consumer)      look without touching - DEBUG ONLY
+    mapToInt/mapToObj   cross into/out of primitive streams
+
+THE TWO THAT PEOPLE SWAP BY ACCIDENT
+
+    filter takes a Predicate -> answers true/false
+           -> the COUNT can go down, the TYPE stays same
+    map    takes a Function  -> answers a new value
+           -> the COUNT stays same, the TYPE can change
+
+    [1,2,3,4] filter(x -> x % 2 == 0) -> [2,4]      fewer
+    [1,2,3,4] map(x -> x * x)         -> [1,4,9,16] same
+
+flatMap IN ONE PICTURE
+
+    [[1,2],[3,4]].flatMap(l -> l.stream()) -> [1,2,3,4]
+
+    Rule: if map would hand you Stream<Stream<T>> or
+    Stream<List<T>>, you wanted flatMap.
+
+THE ORDER OF THE MESHES CHANGES THE BILL
+
+    .filter(...).sorted()   sorts only the survivors  FAST
+    .sorted().filter(...)   sorts everything first    SLOW
+
+    Put filter and limit as EARLY as you can, sorted as
+    LATE as you can. sorted() is also a BARRIER - it has to
+    see the last element before it can release the first,
+    which is why it can never work on the endless well.
+
+
+---------------------------------------------------------
+CHAPTER 8 - THE MAN WHO OPENS THE TAP
+---------------------------------------------------------
+Nothing you have built so far has done anything. Now the
+terminal operation arrives and the plant finally runs.
+
+    forEach(Consumer)    do something with each element
+    toList()             an immutable List (Java 16+)
+    collect(Collector)   the flexible one - chapter 11
+    count()              long
+    reduce(...)          fold everything into one value
+    min(cmp) / max(cmp)  Optional<T>
+    findFirst()          Optional<T>   (short-circuits)
+    findAny()            Optional<T>   (parallel friendly)
+    anyMatch/allMatch/noneMatch  -> boolean, short-circuit
+    toArray()
+
+THE NAMES YOU HAD SLIGHTLY WRONG IN Note.txt
+    There is no find(). The pair is findFirst() and
+    findAny(), and BOTH hand you an Optional<T>, not the
+    value itself. That Optional is not a detour - it is the
+    next chapter of your own syllabus. See
+    optional_class/revision.txt.
+
+AND THE RULE THAT THE WHOLE TOPIC RESTS ON
+
+    NO TERMINAL OPERATION  =>  NOTHING RUNS.
+
+    Stream<Integer> s = list.stream().filter(x -> x > 10);
+
+    Read that line again. Nothing happened. Not one element
+    was read. The predicate inside filter was NEVER CALLED,
+    not even once. You built a plant and went home.
+
+
+---------------------------------------------------------
+CHAPTER 9 - THE SECRET OF THE PLANT: ONE BUCKET AT A TIME
+---------------------------------------------------------
+This is the most important scene in the story.
+
+You assume the plant works like this: filter the WHOLE
+tank, then heat the WHOLE tank. Layer by layer. Stage by
+stage. That is HORIZONTAL processing, and it is WRONG.
+
+Watch what actually happens with list = [5, 12, 7, 20]:
+
+    list.stream()
+        .filter(x -> x > 10)
+        .map(x -> x * 2)
+        .toList();
+
+    5   -> mesh: "5 > 10?"  NO  -> thrown out. NEXT.
+           (the heater never even saw 5)
+    12  -> mesh: yes -> heater: 24 -> into the bucket
+    7   -> mesh: "7 > 10?"  NO  -> thrown out. NEXT.
+    20  -> mesh: yes -> heater: 40 -> into the bucket
+
+    result = [24, 40]
+
+ONE element travels the ENTIRE pipeline before the next
+element is even picked up. Note.txt calls this VERTICAL
+PROCESSING and that is exactly the right name.
+
+DO NOT TAKE MY WORD FOR IT - RUN THIS
+
+    List.of(5, 12, 7, 20).stream()
+        .peek(x -> System.out.println("filter sees " + x))
+        .filter(x -> x > 10)
+        .peek(x -> System.out.println("   map sees " + x))
+        .map(x -> x * 2)
+        .toList();
+
+    filter sees 5
+    filter sees 12
+       map sees 12
+    filter sees 7
+    filter sees 20
+       map sees 20
+
+The interleaving in that output IS the proof. If Java were
+horizontal you would see all four "filter sees" lines
+first.
+
+WHY DOES ANY OF THIS MATTER - THE PAYOFF
+
+    Stream.iterate(1, x -> x + 1)     // the endless well
+          .filter(x -> x % 7 == 0)
+          .findFirst();               // stops dead at 7
+
+    Java stops the instant the answer is known. It never
+    builds 1..infinity. This is SHORT CIRCUITING, and it is
+    only possible because processing is lazy and vertical.
+    An eager engine could not do it at all.
+
+    Same for limit(), anyMatch(), allMatch(), noneMatch().
+    On a million rows with a selective filter, that is a
+    million map() calls that never happen. Laziness is a
+    PERFORMANCE feature, not a curiosity.
+
+
+---------------------------------------------------------
+CHAPTER 10 - THE DAY YOU USED THE PIPE TWICE
+---------------------------------------------------------
+Feeling clever, you save the stream in a variable and use
+it twice:
+
+    Stream<Integer> s = list.stream();
+    s.forEach(System.out::println);     // fine
+    s.forEach(System.out::println);     // BOOM
+
+    java.lang.IllegalStateException:
+        stream has already been operated upon or closed
+
+Note.txt calls this "the stream is dead", and that is the
+right instinct. A stream behaves like an ITERATOR, not
+like a collection: once it has been walked, it is spent.
+
+THE FIX - make a new one, it is cheap (O(1)):
+
+    list.stream().forEach(...);
+    list.stream().count();
+
+    // or keep a recipe instead of a stream
+    Supplier<Stream<Integer>> sup = () -> list.stream();
+    sup.get().forEach(...);
+    sup.get().count();
+
+NOW LOOK AT THE BLOCK YOU COMMENTED OUT IN Demo.java
+
+    Stream<Integer> s = list.stream();
+    s = s.filter(x -> x > 10);
+    s = s.map(x -> x * 2);
+    s.forEach(System.out::println);
+
+    That is CORRECT, and worth understanding why. Every
+    intermediate operation returns a BRAND NEW stream and
+    marks the old one as used. Because you REASSIGN s each
+    time, s always points at the newest stage and nothing
+    is ever touched twice.
+
+    What breaks is keeping both references:
+
+    Stream<Integer> a = list.stream();
+    Stream<Integer> b = a.filter(x -> x > 10);
+    a.forEach(...);      // IllegalStateException - a is
+                         // already linked into b
+
+
+---------------------------------------------------------
+CHAPTER 11 - THE ACCOUNTANT AND HIS MANY BUCKETS
+---------------------------------------------------------
+toList() is one bucket. The accountant wants shapes:
+a set, a joined string, a map, groups, totals. That is
+collect().
+
+    .toList()                             // immutable
+    .collect(Collectors.toList())         // pre-Java 16
+    .collect(Collectors.toSet())
+    .collect(Collectors.toCollection(ArrayList::new)) // mutable
+    .collect(Collectors.joining(", "))
+    .collect(Collectors.counting())
+    .collect(Collectors.toMap(Emp::getId, Emp::getName))
+    .collect(Collectors.groupingBy(Emp::getDept))
+    .collect(Collectors.partitioningBy(e -> e.getSalary() > 50000))
+    .collect(Collectors.summingDouble(Emp::getSalary))
+    .collect(Collectors.averagingDouble(Emp::getSalary))
+
+groupingBy is the one that deletes fifteen lines of loop:
+
+    Map<String, List<Employee>> byDept =
+        employees.stream()
+                 .collect(Collectors.groupingBy(Employee::getDept));
+
+    Map<String, Long> countByDept =
+        employees.stream()
+                 .collect(Collectors.groupingBy(Employee::getDept,
+                                                Collectors.counting()));
+
+Write those two out by hand as loops once. You will never
+argue about streams again.
+
+WHEN NO READY-MADE BUCKET FITS - reduce()
+
+    int sum = list.stream().reduce(0, (a, b) -> a + b);
+    Optional<Integer> max = list.stream().reduce(Integer::max);
+
+    reduce(identity, accumulator) -> always returns a value
+                                     (empty stream -> the
+                                     identity, here 0)
+    reduce(accumulator)           -> returns Optional
+                                     (empty stream -> no
+                                     answer exists at all)
+
+    And in parallel, the accumulator MUST be associative -
+    (a+b)+c == a+(b+c) - or sequential and parallel give
+    different answers.
+
+
+---------------------------------------------------------
+CHAPTER 12 - THE BOXING TAX
+---------------------------------------------------------
+Your pipeline looks innocent:
+
+    Stream<Integer> s = list.stream().filter(x -> x > 10)
+                                     .map(x -> x + 20);
+
+Stream<T> only carries OBJECTS. So every int is BOXED into
+an Integer to enter, UNBOXED to do the arithmetic, and
+BOXED again to continue. On ten million numbers that is
+ten million throwaway objects and a pointer chase each.
+That is the boxing tax, and you pay it silently.
+
+The receipt is refunded by three special streams:
+
+    IntStream    LongStream    DoubleStream
+
+    IntStream.rangeClosed(1, 5).sum();    // 15
+    IntStream.range(1, 5).forEach(...);   // 1,2,3,4
+
+THE FAMILY TREE YOU SKETCHED IN Note.txt - it is right:
+
+                    BaseStream<T, S>
+             +---------+---------+---------------+
+             |         |         |               |
+         Stream<T>  IntStream LongStream  DoubleStream
+
+    (there is no CharStream and no BooleanStream -
+     "abc".chars() gives you an IntStream)
+
+BUT THE REAL REASON TO USE THEM is that they have methods
+Stream<T> simply does not have:
+
+    .sum()  .average()  .max()  .min()  .summaryStatistics()
+
+    IntSummaryStatistics st =
+        IntStream.of(3, 9, 4).summaryStatistics();
+    st.getCount(); st.getSum(); st.getMin();
+    st.getMax();   st.getAverage();      // all in ONE pass
+
+CROSSING THE BORDER BETWEEN THE TWO WORLDS
+
+    list.stream().mapToInt(Integer::intValue).sum();  // obj -> int
+    IntStream.range(1,5).boxed().toList();            // int -> obj
+    IntStream.range(1,5).mapToObj(i -> "id" + i);     // int -> obj
+
+    Careful: .map() on an IntStream must return an int. To
+    leave the primitive world you need mapToObj or boxed.
+
+    And notice what average() gives back: OptionalDouble.
+    Not a double. Because the average of an empty stream
+    does not exist - Optional again, waiting for you in the
+    next topic. sum() on the other hand returns a plain
+    int, because the sum of nothing is honestly 0.
+
+
+---------------------------------------------------------
+CHAPTER 13 - THE DAY YOU HIRED MORE WORKERS
+---------------------------------------------------------
+One word turns your plant into many plants:
+
+    list.stream()          -> one thread, in order
+    list.parallelStream()  -> split across the common
+                              ForkJoinPool, many threads
+    list.stream().parallel()   // same thing, said later
+
+The senior stops you before you type it everywhere.
+
+"Use it only when ALL FOUR are true:
+    - the data is LARGE (tens of thousands, not twenty)
+    - the work per element is EXPENSIVE
+    - the source SPLITS CHEAPLY (array, ArrayList: yes.
+      LinkedList: it has to be walked, so no)
+    - the lambdas are STATELESS and touch nothing shared
+
+ And do not use it when:
+    - the pipeline does blocking I/O - the common pool is
+      shared by the WHOLE JVM, so one slow parallel stream
+      starves every other library using it
+    - order matters and you used forEach (use
+      forEachOrdered, or accept a shuffled output)
+    - the work per element is tiny - splitting and merging
+      cost more than the work itself
+
+ Small data plus parallel is SLOWER, not faster. If you
+ cannot explain why parallel is safe here, sequential is
+ the right answer. Measure before and after, or do not
+ do it."
+
+Note.txt spells this parrallelstream(). It is
+parallelStream() - two r's, two l's, camelCase.
+
+
+---------------------------------------------------------
+CHAPTER 14 - MONDAY MORNING AGAIN
+---------------------------------------------------------
+The boss is back, and now she wants five things. You do
+not open a loop even once.
+
+    // 1. names above 50000, sorted   (the original ask)
+    List<String> names =
+        employees.stream()
+                 .filter(e -> e.getSalary() > 50000)
+                 .map(Employee::getName)
+                 .sorted()
+                 .toList();
+
+    // 2. top 3 earners
+    List<Employee> top3 =
+        employees.stream()
+                 .sorted(Comparator.comparingDouble(Employee::getSalary)
+                                   .reversed())
+                 .limit(3)
+                 .toList();
+
+    // 3. total salary per department
+    Map<String, Double> totalByDept =
+        employees.stream()
+                 .collect(Collectors.groupingBy(
+                         Employee::getDept,
+                         Collectors.summingDouble(Employee::getSalary)));
+
+    // 4. is anybody underpaid?
+    boolean anyLow = employees.stream()
+                              .anyMatch(e -> e.getSalary() < 10000);
+
+    // 5. who earns the most?
+    Optional<Employee> best =
+        employees.stream()
+                 .max(Comparator.comparingDouble(Employee::getSalary));
+
+Look at #5 one more time. Optional again. Third time in
+this story. Streams keep handing you a box that may be
+empty, because "the highest paid employee" has no answer
+when nobody works here. That is not a stream problem -
+that is the next story.
+
+
+---------------------------------------------------------
+CHAPTER 15 - THE TYPOS THAT COST YOU AN HOUR
+---------------------------------------------------------
+Everything below is in Note.txt as written. None of it
+compiles. Fix them in your head now, not at 11 PM.
+
+    WRITTEN IN Note.txt          WHAT IT REALLY IS
+    -------------------------    -------------------------
+    .tolist()                    .toList()
+    arr.stream(arr)              Arrays.stream(arr)
+    stream.of(...)               Stream.of(...)
+    parrallelstream()            parallelStream()
+    find() / finfirst()          findFirst() / findAny()
+    s.for.each(...)              s.forEach(...)
+    sout.println                 System.out::println
+    collections.sort()           Collections.sort()
+    filter(x -> x > 50000)       filter(e -> e.getSalary()
+      over employees                            > 50000)
+
+AND THE BIG ONE - THE SEMICOLONS
+
+    Note.txt writes the chain like this:
+
+        list.stream()
+        .filter(x -> x > 10);
+        .map(x -> x * 2);
+        .toList();
+
+    That first semicolon ENDS THE STATEMENT. The next line
+    then begins with a dot, attached to nothing, and the
+    compiler stops. One pipeline is ONE statement:
+    dots join the stages, and exactly one semicolon sits
+    at the very end.
+
+
+---------------------------------------------------------
+EPILOGUE - THE SIXTY SECOND VERSION
+---------------------------------------------------------
+If somebody wakes you at 3 AM:
+
+  * A Stream is a PLAN for processing a sequence. A List
+    holds elements; a Stream holds no data and changes
+    nothing.
+  * Three parts: SOURCE -> INTERMEDIATE* -> TERMINAL.
+  * Returns a Stream = intermediate = lazy. Returns
+    anything else = terminal = runs now.
+  * NO TERMINAL => NOTHING RUNS. Not even the predicate.
+  * Processing is VERTICAL: one element through the whole
+    pipeline, then the next.
+  * Laziness buys SHORT CIRCUITING (findFirst, limit,
+    anyMatch) and makes infinite streams usable.
+  * A stream is SINGLE USE - reuse throws
+    IllegalStateException. Make a new one; it is free.
+  * Sources: collection, array, Stream.of, empty, infinite.
+  * iterate REMEMBERS the previous value, generate FORGETS.
+  * filter keeps/drops (Predicate); map transforms
+    (Function); flatMap flattens.
+  * filter and limit EARLY, sorted LATE. sorted is a
+    barrier and dies on infinite streams.
+  * IntStream/LongStream/DoubleStream skip boxing and add
+    sum, average, summaryStatistics.
+  * parallelStream only for big data, expensive work, a
+    splittable source, no shared state - and measure it.
+  * findFirst / min / max / reduce hand back an Optional
+    -> read optional_class/revision.txt next.

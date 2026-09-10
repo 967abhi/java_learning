@@ -335,7 +335,7 @@ td b{font-weight:700;color:var(--ink)}
     <button class="tab" role="tab" id="tab-core" aria-controls="p-core" data-panel="p-core" data-track="core" aria-selected="true">Core Java <em>14</em></button>
     <button class="tab" role="tab" id="tab-adv" aria-controls="p-adv" data-panel="p-adv" data-track="adv" aria-selected="false">Advanced Java <em>13</em></button>
     <button class="tab" role="tab" id="tab-col" aria-controls="p-col" data-panel="p-col" data-track="col" aria-selected="false">Collections <em>15</em></button>
-    <button class="tab" role="tab" id="tab-str" aria-controls="p-str" data-panel="p-str" data-track="str" aria-selected="false">Streams <em>07</em></button>
+    <button class="tab" role="tab" id="tab-str" aria-controls="p-str" data-panel="p-str" data-track="str" aria-selected="false">Streams <em>08</em></button>
     <button class="tab" role="tab" id="tab-rec" aria-controls="p-rec" data-panel="p-rec" data-track="rec" aria-selected="false">Recall &amp; Gaps <em>04</em></button>
   </div>
 </header>
@@ -1605,7 +1605,7 @@ if (o instanceof Student s &amp;&amp; s.marks() &gt; 90) { ... }   <i>// test an
       <div class="deep"><span class="lbl">Design note &mdash; how to use these without being annoying about it</span>
         <ul>
           <li><b>Records are for data, not for everything.</b> They are transparent carriers: all components are public through accessors. If the type has behaviour or hidden invariants, it is a class.</li>
-          <li><b><code>Optional</code> is a return type.</b> Not a field (it is not serialisable and adds an object per instance), not a parameter (the caller then has to wrap). And <code>opt.get()</code> without <code>isPresent()</code> is just a NullPointerException wearing a costume &mdash; use <code>orElse</code>, <code>orElseGet</code>, <code>orElseThrow</code>, <code>map</code>.</li>
+          <li><b><code>Optional</code> is a return type.</b> Not a field (it is not serialisable and adds an object per instance), not a parameter (the caller then has to wrap). And <code>opt.get()</code> without <code>isPresent()</code> is just a NullPointerException wearing a costume &mdash; use <code>orElse</code>, <code>orElseGet</code>, <code>orElseThrow</code>, <code>map</code>. Streams&nbsp;08 is the full card.</li>
           <li><b><code>var</code> is for when the right-hand side already names the type.</b> <code>var list = new ArrayList&lt;String&gt;()</code> reads fine; <code>var x = compute()</code> hides exactly the information the reader needed.</li>
           <li><b>Sealed + records + switch patterns</b> is the combination worth knowing as one idea: a closed set of shapes the compiler can check exhaustively. It is how Java expresses a discriminated union.</li>
         </ul>
@@ -2533,11 +2533,12 @@ Collections.binarySearch(sorted, 25);   <b>// -3 &mdash; not found; it belongs a
     <div class="lede">
       <div class="kicker">Track four &middot; the newest folder, and the one interviews ask about</div>
       <h1>Streams: a pipeline, not a loop.</h1>
-      <p>Everything here is rebuilt from <code>Stream/Note.txt</code> and <code>Stream/Demo.java</code> &mdash; course #39&ndash;42. Your note already lands the three things that matter: a stream is <b>a tool for processing a sequence of data through a chain of operations</b>, the pipeline is <b>source &rarr; intermediate &rarr; terminal</b>, and <b>nothing runs until the terminal operation</b>. This track takes each of those down a level.</p>
+      <p>Everything here is rebuilt from <code>Stream/Note.txt</code>, <code>Stream/Demo.java</code> and <code>optional_class/</code> &mdash; course #39&ndash;42. Your note already lands the three things that matter: a stream is <b>a tool for processing a sequence of data through a chain of operations</b>, the pipeline is <b>source &rarr; intermediate &rarr; terminal</b>, and <b>nothing runs until the terminal operation</b>. This track takes each of those down a level.</p>
       <p>The water-pipeline picture in your note is the right mental model and worth keeping: one source, a chain of filters, and a tap at the end. Until somebody opens the tap, no water moves &mdash; and no filter is ever asked a question.</p>
       <p><b>This was listed as the largest gap in the repo until this folder appeared.</b> It is asked in roughly nine backend interviews out of ten, usually as &ldquo;rewrite this loop with streams&rdquo; followed by &ldquo;now what does <code>parallel()</code> change?&rdquo;</p>
+      <p>Card&nbsp;08 closes the track with <code>Optional</code> &mdash; course #41, from <code>optional_class/</code>. It belongs here rather than in Advanced, because <code>findFirst</code>, <code>findAny</code>, <code>min</code>, <code>max</code>, <code>reduce</code> and <code>average</code> all hand you one, so the pipeline is not finished until you know what to do with the box.</p>
       <div class="lede-meta">
-        <span><b>7</b> cards</span>
+        <span><b>8</b> cards</span>
         <span><b>1</b> animated mechanism</span>
         <span><b>Course</b> #39&ndash;42</span>
       </div>
@@ -2820,7 +2821,7 @@ big.stream().filter(x -&gt; x &gt; 10).sorted().toList();   <b>// sorts only the
       <p class="s-why">Where the work happens, and where the interview question usually lands</p>
       <ul class="facts">
         <li><b>A terminal operation returns anything except a Stream</b> &mdash; a collection, a number, an <code>Optional</code>, a boolean, or nothing. That is the whole definition; there is no list to memorise.</li>
-        <li><b>The ones that can return &ldquo;nothing found&rdquo; return an <code>Optional</code>:</b> <code>findFirst</code>, <code>findAny</code>, <code>reduce</code> without an identity, <code>min</code>, <code>max</code>. This is precisely the return-type use of <code>Optional</code> that Advanced&nbsp;13 argues for.</li>
+        <li><b>The ones that can return &ldquo;nothing found&rdquo; return an <code>Optional</code>:</b> <code>findFirst</code>, <code>findAny</code>, <code>reduce</code> without an identity, <code>min</code>, <code>max</code>. This is precisely the return-type use of <code>Optional</code> that Advanced&nbsp;13 argues for &mdash; and card&nbsp;08 is the whole class, method by method.</li>
         <li><b><code>toList()</code> (Java 16) returns an <i>unmodifiable</i> list</b>; <code>collect(Collectors.toList())</code> makes no promise about mutability, and <code>Collectors.toUnmodifiableList()</code> is the explicit Java&nbsp;10 form. Calling <code>add</code> on the result of <code>toList()</code> throws.</li>
         <li><b><code>collect</code> is the general one.</b> Everything else is a convenience over it &mdash; and <code>Collectors.groupingBy</code> is the single most useful method in the whole API for backend work.</li>
         <li><b><code>forEach</code> gives no ordering guarantee on a parallel stream.</b> <code>forEachOrdered</code> does, at a cost. On a sequential stream they behave the same, which is how the bug survives testing.</li>
@@ -2905,6 +2906,74 @@ double value = avg.orElse(0);                             <i>// never call getAs
       <div class="say"><span class="lbl">Say it out loud</span><p>Use <code>IntStream</code> to skip the boxing and to get <code>sum</code> and <code>average</code>. Use <code>parallelStream()</code> only for <b>large data, expensive work, a splittable source and no shared state</b> &mdash; and measure it.</p></div>
     </section>
 
+
+    <!-- str 8 -->
+    <section id="s8" data-key="1">
+      <div class="s-head"><span class="s-num">08</span><h2><code>Optional</code>: the box that ends the null check <span class="star">&#9733;</span></h2><span class="src">optional_class/note.txt &middot; optional_class/Demo.java</span></div>
+      <p class="s-why">Course&nbsp;#41, and the answer to every <code>Optional</code> that cards&nbsp;06 and&nbsp;07 just handed you</p>
+      <ul class="facts">
+        <li><b>The problem is not that null exists &mdash; it is that the <i>type</i> stays silent.</b> <code>String name = getName();</code> compiles whether or not the method can return null, so the compiler cannot warn you, the test does not cover it, and you find out from a stack trace. <code>Optional&lt;String&gt;</code> moves &ldquo;there may be nothing here&rdquo; from a Javadoc line into the signature, where it cannot be ignored.</li>
+        <li><b>null carries no information.</b> It is the same three-letter answer for &ldquo;not found&rdquo;, &ldquo;exists but empty&rdquo; and &ldquo;somebody forgot to set it&rdquo;. Your note is exactly right that this ambiguity is a second, separate problem from the crash &mdash; and the one that survives every null check you write.</li>
+        <li><b>Inside, it is one field.</b> <code>private final T value;</code> &mdash; null means <b>empty</b>, non-null means <b>present</b>. The class is trivial; the power is that the type now forces a conversation. <i>(Your note writes &ldquo;empty&rdquo; on both lines &mdash; the second one is <b>present</b>.)</i></li>
+        <li><b>Three factories, and picking one is the design decision.</b> <code>of(v)</code> is a promise &mdash; it throws NPE on null, deliberately, so a broken promise fails at the source. <code>ofNullable(v)</code> is for the border: a legacy API, a <code>map.get()</code>, a DB row. <code>empty()</code> is what replaces <code>return null</code>.</li>
+        <li><b><code>get()</code> is the method to stop using.</b> It converts &ldquo;might be null and I forgot to check&rdquo; into &ldquo;might be empty and I forgot to check&rdquo; &mdash; the same bug with a new exception name, <code>NoSuchElementException</code>. Java&nbsp;10 added the better-named <code>orElseThrow()</code> for exactly this reason.</li>
+        <li><b>The real win is never opening the box at all.</b> <code>map</code>, <code>flatMap</code>, <code>filter</code> and <code>or</code> all share one rule: <b>if it is empty, the function is never called</b>. That skipped call <i>is</i> your null check &mdash; which is why the pyramid below collapses into one chain.</li>
+      </ul>
+
+      <pre><i>// the pyramid of doom from your note &mdash; five lines of scaffolding to read one String</i>
+User u = getUser();
+if (u != null){
+    if (u.getAddress() != null){
+        if (u.getAddress().getCity() != null) return u.getAddress().getCity();
+    }
+}
+return "Unknown";
+
+<i>// the same requirement, with getUser() and getAddress() returning Optional</i>
+String city = getUser()                     <i>// Optional&lt;User&gt;</i>
+        .flatMap(User::getAddress)          <i>// flatMap &mdash; getAddress already returns Optional</i>
+        .map(Address::getCity)              <i>// map &mdash; getCity returns a plain String</i>
+        .filter(c -&gt; !c.isBlank())
+        .orElse("UNKNOWN");                 <b>// zero ifs, zero null checks, zero possible NPE</b></pre>
+
+      <div class="tbl"><table>
+        <tr><th>You want to&hellip;</th><th>Call</th><th>Note</th></tr>
+        <tr><td>ask a question</td><td><code>isPresent()</code> / <code>isEmpty()</code></td><td>returns <code>boolean</code> &mdash; still an <code>if</code>, prefer the rows below</td></tr>
+        <tr><td>do something if there is a value</td><td><code>ifPresent(Consumer)</code></td><td>returns <code>void</code>, no else branch. <b>One letter from <code>isPresent</code> and a different job</b></td></tr>
+        <tr><td>&hellip;with a fallback action</td><td><code>ifPresentOrElse(Consumer, Runnable)</code></td><td>Java&nbsp;9+ &mdash; the if/else of the Optional world</td></tr>
+        <tr><td>get a value, always</td><td><code>orElse(v)</code></td><td>the argument is evaluated <b>every time</b> &mdash; see below</td></tr>
+        <tr><td>&hellip;where the default costs something</td><td><code>orElseGet(Supplier)</code></td><td>the lambda runs <b>only</b> when empty</td></tr>
+        <tr><td>fail loudly, with meaning</td><td><code>orElseThrow(Supplier)</code></td><td>your exception, your message &mdash; the service-layer answer</td></tr>
+        <tr><td>transform without unwrapping</td><td><code>map</code> / <code>flatMap</code> / <code>filter</code> / <code>or</code></td><td>skipped entirely when empty</td></tr>
+        <tr><td>drop empties inside a pipeline</td><td><code>.flatMap(Optional::stream)</code></td><td>Java&nbsp;9+ &mdash; the bridge back into card&nbsp;05</td></tr>
+      </table></div>
+
+      <div class="trap"><span class="lbl"><code>orElse</code> vs <code>orElseGet</code> &mdash; the question that gets asked</span>
+        <ul>
+          <li><b><code>orElse</code> takes a value, so Java must produce it <i>before</i> the call.</b> <code>name.orElse(loadFromDb())</code> hits the database on every call &mdash; including when the Optional is full and the result goes straight in the bin.</li>
+          <li><b><code>orElseGet</code> takes a <code>Supplier</code>, so nothing runs unless the box is empty.</b> Cheap constant &rarr; <code>orElse("Unknown")</code>. Real work &rarr; <code>orElseGet(() -&gt; loadFromDb())</code>.</li>
+          <li><b>It is not only a speed question.</b> If the &ldquo;default&rdquo; writes a row, sends a mail or bumps a counter, <code>orElse</code> fires that side effect on the happy path too. That is a correctness bug wearing a performance costume.</li>
+        </ul>
+      </div>
+
+      <div class="trap"><span class="lbl">Fixes to the draft in <code>optional_class/note.txt</code></span>
+        <ul>
+          <li><b>Capital O, camelCase methods.</b> <code>optional&lt;String&gt;</code> &rarr; <code>Optional&lt;String&gt;</code>, <code>Optiona.of</code> &rarr; <code>Optional.of</code>, <code>ofnullable</code> &rarr; <code>ofNullable</code>, <code>ifpresent</code> &rarr; <code>ifPresent</code>, <code>ifpresentorElse</code> &rarr; <code>ifPresentOrElse</code>.</li>
+          <li><b>&ldquo;orElseThrow gives NoSuchElementException&rdquo; is only half true.</b> That is the <b>no-argument</b> version. Pass a supplier and it throws <i>your</i> exception &mdash; which is the version worth using.</li>
+          <li><b><code>String name = null</code> is not &ldquo;bad design&rdquo; because null is illegal</b> &mdash; it is bad design because the <i>caller</i> cannot see it coming. That distinction is what makes <code>Optional</code> a <b>return type</b> and not a null replacement everywhere.</li>
+        </ul>
+      </div>
+
+      <div class="deep"><span class="lbl">One level down &mdash; where <code>Optional</code> does not belong</span>
+        <p>The team that added it said plainly that it was designed for <b>one job</b>: a return type for a method that may have no answer. It is <b>not <code>Serializable</code></b>, so it has no business as a field on an entity or a DTO &mdash; store the plain field and return <code>Optional</code> from the getter. It should not be a <b>parameter</b> either: the caller then has to build a box just to call you, and you still have to handle null <i>and</i> empty. Write the overload instead.</p>
+        <p>And the rule that people break within a week of learning it: <b>never return <code>null</code> from a method that returns <code>Optional</code></b>. That is the worst of both worlds &mdash; the caller now has to null-check the very object whose job was to end null checks. Same for <code>List&lt;Optional&lt;T&gt;&gt;</code>: filter the list instead.</p>
+        <p>The primitive family &mdash; <code>OptionalInt</code>, <code>OptionalLong</code>, <code>OptionalDouble</code> &mdash; exists for the same reason <code>IntStream</code> does, and card&nbsp;07 already handed you one: <code>average()</code> returns <code>OptionalDouble</code> because the average of nothing does not exist, while <code>sum()</code> returns a plain <code>int</code> because the sum of nothing is honestly 0.</p>
+      </div>
+
+      <div class="gap"><span class="lbl">Repo note</span><code>optional_class/Demo.java</code> calls <code>name.get()</code> and prints it &mdash; safe <b>today</b>, and only because <code>getName()</code> returns <code>Optional.of("Abhishek")</code> and can never be empty. Change that one line to <code>Optional.empty()</code> and run it: <code>NoSuchElementException: No value present</code>. Then replace the call with <code>orElse("Unknown")</code> and run it again. The gap between those two runs, on identical data, is the entire reason the class exists &mdash; and it is a two-minute experiment.</div>
+
+      <div class="say"><span class="lbl">Say it out loud</span><p><code>Optional</code> is a <b>return type</b> that says &ldquo;there may be no answer&rdquo;. Pack it with <code>of</code>, <code>ofNullable</code> or <code>empty</code>; never open it with <code>get()</code>; chain <code>map</code>/<code>flatMap</code>/<code>filter</code> and finish with <code>orElseGet</code> or <code>orElseThrow</code>. <b>The skipped function call is the null check.</b></p></div>
+    </section>
   </div><!-- /streams -->
 
   <!-- ============================================================ RECALL -->
@@ -2916,8 +2985,8 @@ double value = avg.orElse(0);                             <i>// never call getAs
       <p>The first card is rapid-fire recall: read the question, answer it out loud, <i>then</i> open it. The second is the mistakes log pulled out of your own notes files &mdash; those are the errors you have already made once, which makes them the ones most likely to come back.</p>
       <p>The last two are the honest map: what the repo covers, and the four heavyweight topics still ahead that carry more interview weight than everything above them combined.</p>
       <div class="lede-meta">
-        <span><b>46</b> recall questions</span>
-        <span><b>19</b> folders mapped</span>
+        <span><b>53</b> recall questions</span>
+        <span><b>20</b> folders mapped</span>
         <span><b>3</b> tracks still ahead</span>
       </div>
     </div>
@@ -3024,6 +3093,22 @@ double value = avg.orElse(0);                             <i>// never call getAs
       <details class="qa"><summary>Which stream operations are stateful, and why does it matter?</summary><div class="ans"><p><code>sorted</code>, <code>distinct</code>, <code>limit</code> and <code>skip</code>. <code>sorted</code> is a <b>full barrier</b> &mdash; it must see the last element before releasing the first, so it never terminates on an infinite stream, and it is the reason to <b>filter before you sort</b> rather than after. <code>distinct</code> has to remember everything it has emitted, using <code>equals</code> and <code>hashCode</code>.</p></div></details>
 
       <details class="qa"><summary>When is <code>parallelStream()</code> the wrong call?</summary><div class="ans"><p>Almost always, unless four things hold: a <b>large</b> data set, <b>expensive</b> per-element work, a source that <b>splits cheaply</b> (an array or ArrayList, not a LinkedList), and lambdas with <b>no shared mutable state</b>. It runs on the shared common ForkJoinPool, so a parallel stream doing blocking I/O starves every other user of that pool in the JVM. And <code>reduce</code>&rsquo;s function must be associative, or sequential and parallel give different answers.</p></div></details>
+
+      <h3>The fifth round &mdash; Optional</h3>
+
+      <details class="qa"><summary>What problem does <code>Optional</code> actually solve?</summary><div class="ans"><p>Two, and they are separate. The crash &mdash; <code>NullPointerException</code> is a <b>runtime</b> failure the compiler cannot warn about, because <code>String</code> and &ldquo;String or nothing&rdquo; are the same type. And the <b>ambiguity</b> &mdash; null is the same answer for &ldquo;not found&rdquo;, &ldquo;exists but empty&rdquo; and &ldquo;somebody forgot&rdquo;. <code>Optional&lt;T&gt;</code> moves &ldquo;there may be no answer&rdquo; out of the Javadoc and into the signature.</p></div></details>
+
+      <details class="qa"><summary><code>of</code>, <code>ofNullable</code> or <code>empty</code> &mdash; which one?</summary><div class="ans"><p><code>of(v)</code> is a <b>promise</b>: it throws NPE on null on purpose, so a broken promise fails at the source rather than three layers later. <code>ofNullable(v)</code> is for the <b>border</b> &mdash; a legacy API, a <code>map.get()</code>, a DB row. <code>empty()</code> is what replaces <code>return null</code>.</p></div></details>
+
+      <details class="qa"><summary><code>orElse</code> or <code>orElseGet</code> &mdash; what is the difference?</summary><div class="ans"><p><code>orElse</code> takes a <b>value</b>, so Java evaluates it <b>before</b> the call &mdash; <code>orElse(loadFromDb())</code> hits the database even when the Optional is full. <code>orElseGet</code> takes a <code>Supplier</code> that runs <b>only</b> when empty. Cheap constant &rarr; <code>orElse</code>; real work &rarr; <code>orElseGet</code>. And if the default has a side effect, <code>orElse</code> fires it on the happy path too &mdash; a correctness bug, not just a slow one.</p></div></details>
+
+      <details class="qa"><summary><code>isPresent</code> vs <code>ifPresent</code> &mdash; one letter, what changes?</summary><div class="ans"><p><code>isPresent()</code> asks a <b>question</b> and returns <code>boolean</code> &mdash; you still write the <code>if</code>. <code>ifPresent(Consumer)</code> takes an <b>action</b> and returns <code>void</code>. And <code>if (o.isPresent()) o.get();</code> is just the old null check in a costume &mdash; the point of the class is to stop writing it.</p></div></details>
+
+      <details class="qa"><summary>Why is <code>get()</code> the method to avoid?</summary><div class="ans"><p>Because it converts &ldquo;might be null and I forgot to check&rdquo; into &ldquo;might be empty and I forgot to check&rdquo; &mdash; the same bug with a new name, <code>NoSuchElementException</code>. Java&nbsp;10 added <code>orElseThrow()</code> as the honestly-named twin. In a service, pass a supplier: <code>orElseThrow(() -&gt; new UserNotFoundException(id))</code> gives a real error instead of a bare NPE.</p></div></details>
+
+      <details class="qa"><summary>Where should <code>Optional</code> never be used?</summary><div class="ans"><p>As a <b>field</b> (it is not <code>Serializable</code>, and it costs an object per field &mdash; keep the plain field, return <code>Optional</code> from the getter), as a <b>parameter</b> (the caller has to build a box to call you, and you still handle null <i>and</i> empty &mdash; write the overload), and inside a <b>collection</b>. And never <code>return null</code> from a method that returns <code>Optional</code>: that forces a null check on the very object meant to end them.</p></div></details>
+
+      <details class="qa"><summary>Your <code>getUser().getAddress().getCity()</code> chain &mdash; <code>map</code> or <code>flatMap</code>?</summary><div class="ans"><p><b>Both.</b> <code>flatMap(User::getAddress)</code> because <code>getAddress()</code> already returns an <code>Optional</code> &mdash; <code>map</code> there would give you <code>Optional&lt;Optional&lt;Address&gt;&gt;</code>. Then <code>map(Address::getCity)</code> because <code>getCity()</code> returns a plain <code>String</code>. Same rule as <code>Stream.flatMap</code>. If any step is empty the rest is skipped, and that skipped call <b>is</b> the null check.</p></div></details>
     </section>
 
     <!-- rec 2 -->
@@ -3052,6 +3137,11 @@ double value = avg.orElse(0);                             <i>// never call getAs
         <li><b><code>arr.stream(arr)</code></b> &mdash; an array has no methods. It is <code>Arrays.stream(arr)</code>. And <code>Stream.of(intArray)</code> gives a stream of <b>one</b> element, the array itself.</li>
         <li><b><code>.tolist()</code> and <code>.parrallelstream()</code></b> &mdash; <code>toList()</code> (Java&nbsp;16+) and <code>parallelStream()</code>. Java is case-sensitive and these are the two that autocomplete will not rescue.</li>
         <li><b>&ldquo;Method references only work for inbuilt methods.&rdquo;</b> Written in <code>Lambda/Demo.java</code>, and not true &mdash; <code>Student::getMarks</code> is your own class and the most useful reference in the file.</li>
+        <li><b><code>value != null</code> means &ldquo;empty&rdquo;.</b> <code>optional_class/note.txt</code> writes <i>empty</i> on both branches. Non-null is <b>present</b> &mdash; and the whole class is that one distinction, so it is the one line that has to be right.</li>
+        <li><b><code>name.get()</code> as the normal way to read an Optional.</b> In <code>optional_class/Demo.java</code> it is safe only because <code>getName()</code> returns <code>Optional.of(&hellip;)</code>. Swap in <code>Optional.empty()</code> and it throws <code>NoSuchElementException</code> &mdash; the null bug, renamed. Use <code>orElse</code>, <code>ifPresent</code> or <code>orElseThrow(&hellip;)</code>.</li>
+        <li><b><code>Optional.of(x)</code> where <code>x</code> may be null.</b> That throws NPE immediately &mdash; which is correct behaviour, and exactly why <code>ofNullable</code> exists for anything coming from a map, a DB row or a legacy API.</li>
+        <li><b><code>orElse(expensiveCall())</code>.</b> The argument is evaluated even when the Optional is full. Anything more than a constant belongs in <code>orElseGet(() -&gt; &hellip;)</code>, and anything with a side effect <i>must</i> go there.</li>
+        <li><b>Lowercase Optional API.</b> <code>optional&lt;String&gt;</code>, <code>Optiona.of</code>, <code>ofnullable</code>, <code>ifpresent</code>, <code>ifpresentorElse</code>, <code>nosuchelementexception</code> &mdash; the same case-sensitivity trap as <code>.tolist()</code>, and autocomplete will not rescue any of them.</li>
       </ul>
     </section>
 
@@ -3067,6 +3157,7 @@ double value = avg.orElse(0);                             <i>// never call getAs
         <tr><td><code>oops/</code></td><td>Class/object, constructors, chaining, call by value, static, packages, encapsulation, inheritance, abstraction, interfaces</td><td><b>Very good</b></td></tr>
         <tr><td><code>ImmutableClass.java</code></td><td>Five rules, both leaks, defensive copy</td><td><b>Very good</b></td></tr>
         <tr><td><code>Stream/</code></td><td>Imperative vs declarative, the pipeline, laziness and vertical processing, sources, intermediate and terminal ops, primitive and parallel streams</td><td><b>Newest &mdash; and the notes are already strong</b></td></tr>
+        <tr><td><code>optional_class/</code></td><td>The null problem, the pyramid of doom, <code>of</code>/<code>ofNullable</code>/<code>empty</code>, the whole extraction set, <code>map</code>/<code>flatMap</code>/<code>filter</code>, and where <code>Optional</code> must not be used</td><td><b>Newest &mdash; notes ahead of the code</b></td></tr>
         <tr><td><code>Lambda/</code></td><td>Anonymous class &rarr; lambda &rarr; method reference on a real Comparator; the four reference kinds; composition</td><td><b>Newest, and already deep</b> &mdash; notes ahead of the code</td></tr>
         <tr><td><code>Comparable/</code></td><td>Comparable vs Comparator, the danger of returning 0, the <code>Collections</code> utility set</td><td><b>Very good</b> &mdash; it reached functional interfaces on its own</td></tr>
         <tr><td><code>Queue/</code></td><td>Array and linked-list queues, circular wrap, Deque, ArrayDeque vs LinkedList, why not Stack</td><td>Good notes, code still a stub</td></tr>
@@ -3102,6 +3193,7 @@ double value = avg.orElse(0);                             <i>// never call getAs
         <tr><td><code>Queue/</code></td><td>Collections&nbsp;09 &mdash; including writing both implementations by hand</td></tr>
         <tr><td><code>Comparable/</code></td><td>Collections&nbsp;12, and Collections&nbsp;13 for the <code>Collections</code> utility list at the end of your note</td></tr>
         <tr><td><code>Stream/</code></td><td>Streams&nbsp;01&ndash;07 &mdash; the whole track</td></tr>
+        <tr><td><code>optional_class/</code></td><td>Streams&nbsp;08 &mdash; the full method set, plus Advanced&nbsp;13 for the design rules</td></tr>
         <tr><td><code>Headfirstjava/</code></td><td><b>Deliberately not covered</b> &mdash; while loops, if/else and string concatenation. Book exercises, not interview material</td></tr>
         <tr><td><code>Framework/</code></td><td><b>Empty folder</b> &mdash; nothing to cover yet</td></tr>
       </table></div>
@@ -3126,7 +3218,7 @@ double value = avg.orElse(0);                             <i>// never call getAs
         <tr><td>38</td><td>Deep dive &middot; method references &amp; composition</td><td>Advanced&nbsp;11&ndash;12 &mdash; <b>covered</b></td></tr>
         <tr><td>39</td><td>Streams &mdash; creation &amp; architecture</td><td>Streams&nbsp;01&ndash;04 &mdash; <b>covered</b></td></tr>
         <tr><td>40</td><td>Stream methods &mdash; intermediate &amp; terminal</td><td>Streams&nbsp;05&ndash;06 &mdash; <b>covered</b></td></tr>
-        <tr><td>41</td><td><code>Optional</code> &mdash; all methods, stream integration</td><td>Advanced&nbsp;13 has the rules, Streams&nbsp;06 the returns; the full method set is ahead</td></tr>
+        <tr><td>41</td><td><code>Optional</code> &mdash; all methods, stream integration</td><td>Streams&nbsp;08 &mdash; <b>covered</b></td></tr>
         <tr><td>42</td><td>Parallel streams &middot; primitive Optionals</td><td>Streams&nbsp;07 &mdash; <b>covered</b></td></tr>
         <tr><td>43&ndash;44</td><td>Exceptions &middot; hierarchy, <code>throw</code> vs <code>throws</code>, custom</td><td>Advanced&nbsp;07&ndash;08 &mdash; <b>covered</b></td></tr>
         <tr><td>45&ndash;46</td><td>Memory &middot; stack, heap, method area, GC algorithms</td><td>Core&nbsp;13 &mdash; <b>covered</b></td></tr>
@@ -3145,7 +3237,8 @@ double value = avg.orElse(0);                             <i>// never call getAs
 
       <div class="deep"><span class="lbl">Now covered here, not pending</span>
         <p>Six items that were on this list have moved into the notebook: <b>exceptions in depth</b> (Advanced&nbsp;08), <b>functional interfaces and lambdas</b> (Advanced&nbsp;09), <b>the anonymous-class-to-method-reference journey</b> (Advanced&nbsp;10, rebuilt from <code>Lambda/Demo.java</code>), <b>the four kinds of method reference</b> (Advanced&nbsp;11), <b>functional composition</b> (Advanced&nbsp;12) and <b>JVM memory and GC</b> (Core&nbsp;13). Collections gained a fourteenth card, <b>the Map API method by method</b> (Collections&nbsp;08), from <code>set/Demo2.java</code>.</p>
-        <p>Advanced cards 10&ndash;12 are course #37 and #38; the whole <b>Streams track</b> is #39&ndash;42, written from <code>Stream/Note.txt</code> the day the folder appeared. That closes what this card called the largest gap in the repo for as long as it has existed &mdash; streams were listed as pending in every earlier version of this notebook, and they are now seven cards with their own tab.</p>
+        <p>Advanced cards 10&ndash;12 are course #37 and #38; the whole <b>Streams track</b> is #39&ndash;42, written from <code>Stream/Note.txt</code> the day the folder appeared. That closes what this card called the largest gap in the repo for as long as it has existed &mdash; streams were listed as pending in every earlier version of this notebook, and they are now eight cards with their own tab.</p>
+        <p>The eighth is <b><code>Optional</code></b> (Streams&nbsp;08), course #41, from the <code>optional_class/</code> folder. It was the last item on this list still marked partial &mdash; Advanced&nbsp;13 had the design rules and Streams&nbsp;06 had the return types, but the method set itself was unwritten. It is now a full card, which means <b>#35 through #46 are all covered</b> and the pending list starts cleanly at #47.</p>
         <p>What is genuinely left is <b>concurrency</b>, and it is eleven videos rather than four. That is now the honest answer to &ldquo;what have you not covered yet&rdquo;.</p>
       </div>
 

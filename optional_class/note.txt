@@ -1,0 +1,71 @@
+So java have a problem that is null problem 
+what is the problem we get null expection error and then new programming language made cotlin 
+suppose that there are mutliple class like 
+User
+         address 
+                     string city
+Class User{
+    Address(); 
+}
+class Address{
+    city()
+
+}
+class city{
+    return city name ;
+}
+User u=getUser();
+if(u!=null){
+    if(u.getAddress()!=null){
+        if(u.getAddress().getCity()!=null){
+            return the city 
+
+        }
+    }
+}
+so for fetching the city only in the java we have written this much code to avoide the null expection error and we went to the null-check hell 
+PROBLEM WITH NULL 
+String name=getName();
+and when we are getting the name then java didnot tell what means of the null error 
+some time it would be empty name,error,expected like these error 
+to remove this time of the error java 8 launched the optional class
+so it ewill wrap with the optional class and then it will give the optional<string> like this 
+optional<T>=>optional<String>
+so befpre that in the above class code there we are searching that whether it is giving the null expection error or not so now we return it as a optional 
+like optional<String>name=getname():
+so here the strign may/maynot contain a string 
+so here java gives the optional some method like 
+name.ifpresent(System.out::println);
+string name=null so this is bad design 
+Optional<string>name=Optional.empty()
+so the caller get the name.ifpresent and then it small the code 
+Optional<String>name=Optional.of("Aditya") by this we get the dat A
+Class optional<T>{
+    private final T values;
+}
+(value==null)emoty 
+(values!==null)empty
+
+Creatign Optional 
+optioinal<String>n= Optiona.of("Aditya") so it will take the values only it will not take the null 
+but some time the 
+Optional<sTRING>N=optional.ofnullable("aditya pr null )value 
+
+
+GETTIGN VALUES FROM OPTIONAL 
+get()
+Optional<String>name=getName();
+name.ifpresent or name.get()
+nosuchelementexception will give this get when there are nothign 
+ispresent() it is difference rom the ifpresent
+ifpresent
+name.ifpresent(System.out::println)
+->orElse()
+it gives the values name.orElse("Unknown");
+String s=name.orElse("Unknown")
+it gives the default values 
+->OrElse getOrelse throw
+ifpresentorElse
+orElseget -> it work the same with orElse 
+orElseThrow it gives the nosuchelementexception
+ifpresentorelse it call the customer or default it will give 
