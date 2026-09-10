@@ -1,0 +1,498 @@
+=========================================================
+        THE OPTIONAL CLASS - THE STORY VERSION
+   (the same syllabus as note.txt, told as one story:
+    a 2 AM production call, and how Java 8 ended it)
+=========================================================
+note.txt is the raw idea. Demo.java is the working proof.
+This file is the story that joins them - read it end to
+end and the method names stop being a list you memorise
+and become things that happened.
+
+Read this AFTER Stream/revision.txt. Streams keep handing
+you a box that may be empty; this is the story of the box.
+
+
+---------------------------------------------------------
+CHAPTER 0 - THE PHONE RINGS AT 2 AM
+---------------------------------------------------------
+Production is down. You open the log and there it is, the
+most famous six words in Java:
+
+    java.lang.NullPointerException
+        at com.app.UserService.getCity(UserService.java:41)
+
+Line 41 is this:
+
+    return u.getAddress().getCity();
+
+Somebody in the database has no address. That is all. One
+missing row, and the service is on the floor at 2 AM.
+
+Here is the part that should make you angry: the compiler
+read that line and said NOTHING. It compiled happily. The
+type said "Address". It did not say "Address, or possibly
+nothing at all" - because in Java, before 8, there was no
+way to say that.
+
+    String name = getName();   // may this be null?
+    name.length();             // compiles. may explode.
+
+NPE is a RUNTIME error. The type system knew nothing, so
+the compiler could not warn you, so the test did not cover
+it, so you found out from a phone call.
+
+Tony Hoare invented the null reference in 1965 and later
+called it his "billion dollar mistake". At 2 AM you agree
+with him.
+
+
+---------------------------------------------------------
+CHAPTER 1 - THE PYRAMID YOU BUILT TO SURVIVE
+---------------------------------------------------------
+So you do what everybody does. You defend.
+
+    class User    { Address getAddress(); }
+    class Address { String  getCity();    }
+
+    User u = getUser();
+    if (u != null) {
+        if (u.getAddress() != null) {
+            if (u.getAddress().getCity() != null) {
+                return u.getAddress().getCity();
+            }
+        }
+    }
+    return "Unknown";
+
+Count what is on the screen: three nested ifs, four method
+calls, five lines of scaffolding - to read ONE STRING.
+
+note.txt calls it "null-check hell". The rest of the world
+calls it the PYRAMID OF DOOM. Both names are right, and
+the pyramid grows one level for every dot in the chain.
+
+Now hold that picture. The whole point of this topic is a
+single line that deletes the pyramid - you will see it in
+chapter 7.
+
+
+---------------------------------------------------------
+CHAPTER 2 - THE SECOND PROBLEM: null WON'T EXPLAIN ITSELF
+---------------------------------------------------------
+Even when you survive it, null lies to you by staying
+silent.
+
+    String name = getName();     // returns null
+
+What does that null MEAN?
+
+    - the user was not found?
+    - the user exists but has no name?
+    - a lookup failed?
+    - somebody forgot to set the field?
+
+You cannot tell. null carries NO INFORMATION. It is the
+same three-letter answer for "nothing exists", "nothing
+was found" and "I made a mistake". The caller has to guess,
+and the guess usually lives in a Javadoc line nobody reads.
+
+Other languages fixed this in the type system - Kotlin
+writes String? and refuses to compile the unsafe call.
+That is the language note.txt is remembering. Java could
+not change String without breaking the world, so in Java 8
+it added something next to it instead: a BOX.
+
+
+---------------------------------------------------------
+CHAPTER 3 - JAVA 8 HANDS YOU A BOX
+---------------------------------------------------------
+The method signature changes by five characters and the
+whole conversation changes with it:
+
+    Optional<String> name = getName();
+
+Now the TYPE ITSELF is speaking:
+
+    "There may or may not be a value in here.
+     You are going to have to decide what happens
+     when there is not. I am not letting you forget."
+
+You cannot call .length() on it by accident. There is no
+way to ignore the empty case silently any more, because
+the box will not open without you saying what to do.
+
+WHAT IS INSIDE THE BOX - it is almost embarrassing:
+
+    public final class Optional<T> {
+        private final T value;    // null  -> EMPTY
+                                  // !null -> PRESENT
+    }
+
+    value == null  ->  the box is EMPTY
+    value != null  ->  the box is PRESENT
+
+    (note.txt has a typo here: it writes "empty" on both
+     lines. A non-null value means PRESENT.)
+
+That is the entire idea. One field. The power is not in
+the class - it is in the fact that the TYPE now forces a
+conversation that null let you skip.
+
+The family also has primitive versions with no boxing:
+    OptionalInt   OptionalLong   OptionalDouble
+
+
+---------------------------------------------------------
+CHAPTER 4 - THREE WAYS TO PACK THE BOX
+---------------------------------------------------------
+Optional is final and has no public constructor. You always
+use one of three factories, and choosing the right one IS
+the design decision.
+
+    Optional.of(value)          "there is definitely
+                                 something here"
+        Optional<String> n = Optional.of("Aditya");   // ok
+        Optional<String> n = Optional.of(null);       // NPE!
+
+        Yes - of(null) throws immediately. That is not a
+        bug, it is the point: if you promised a value and
+        there is none, you want the crash HERE, at the
+        source, not three layers away at 2 AM.
+
+    Optional.ofNullable(value)  "there might be something"
+        Optional<String> n = Optional.ofNullable(mayBeNull);
+
+        null -> Optional.empty(),  else -> Optional.of(v).
+        This is the one you use at the BORDER: wrapping a
+        legacy API, a map.get(), a DB row, a request param.
+
+    Optional.empty()            "there is definitely
+                                 nothing here"
+        Optional<String> n = Optional.empty();
+
+        This is what replaces "return null". The caller
+        cannot ignore it by accident any more.
+
+    of()          -> promise. Crash if broken.
+    ofNullable()  -> maybe. Handle it.
+    empty()       -> nothing, on purpose.
+
+
+---------------------------------------------------------
+CHAPTER 5 - OPENING THE BOX (AND THE WRONG WAY FIRST)
+---------------------------------------------------------
+THE WRONG WAY - get()
+
+    String s = name.get();
+
+    If the box is empty:
+        java.util.NoSuchElementException: No value present
+
+    Look at what you just did. You took a problem called
+    "it might be null and I forgot to check", and turned
+    it into "it might be empty and I forgot to check". Same
+    bug, new exception name, more typing.
+
+    Since Java 10 there is a better-named twin,
+    orElseThrow(), and get() is effectively discouraged.
+
+    Your Demo.java calls name.get() directly:
+
+        Optional<String> name = getName();
+        System.out.println(name.get());
+
+        public static Optional<String> getName() {
+            return Optional.of("Abhishek");
+        }
+
+    That is safe TODAY, and only because getName() returns
+    Optional.of(...) and can never be empty. Change that
+    one line to Optional.empty() and the program throws.
+    Do it once, on purpose, so you have seen it.
+
+THE HONEST WAYS - and there is one for every situation:
+
+    isPresent() / isEmpty()      -> a QUESTION, gives boolean
+        if (name.isPresent()) { ... }
+        if (name.isEmpty())   { ... }     // Java 11+
+
+    ifPresent(Consumer)          -> an ACTION, gives void
+        name.ifPresent(System.out::println);
+
+        note.txt flags this pair as confusing and it is:
+        isPresent asks, ifPresent does. One letter apart,
+        completely different jobs.
+
+    ifPresentOrElse(Consumer, Runnable)    // Java 9+
+        name.ifPresentOrElse(
+                n  -> System.out.println("Hi " + n),
+                () -> System.out.println("No name found"));
+
+        The if/else of the Optional world, in one call.
+
+    orElse(default)              -> "always give me something"
+        String s = name.orElse("Unknown");
+
+    orElseGet(Supplier)          -> the lazy twin
+        String s = name.orElseGet(() -> loadFromDb());
+
+    orElseThrow()                -> "this MUST exist"
+        String s = name.orElseThrow();          // NoSuchElement
+        String s = name.orElseThrow(
+                () -> new UserNotFoundException(id));
+
+        In a service layer this is the good one: a real
+        business error with a real message, instead of a
+        bare NPE with no story.
+
+
+---------------------------------------------------------
+CHAPTER 6 - THE INTERVIEW QUESTION HIDING IN CHAPTER 5
+---------------------------------------------------------
+orElse and orElseGet look identical. They are not, and
+this is the single most asked Optional question.
+
+    name.orElse(expensiveCall());
+    name.orElseGet(() -> expensiveCall());
+
+    orElse takes a VALUE. Java must produce that value
+    BEFORE calling orElse - so expensiveCall() runs EVERY
+    TIME, even when the box is full and the result is
+    thrown straight in the bin.
+
+    orElseGet takes a SUPPLIER. The lambda is only invoked
+    if the box turns out to be empty.
+
+    Picture it: orElse is bringing a spare tyre in the car
+    on every trip. orElseGet is having the number of a
+    mechanic in your phone.
+
+    THE RULE
+        cheap constant  ->  orElse("Unknown")
+        real work       ->  orElseGet(() -> loadFromDb())
+
+    And it is not only about speed. If the "default" does
+    a DB write, sends a mail or increments a counter,
+    orElse fires that side effect on every single call,
+    including the happy path. That is a correctness bug,
+    not a performance one.
+
+
+---------------------------------------------------------
+CHAPTER 7 - THE CHAPTER THAT DELETES THE PYRAMID
+---------------------------------------------------------
+Everything so far still opens the box. The real power of
+Optional is that YOU NEVER OPEN IT AT ALL until the very
+last line.
+
+Optional has the same shape as a stream of 0 or 1 element,
+so it has the same methods - and they all share one rule:
+
+    IF THE BOX IS EMPTY, THE FUNCTION IS NEVER CALLED.
+
+That sentence is the null check. You stop writing it,
+because map() is already doing it.
+
+    map(Function)
+        Optional<String>  name = Optional.of("Abhishek");
+        Optional<Integer> len  = name.map(String::length);  // [8]
+        Optional.<String>empty().map(String::length);       // empty
+
+    flatMap(Function)   - when the function ITSELF returns
+                          an Optional
+        // getAddress() returns Optional<Address>
+        user.map(User::getAddress)      // Optional<Optional<Address>> BAD
+        user.flatMap(User::getAddress)  // Optional<Address>           GOOD
+
+        Exactly the same rule as Stream.flatMap: map for a
+        plain value, flatMap when the result is already
+        wrapped.
+
+    filter(Predicate)
+        name.filter(n -> n.length() > 5);
+        // present and passes -> stays
+        // present and fails  -> becomes EMPTY
+        // already empty      -> stays empty
+
+    or(Supplier<Optional>)      // Java 9+
+        findInCache(id).or(() -> findInDb(id));
+
+    stream()                    // Java 9+, the bridge back
+        users.stream()
+             .map(User::getNickname)     // Stream<Optional<String>>
+             .flatMap(Optional::stream)  // empties disappear
+             .toList();
+
+NOW GO BACK TO CHAPTER 1 AND LOOK AT THE PYRAMID.
+Here is the same requirement, with every tool applied:
+
+    String city = getUser()                  // Optional<User>
+            .flatMap(User::getAddress)       // Optional<Address>
+            .map(Address::getCity)           // Optional<String>
+            .filter(c -> !c.isBlank())
+            .map(String::toUpperCase)
+            .orElse("UNKNOWN");
+
+    Zero if-statements. Zero null checks. Zero possible
+    NPEs. And it reads as one English sentence, exactly
+    like a stream pipeline does.
+
+    If the user is missing, the whole chain is skipped and
+    you land on orElse. Nothing throws. Nothing is nested.
+
+That is the entire topic. Everything else is vocabulary.
+
+
+---------------------------------------------------------
+CHAPTER 8 - OPTIONAL FINDS YOU EVEN IF YOU NEVER CALL IT
+---------------------------------------------------------
+You may decide never to create an Optional yourself. It
+does not matter - the JDK hands you them anyway, and now
+you know what to do:
+
+    stream.findFirst()         -> Optional<T>
+    stream.findAny()           -> Optional<T>
+    stream.max(cmp)            -> Optional<T>
+    stream.min(cmp)            -> Optional<T>
+    stream.reduce(accumulator) -> Optional<T>
+    intStream.average()        -> OptionalDouble
+    intStream.max()            -> OptionalInt
+
+    Spring Data JPA:
+    repository.findById(id)    -> Optional<User>
+
+Which is why the two topics belong together:
+
+    Optional<Employee> best =
+        employees.stream()
+                 .max(Comparator.comparingDouble(Employee::getSalary));
+
+    String who = best.map(Employee::getName)
+                     .orElse("nobody works here");
+
+    "The highest paid employee" genuinely has no answer
+    when the list is empty. Optional is the type saying so
+    out loud instead of returning null and hoping.
+
+    -> Stream/revision.txt, chapters 8, 12 and 14.
+
+
+---------------------------------------------------------
+CHAPTER 9 - THE RULES OF THE BOX
+---------------------------------------------------------
+Optional is a scalpel, not a hammer. The people who wrote
+it said so.
+
+DO
+    * use it as a RETURN TYPE when a method may honestly
+      find nothing - findUserByEmail, getMiddleName
+    * chain map / flatMap / filter instead of nesting ifs
+    * finish every chain with orElse, orElseGet,
+      orElseThrow or ifPresent
+
+DO NOT
+    * do NOT use it as a FIELD in a class - it is not
+      Serializable, and it costs an extra object per field
+    * do NOT use it as a METHOD PARAMETER - write an
+      overload instead, or the caller has to build a box
+      just to call you
+    * do NOT return null from a method that returns
+      Optional. That is the worst of both worlds - now the
+      caller must null-check the thing that exists to stop
+      null-checking
+    * do NOT put it in a collection -
+      List<Optional<String>> is a smell; filter the list
+    * do NOT write  if (o.isPresent()) o.get();  - that is
+      the old null check wearing a costume
+
+THE ONE-LINE RULE
+    Optional is a RETURN TYPE for "maybe there is no
+    answer". It is not a general-purpose replacement for
+    null everywhere.
+
+
+---------------------------------------------------------
+CHAPTER 10 - THE MISTAKES LOG
+---------------------------------------------------------
+    WHAT YOU WROTE               WHAT IT SHOULD BE
+    -------------------------    -------------------------
+    o.get()                      o.orElseThrow(...)
+    if (o.isPresent()) o.get()   o.ifPresent(...)
+    o.orElse(heavyCall())        o.orElseGet(() -> heavyCall())
+    Optional.of(mayBeNull)       Optional.ofNullable(mayBeNull)
+    return null;                 return Optional.empty();
+    nested if != null            .map().flatMap().orElse()
+    Optional field in an entity  plain field, Optional getter
+
+AND THE SPELLING, STRAIGHT FROM note.txt:
+
+    optional<String>          ->  Optional<String>  (capital O)
+    Optiona.of / optional.of  ->  Optional.of
+    optional.ofnullable       ->  Optional.ofNullable
+    name.ifpresent            ->  name.ifPresent
+    ifpresentorElse           ->  ifPresentOrElse
+    orElse getOrelse throw    ->  orElse / orElseGet / orElseThrow
+    nosuchelementexception    ->  NoSuchElementException
+    "private final T values"  ->  one value, singular: T value
+
+    One more correction: note.txt says orElseThrow gives
+    NoSuchElementException. True only for the NO-ARGUMENT
+    version. Give it a supplier and it throws YOUR
+    exception - which is the version you actually want in
+    a service.
+
+
+---------------------------------------------------------
+CHAPTER 11 - FIVE EXPERIMENTS TO RUN IN Demo.java TONIGHT
+---------------------------------------------------------
+    // 1. make it empty and watch get() explode
+    return Optional.empty();
+    // NoSuchElementException: No value present
+
+    // 2. the same line, now unbreakable
+    System.out.println(name.orElse("Unknown"));
+
+    // 3. action instead of question
+    name.ifPresent(System.out::println);
+    name.ifPresentOrElse(System.out::println,
+                         () -> System.out.println("no name"));
+
+    // 4. transform without ever opening the box
+    System.out.println(name.map(String::toUpperCase)
+                           .orElse("NO NAME"));
+
+    // 5. the version you would ship
+    String n = name.orElseThrow(
+            () -> new IllegalStateException("name missing"));
+
+Run 1, then 2. That gap - crash versus a sensible default,
+with the same data - is the whole reason the class exists.
+
+
+---------------------------------------------------------
+EPILOGUE - THE SIXTY SECOND VERSION
+---------------------------------------------------------
+  * The problem: null is a RUNTIME bomb, and it carries no
+    meaning - "absent", "not found" and "bug" all look the
+    same.
+  * Optional<T> is a box holding 0 or 1 value, added in
+    Java 8. The TYPE forces the caller to handle "nothing".
+  * Pack it: of() (never null), ofNullable() (may be null),
+    empty() (nothing on purpose).
+  * Ask it: isPresent / isEmpty (boolean), ifPresent
+    (action), ifPresentOrElse (action + fallback).
+  * Open it: orElse (eager default), orElseGet (lazy
+    default), orElseThrow (my own exception), get (avoid).
+  * orElse vs orElseGet -> the classic interview question:
+    orElse's argument is evaluated even when the box is
+    full.
+  * isPresent vs ifPresent -> the classic typo: question
+    versus action.
+  * Never open it if you can help it: map, flatMap, filter,
+    or, stream - all of them skip the work when empty, and
+    that skip IS your null check.
+  * Use it as a RETURN TYPE only. Never a field, never a
+    parameter, never inside a collection, and never return
+    null from an Optional method.
+  * Streams hand you Optional from findFirst, findAny, min,
+    max, reduce and average -> Stream/revision.txt.

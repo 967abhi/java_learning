@@ -13,6 +13,8 @@ FOLDER MAP - where each topic lives
   NestedClasses/   -> static nested / inner / local / anon   [revision.txt + notes.txt]
   oops/            -> the whole OOPs series                  [revision.txt + ReviseConcept.txt]
   Queue/           -> queue, deque, stack, ArrayDeque        [Note.txt + revision.txt]
+  Stream/          -> java streams, pipeline, lazy eval      [Note.txt + revision.txt]
+  optional_class/  -> Optional, null safety                  [note.txt + revision.txt]
   ImmutableClass.java -> immutable classes (notes below)
 
 
