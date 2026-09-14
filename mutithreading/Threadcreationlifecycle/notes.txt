@@ -1,0 +1,655 @@
+================================================================================
+           JAVA MULTITHREADING - THREAD CREATION & LIFECYCLE NOTES
+================================================================================
+Course / Repo : coderarmy / java basic
+Folder        : mutithreading/Threadcreationlifecycle
+Files Covered : Demo.java, Demo2.java, Demo3.java, Demo4.java, Demo5.java, Demo6.java
+Author        : Abhishek's Learning Notes (Explained deeply from 0 to 100)
+================================================================================
+
+TABLE OF CONTENTS:
+--------------------------------------------------------------------------------
+1. Core Mental Model: Process vs. Thread (The Restaurant Analogy)
+2. JVM & OS Memory Architecture (What is Shared vs. What is Private)
+3. Demo.java  -> Approach 1: Extending the Thread Class
+4. Demo2.java -> Approach 2: Implementing the Runnable Interface (Why Preferred?)
+5. Demo3.java -> Thread Metadata & Properties (Name, ID, Priority, Daemon, isAlive)
+6. Demo4.java -> Two Critical Questions:
+                 - Can we call start() twice?
+                 - What happens if we call run() directly instead of start()?
+7. Demo5.java -> Concurrency, OS Time Slicing & Non-Determinism (Odd/Even Demo)
+8. Demo6.java -> The 6 Thread Lifecycle States in Java (Thread.State Enum)
+9. Complete ASCII State Transition Diagram
+10. Summary Cheat Sheet & Top Interview Traps
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. CORE MENTAL MODEL: PROCESS VS. THREAD
+--------------------------------------------------------------------------------
+
+Imagine a Restaurant:
+- The RESTAURANT BUILDING with its kitchen, refrigerator, tables, and pantry is a PROCESS.
+  - It has its own dedicated space and resources.
+  - Two different restaurants (Process A and Process B) cannot directly touch each
+    other's refrigerator or kitchen. They are isolated.
+- The CHEFS working inside that kitchen are THREADS!
+  - All chefs share the same kitchen counter and refrigerator (Shared Heap Memory).
+  - But each chef has their own notepad, their own hands, and their own current step
+    they are cooking (Private Call Stack & Program Counter).
+  - Multiple chefs can work at the same time: one chops onions, one boils soup, one bakes bread.
+
+TECHNICAL DEFINITIONS:
+- PROCESS:
+  - An instance of a program in execution (e.g., Chrome browser, IntelliJ IDE, JVM).
+  - Heavyweight: has its own dedicated, isolated memory address space allocated by the OS.
+  - Inter-Process Communication (IPC) is slow and complex.
+- THREAD:
+  - The smallest independent unit of CPU execution inside a process.
+  - Often called a "Lightweight Process".
+  - Belongs to a process. A single process can have many threads (Multithreading).
+  - Threads inside the same process share the same memory (Heap & Metaspace),
+    making context switching faster and communication very simple.
+
+
+--------------------------------------------------------------------------------
+2. JVM & OS MEMORY ARCHITECTURE (SHARED VS PRIVATE)
+--------------------------------------------------------------------------------
+
+When the JVM starts your program, it creates a process.
+Inside this process:
+
+                    +------------------------------------------+
+                    |               JVM PROCESS                |
+                    |                                          |
+                    |  +------------------------------------+  |
+                    |  |       SHARED: HEAP MEMORY          |  |
+                    |  | (All Objects, Instance Variables,  |  |
+                    |  |   Shared Arrays live here)         |  |
+                    |  +------------------------------------+  |
+                    |  |       SHARED: METASPACE / METHOD   |  |
+                    |  | (Class definitions, Static vars)   |  |
+                    |  +------------------------------------+  |
+                    |                                          |
+                    |   Thread-1               Thread-2        |
+                    |  +-------------+        +-------------+  |
+                    |  | Call Stack  |        | Call Stack  |  |
+                    |  | (Local vars,|        | (Local vars,|  |
+                    |  |  Frames)    |        |  Frames)    |  |
+                    |  +-------------+        +-------------+  |
+                    |  | PC Register |        | PC Register |  |
+                    |  | (Curr Inst) |        | (Curr Inst) |  |
+                    |  +-------------+        +-------------+  |
+                    +------------------------------------------+
+
+- SHARED among all threads:
+  1. Heap Memory: Objects created with `new` (like `MyThread mt = new MyThread()`).
+  2. Metaspace / Method Area: Static variables and bytecode.
+  *Note:* Because Heap is shared, if two threads edit the same variable at the same
+  time without synchronization, you get RACE CONDITIONS (data corruption)!
+
+- PRIVATE to EACH thread:
+  1. Call Stack: Stores active method frames, local variables, and primitive types.
+  2. Program Counter (PC Register): Keeps track of which exact bytecode instruction
+     this specific thread is currently executing.
+
+
+--------------------------------------------------------------------------------
+3. DEMO.JAVA -> APPROACH 1: EXTENDING THE THREAD CLASS
+--------------------------------------------------------------------------------
+
+Look at your code in Demo.java:
+
+```java
+public class Demo {
+    public static void main(String[] args) {
+        MyThread mt = new MyThread();
+        mt.start();
+    }
+}
+
+class MyThread extends Thread {
+    @Override
+    public void run() {
+        System.out.println("thread is running");
+    }
+}
+```
+
+HOW IT WORKS STEP-BY-STEP:
+1. `class MyThread extends Thread`:
+   - `java.lang.Thread` is Java's built-in class that represents a thread of execution.
+   - By extending it, `MyThread` inherits all thread behaviors.
+
+2. `@Override public void run()`:
+   - The `run()` method is the ENTRY POINT of the new thread (just like `main()`
+     is the entry point for the primary thread).
+   - Whatever code you write inside `run()` is the work that the thread will execute.
+
+3. `MyThread mt = new MyThread();`:
+   - At this moment, this is ONLY a normal Java object sitting in the Heap memory!
+   - NO new OS thread has been created yet!
+
+4. `mt.start();` -> THIS IS WHERE THE MAGIC HAPPENS!
+   - When you call `mt.start()`, the JVM does three internal things:
+     a) Makes a native call to the Operating System kernel (`native void start0()`).
+     b) The OS allocates a brand-new OS Thread with its own private Call Stack and PC.
+     c) The thread moves to the RUNNABLE state. When the CPU gives it a time slice,
+        the JVM automatically invokes `MyThread.run()` inside this NEW thread's stack!
+
+Abhishek's note from Demo.java:
+"// t1.start jvm asks os to create a new thread thread get stack/pc space"
+"// Thread execute run method"
+-> This note was 100% spot-on!
+
+
+--------------------------------------------------------------------------------
+4. DEMO2.JAVA -> APPROACH 2: IMPLEMENTING RUNNABLE INTERFACE
+--------------------------------------------------------------------------------
+
+Look at your code in Demo2.java:
+
+```java
+public class Demo2 {
+    public static void main(String[] args) {
+        Mytask task = new Mytask();
+        Thread t1 = new Thread(task);
+        t1.start();
+    }
+}
+
+class Mytask implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("task thread is running");
+    }
+}
+```
+
+HOW IT WORKS:
+1. `java.lang.Runnable` is a `@FunctionalInterface` with exactly one method:
+   `public abstract void run();`
+2. `Mytask` represents the JOB / TASK to be executed.
+3. `Thread t1 = new Thread(task);`
+   - You pass the `task` (the work) into the `Thread` object (the worker).
+   - When `t1.start()` runs, `t1` invokes `task.run()`.
+
+WHY IS RUNNABLE VASTLY PREFERRED OVER EXTENDING THREAD? (Top Interview Question!)
+1. Single Inheritance Limitation in Java:
+   - Java does NOT support multiple class inheritance (`extends A, B` is illegal).
+   - If your class does `class Mytask extends Thread`, it can NEVER extend any other
+     class (like `class Mytask extends Employee` or `extends BaseService`).
+   - If you do `class Mytask implements Runnable`, you can still extend any other class!
+2. Separation of Concerns (Task vs Worker):
+   - `Runnable` separates the TASK (what needs to be done) from the THREAD (who does it).
+   - A thread is an execution engine (worker). The code it executes is a job (task).
+     Mixing both in one class violates Single Responsibility Principle.
+3. Reusability with Thread Pools (`ExecutorService`):
+   - In production backend apps, we NEVER create `new Thread()` manually because creating
+     an OS thread is very expensive (~1MB stack memory per thread).
+   - Instead, we use Thread Pools: 10 worker threads execute 10,000 `Runnable` tasks.
+   - You cannot submit a class that extends `Thread` to a thread pool cleanly, but you
+     can submit `Runnable` tasks effortlessly!
+4. Lambda Expressions:
+   - Since `Runnable` is a functional interface, you don't even need a separate class:
+     `Thread t1 = new Thread(() -> System.out.println("Running via lambda!"));`
+
+
+--------------------------------------------------------------------------------
+5. DEMO3.JAVA -> THREAD PROPERTIES & METADATA
+--------------------------------------------------------------------------------
+
+Look at your code in Demo3.java:
+
+```java
+public class Demo3 {
+    public static void main(String[] args) {
+        System.out.println(Thread.currentThread().getId());
+        System.out.println(Thread.currentThread().getName());
+
+        Thread T1 = new Thread(() -> {
+            System.out.println("thread is running");
+        });
+        T1.start();
+        System.out.println(T1.getId());
+        System.out.println(T1.getName());
+    }
+}
+```
+
+EVERY THREAD IN JAVA CARRIES METADATA:
+1. `Thread.currentThread()`:
+   - Static method that returns a reference to whichever thread is currently executing
+     this exact line of code.
+   - When called in `main()`, it returns the `main` thread object.
+
+2. `getName()` and `setName(String name)`:
+   - Every thread has a human-readable name.
+   - Default name for main thread is `"main"`.
+   - Default names for worker threads are `"Thread-0"`, `"Thread-1"`, `"Thread-2"`, etc.
+   - In production, ALWAYS name your threads:
+     `Thread t = new Thread(task, "PaymentProcessor-Thread");`
+     Why? When a server crashes or deadlocks, the Thread Dump and logs will show
+     "PaymentProcessor-Thread" instead of a cryptic "Thread-47"!
+
+3. `getId()` (or in Java 19+ `threadId()`):
+   - A unique positive `long` identifier assigned by JVM when the thread is created.
+   - Lives for the lifetime of the thread and cannot be changed.
+
+4. `getPriority()` and `setPriority(int newPriority)`:
+   - Values range from 1 to 10:
+     - `Thread.MIN_PRIORITY`  = 1
+     - `Thread.NORM_PRIORITY` = 5 (Default for all threads)
+     - `Thread.MAX_PRIORITY`  = 10
+   - *Crucial Real-World Note:* Thread priority is only a HINT to the OS thread scheduler.
+     Modern operating systems (Windows, Linux, macOS) have sophisticated preemptive
+     schedulers that may completely ignore Java thread priorities. Do NOT rely on
+     priority for program correctness!
+
+5. `isDaemon()` and `setDaemon(boolean on)`:
+   - USER THREAD (Non-Daemon, default):
+     - The JVM will keep running and will NOT shut down as long as even ONE user
+       thread is still alive!
+   - DAEMON THREAD (Background Service Thread):
+     - Example: Garbage Collector (GC), JVM finalizer, background autosave.
+     - The JVM does NOT wait for daemon threads! When all user threads finish, the
+       JVM shuts down immediately, killing all daemon threads abruptly.
+     - You must call `t.setDaemon(true)` BEFORE calling `t.start()`. Calling it
+       after `start()` throws `IllegalThreadStateException`.
+
+6. `isAlive()`:
+   - Returns `true` if the thread has been started (`start()` was called) and has NOT
+     yet died (still running or waiting).
+   - Returns `false` before `start()` and after `run()` finishes.
+
+
+--------------------------------------------------------------------------------
+6. DEMO4.JAVA -> TWO CRITICAL QUESTIONS (START VS RUN)
+--------------------------------------------------------------------------------
+
+Look at Demo4.java:
+
+```java
+public class Demo4 {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -> {
+            System.out.println("Current thread is " + Thread.currentThread().getName());
+        });
+
+        // t1.start();
+        // t1.start();
+        t1.run();
+    }
+}
+```
+
+QUESTION 1: CAN WE START A THREAD TWICE?
+Can we do:
+`t1.start();`
+`t1.start();` ?
+ANSWER: NO! NEVER!
+- If you call `t1.start()` a second time, Java throws:
+  `java.lang.IllegalThreadStateException`
+- Why?
+  - A thread has a lifecycle. Once `start()` is invoked, the thread transitions from
+    `NEW` to `RUNNABLE`.
+  - Once a thread completes its task, it enters the `TERMINATED` state (dead).
+  - In Java, a dead thread or an already-running thread CANNOT be revived or restarted.
+    If you need to do the task again, you must instantiate a new `Thread` object!
+
+QUESTION 2: WHAT HAPPENS IF WE CALL `t1.run()` INSTEAD OF `t1.start()`?
+Look at Demo4: you wrote `t1.run()`.
+- If you run `t1.run()`, the output is:
+  `Current thread is main`
+- If you run `t1.start()`, the output is:
+  `Current thread is Thread-0`
+
+WHY?
+- `t1.start()`:
+  - Asks the OS to create a BRAND NEW THREAD with its own new Call Stack.
+  - The new thread executes `run()` asynchronously.
+  - Both `main` thread and `Thread-0` run concurrently.
+- `t1.run()`:
+  - DOES NOT create any new thread!
+  - It is treated just like a regular, ordinary method call (like calling `obj.print()`).
+  - It executes synchronously on the CURRENT THREAD (`main`), blocking `main` until
+    it finishes!
+- Rule of thumb: If you want multithreading, ALWAYS call `start()`, NEVER call `run()`!
+
+
+--------------------------------------------------------------------------------
+7. DEMO5.JAVA -> CONCURRENCY, TIME SLICING & NON-DETERMINISM
+--------------------------------------------------------------------------------
+
+Look at Demo5.java:
+
+```java
+public class Demo5 {
+    public static void main(String[] args) {
+        // T1: prints even numbers (2, 4, 6, 8 ...)
+        Thread t1 = new Thread(() -> {
+            for (int i = 1; i <= 100; i++) {
+                if (i % 2 == 0) System.out.println("T1 : " + i);
+            }
+        });
+
+        // T2: prints odd numbers (1, 3, 5, 7 ...)
+        Thread t2 = new Thread(() -> {
+            for (int i = 1; i <= 100; i++) {
+                if (i % 2 != 0) System.out.println("T2 : " + i);
+            }
+        });
+
+        t1.start();
+        t2.start();
+    }
+}
+```
+
+WHAT HAPPENS WHEN YOU RUN THIS PROGRAM?
+- You might expect the output to be strictly alternating:
+  T2 : 1, T1 : 2, T2 : 3, T1 : 4, T2 : 5 ...
+- But when you run it, the output looks like:
+  T1 : 2
+  T1 : 4
+  T1 : 6
+  T2 : 1
+  T2 : 3
+  T1 : 8
+  T2 : 5
+  T2 : 7 ...
+- And if you run it 5 times, every single run will produce a DIFFERENT order!
+
+WHY? THIS IS CALLED "NON-DETERMINISM":
+1. The Operating System Thread Scheduler:
+   - Your computer has physical CPU cores. If multiple threads are ready to run,
+     the OS Thread Scheduler decides who gets CPU time and for how long.
+   - It uses a mechanism called TIME SLICING (giving each thread a tiny slice of
+     CPU time, e.g., a few milliseconds).
+2. Context Switching:
+   - The OS lets T1 execute for a few microseconds (prints 2, 4, 6).
+   - The time slice ends. The OS saves T1's registers and pauses T1 (Preemption).
+   - The OS loads T2's state onto the CPU (Context Switch).
+   - T2 executes for a few microseconds (prints 1, 3).
+3. Core Takeaway:
+   - Threads run ASYNCHRONOUSLY and CONCURRENTLY.
+   - You can NEVER predict the exact order of execution of independent threads!
+   - Never write code that assumes Thread A will finish before Thread B unless you
+     explicitly synchronize them (e.g. using `join()`, `CountDownLatch`, locks).
+
+
+--------------------------------------------------------------------------------
+8. DEMO6.JAVA -> THE 6 THREAD LIFECYCLE STATES (JAVA.LANG.THREAD.STATE)
+--------------------------------------------------------------------------------
+
+Look at your code in Demo6.java:
+
+```java
+public class Demo6 {
+    public static void main(String[] args) {
+        Thread mainThread = Thread.currentThread();
+
+        Thread t1 = new Thread(() -> {
+            System.out.println("Name of current thread is " + Thread.currentThread().getName());
+            System.out.println("Main thread state " + mainThread.getState());
+        });
+
+        System.out.println(t1.getState()); // Prints: NEW
+
+        t1.start();
+        System.out.println(t1.getState()); // Prints: RUNNABLE
+
+        try {
+            Thread.sleep(2000);            // main thread sleeps for 2 seconds
+        } catch (Exception e) {}
+
+        System.out.println(t1.getState()); // Prints: TERMINATED
+    }
+}
+```
+
+Java defines EXACTLY 6 STATES for a thread inside the `java.lang.Thread.State` enum.
+At any point in time, a thread can be in ONE and ONLY ONE of these 6 states:
+
+================================================================================
+STATE 1: NEW
+================================================================================
+- When: A thread object is created, but `start()` has NOT been called yet.
+  `Thread t1 = new Thread(task);`  // State is NEW!
+- Memory status: Exists only as an object on the JVM Heap. No OS thread or Call Stack
+  has been allocated yet.
+
+================================================================================
+STATE 2: RUNNABLE
+================================================================================
+- When: `t1.start()` has been called.
+- Note: In Java, "RUNNABLE" includes TWO sub-states at the OS level:
+  a) READY: Thread is ready and sitting in the queue waiting for the CPU.
+  b) RUNNING: The CPU is actively executing the thread's instructions.
+- Java groups both into `RUNNABLE` because the JVM does not track millisecond-level
+  OS scheduler switches.
+
+================================================================================
+STATE 3: BLOCKED
+================================================================================
+- When: The thread is waiting to acquire a monitor lock (`synchronized` block/method).
+- Example:
+  Thread-1 is inside `synchronized void withdraw()`.
+  Thread-2 tries to enter `withdraw()`, but Thread-1 holds the lock.
+  Thread-2 is moved to the BLOCKED state until Thread-1 exits and releases the lock.
+
+================================================================================
+STATE 4: WAITING
+================================================================================
+- When: The thread is waiting INDEFINITELY for another thread to perform a specific action.
+- There is NO timeout! It will wait forever until someone wakes it up.
+- How it enters WAITING:
+  1. `object.wait()`      -> waiting for another thread to call `object.notify()`
+  2. `thread.join()`      -> waiting for `thread` to terminate
+  3. `LockSupport.park()` -> waiting for an unpark permit
+
+================================================================================
+STATE 5: TIMED_WAITING
+================================================================================
+- When: The thread is waiting for another thread or for a SPECIFIED TIME PERIOD.
+- It will wake up either when notified OR when the timer expires!
+- How it enters TIMED_WAITING:
+  1. `Thread.sleep(milliseconds)` -> seen in Demo6 (`Thread.sleep(2000)`)!
+  2. `object.wait(timeout)`
+  3. `thread.join(timeout)`
+  4. `LockSupport.parkNanos()` / `parkUntil()`
+
+================================================================================
+STATE 6: TERMINATED (DEAD)
+================================================================================
+- When: The thread has finished executing its `run()` method.
+- This happens either:
+  a) Normally: the `run()` method runs to the end and returns.
+  b) Abnormally: an uncaught exception was thrown and killed the thread.
+- Once a thread is TERMINATED, it can NEVER be restarted!
+
+
+--------------------------------------------------------------------------------
+9. COMPLETE ASCII STATE TRANSITION DIAGRAM
+--------------------------------------------------------------------------------
+
+                           +---------------+
+                           |      NEW      |
+                           +---------------+
+                                   |
+                                   |  t.start()
+                                   v
+             +-------------------------------------------+
+             |                 RUNNABLE                  |
+             |   (Ready in OS queue / Running on CPU)    |
+             +-------------------------------------------+
+                 |               |               |
+   waiting for   |  wait()       |  sleep(t)     |
+   monitor lock  |  join()       |  wait(t)      |
+                 |               |  join(t)      |
+                 v               v               v
+          +-----------+   +-----------+   +---------------+
+          |  BLOCKED  |   |  WAITING  |   | TIMED_WAITING |
+          +-----------+   +-----------+   +---------------+
+                 |               |               |
+     lock        |  notify()     |  timer expires|
+     acquired    |  joined died  |  or notify()  |
+                 +---------------+---------------+
+                                 |
+                                 v
+             +-------------------------------------------+
+             |                 RUNNABLE                  |
+             +-------------------------------------------+
+                                   |
+                                   | run() finishes or uncaught exception
+                                   v
+                           +---------------+
+                           |  TERMINATED   |
+                           +---------------+
+
+
+--------------------------------------------------------------------------------
+10. SUMMARY CHEAT SHEET & TOP INTERVIEW TRAPS
+--------------------------------------------------------------------------------
+
+| QUESTION / CONCEPT       | THE EXACT ANSWER YOU GIVE IN AN INTERVIEW             |
+|--------------------------|-------------------------------------------------------|
+| Process vs Thread        | Process is an isolated program with its own memory;   |
+|                          | Thread is a lightweight worker sharing process heap.  |
+| Heap vs Stack            | Heap is shared across all threads; Stack & PC are     |
+|                          | strictly private to each individual thread.           |
+| Thread vs Runnable       | Prefer Runnable: avoids single-inheritance lock,      |
+|                          | separates task from worker, works with ThreadPools.   |
+| start() vs run()         | start() asks OS to create new thread & call stack;    |
+|                          | run() is just a normal method call on the same thread.|
+| Calling start() twice    | Throws IllegalThreadStateException at runtime.        |
+| Number of Thread States  | Exactly 6 (NEW, RUNNABLE, BLOCKED, WAITING,          |
+|                          | TIMED_WAITING, TERMINATED).                           |
+| Ready vs Running in Java | Java merges both into RUNNABLE because OS handles CPU |
+|                          | scheduling invisibly under the hood.                  |
+| Execution Order          | Non-deterministic; controlled by OS scheduler time   |
+|                          | slicing; never assume thread execution order!        |
+| Daemon Thread            | Background helper thread (e.g. GC). JVM terminates    |
+|                          | immediately when all non-daemon threads finish.       |
+
+================================================================================
+                    END OF THREAD CREATION & LIFECYCLE NOTES
+================================================================================
+
+
+
+
+
+=============
+================================================================================
+           JAVA MULTITHREADING - QUICK NOTEBOOK REVISION
+================================================================================
+
+1. PROCESS VS THREAD (Restaurant Mental Model)
+--------------------------------------------------------------------------------
+- PROCESS = The Restaurant Building & Kitchen (Isolated OS address space).
+- THREAD  = The Chefs working inside (Lightweight execution units).
+
+[MEMORY ARCHITECTURE]
++-----------------------------------------------------------+
+|                       JVM PROCESS                         |
+|  SHARED:                                                  |
+|   - HEAP MEMORY       -> Objects (new), instance fields   |
+|   - METASPACE / METHOD-> Static variables, bytecode       |
+|                                                           |
+|  PRIVATE (Per Thread):                                    |
+|   - CALL STACK        -> Local variables, method frames   |
+|   - PC REGISTER       -> Current bytecode instruction ptr |
++-----------------------------------------------------------+
+* Note: Shared Heap without synchronization = RACE CONDITIONS (data bugs).
+* Note: Local variables on the stack are ALWAYS thread-safe!
+
+
+2. TWO WAYS TO CREATE A THREAD
+--------------------------------------------------------------------------------
+Approach 1: Extends Thread (Demo.java)
+   class MyThread extends Thread {
+       public void run() { System.out.println("Running"); }
+   }
+   MyThread t = new MyThread();
+   t.start();
+
+Approach 2: Implements Runnable (Demo2.java) -> [PREFERRED!]
+   class MyTask implements Runnable {
+       public void run() { System.out.println("Running"); }
+   }
+   Thread t = new Thread(new MyTask());
+   t.start();
+
+   // Lambda one-liner:
+   Thread t = new Thread(() -> System.out.println("Running"));
+   t.start();
+
+WHY RUNNABLE > EXTENDS THREAD?
+  1. No Single-Inheritance Lock: Can still do `class X extends Base implements Runnable`.
+  2. Separation of Concerns: Separates Task (job) from Thread (worker).
+  3. Thread Pools: `ExecutorService` accepts Runnable, not Thread subclasses.
+
+
+3. THREAD METADATA & PROPERTIES (Demo3.java)
+--------------------------------------------------------------------------------
+- Thread.currentThread() : Reference to thread running current line.
+- getName() / setName()  : Always give custom names in production (e.g. "OrderWorker-1")
+                           -> Makes production thread dumps readable!
+- getId() / threadId()   : Unique JVM positive long ID.
+- Priority (1 to 10)     : MIN=1, NORM=5 (default), MAX=10.
+                           * Only a hint to OS! Never rely on it for correctness.
+- User vs Daemon Thread  :
+   - User (Default) : JVM WILL NOT exit until all user threads finish.
+   - Daemon (Helper): GC, autosave. JVM kills them instantly when user threads end.
+   - Rule: Call `t.setDaemon(true)` BEFORE `t.start()`, else throws IllegalThreadStateException!
+- isAlive()              : true from start() until run() completes.
+
+
+4. TWO GOLDEN INTERVIEW QUESTIONS (Demo4.java)
+--------------------------------------------------------------------------------
+Q1: Can we call start() twice on the same thread?
+    -> NO! Throws `java.lang.IllegalThreadStateException`.
+    -> A thread lifecycle is strictly one-way. Terminated threads cannot restart.
+
+Q2: What if we call run() directly instead of start()?
+    -> `t.start()`: Native OS call (`start0`), spawns NEW thread + NEW stack (async).
+    -> `t.run()`  : Normal method call on CURRENT thread (main), blocks main (sync).
+
+
+5. TIME SLICING & NON-DETERMINISM (Demo5.java)
+--------------------------------------------------------------------------------
+- When T1 (Evens) and T2 (Odds) run together, output is interleaved randomly.
+- Reason: OS Preemptive Scheduler gives tiny CPU time slices (quanta) to threads.
+- Context Switch: OS pauses T1, saves registers, loads T2, runs T2.
+- Rule: Execution order is NON-DETERMINISTIC! Never assume Thread A finishes before B.
+
+
+6. THE 6 THREAD LIFECYCLE STATES (Demo6.java - Thread.State)
+--------------------------------------------------------------------------------
+1. NEW           : `new Thread()` created on heap; `start()` NOT yet called.
+2. RUNNABLE      : `start()` called. Ready in OS queue OR running on CPU.
+3. BLOCKED       : Waiting to acquire a monitor lock for a `synchronized` block.
+4. WAITING       : Waiting indefinitely with NO timeout (`wait()`, `join()`).
+5. TIMED_WAITING : Waiting with timeout (`sleep(ms)`, `wait(timeout)`, `join(timeout)`).
+6. TERMINATED    : `run()` finished normally or killed by uncaught exception. Dead.
+
+[LIFECYCLE FLOWCHART]
+        [NEW]
+          |  t.start()
+          v
+     [RUNNABLE] <---------------------------------------------+
+       |   ^                                                   |
+       |   | lock acquired                                     |
+       v   |                                                   |
+    [BLOCKED] (waiting for synchronized monitor lock)          |
+       |                                                       |
+       | sleep(t) / wait(t)        wait() / join()             |
+       v                           v                           |
+  [TIMED_WAITING]              [WAITING]                       |
+       |                           |                           |
+       | timer expires             | notify() / joined died    |
+       +---------------------------+---------------------------+
+          |
+          v (run completes)
+     [TERMINATED]

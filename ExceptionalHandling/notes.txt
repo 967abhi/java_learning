@@ -1,0 +1,100 @@
+User enters wrong input int eh code suppose that file is missing so there are lot of thing in the programmer 
+The problems that comes in the java in lanugage 
+so they categories in two types 
+1.Errors (Serious problems that are not recoverable or unhandleable)
+2.Exception (A recoverable or handleable abnormal condition that occurs during the program of the execution then we called it Exception)
+
+What is Exception ?
+A recoverable or handleable abnormal condition that occurs during the program of the execution then we called it Exception 
+
+So everything in java is object then Exception is also a object in java 
+most common example is 
+int num=a/b and if the b is 0 then this is divide by zero error and it thows a Exception and called arthmetic Exception
+all this Exception is recoverable
+Wrong input enter by the user then we can say that write once more that are not correct 
+
+What is Errors ? 
+So this is a serious problems that are not recoverable 
+so we categories into two part 
+OutofMemoryError
+StackOverflowError
+So this is also the object 
+package ExceptionalHandling;
+
+public class Demo {
+    public static void main(String[] args) {
+        System.out.println("start");
+        // try {
+        int a = 5;
+        int b = 0;
+        // System.out.println(a / b);
+        // }
+        // catch(Exception e)
+        // {
+        // System.out.println("You are enter wrong input");
+        // }
+        // System.out.println("end");
+        main(args);
+    }
+
+}
+
+ so the above the program is the program that are care by the both exception and the error here what happening the a/b is printing the exception error  and then main args is printing the infine error memory out of the memeory 
+ error 
+
+
+
+ Why Exception Handling?
+ We can handle Exception handling by the if else 
+ like the program is 
+ if(b==0){
+    return 
+ }
+ else{
+    a/b
+ }
+ But what happens if the number is very large or very small so we can't handle it by the if else 
+ so we use the Exception Handling in java
+ so if else is graceful handling or presentive handling 
+ if exception handling we not do then jvm decides everything so we took control of the program and we prevent it 
+-> flow of control handle by us , Debugging is easy and the user experience will increase by the Exception handling nn 
+
+
+What Exception trying to say?
+int a=5;
+int b=0;
+sout(a/b);
+-> it will throw the exception 
+java gives the exception throw like jvm:new Arithmatic Exception(herewillmsg); ("/byzero") so it will throw the error it will not exceute the next line of the code 
+so this way we called the Default Exception handling 
+
+What is Exception Handling?
+-> This is a mechanism that is used to handle the exception that occurs during the program of the execution
+main()->method a()->method b() so it come in the stack and java is LIFO -> last in first out 
+so what java do suppose that if the code is written on the b() method and then the issues came the Arithmatic Exception so then it show the A() method and told to check that A() method have the exception or not 
+
+-> if A() method don't have the exception so it show the main() method and told to check that main() method have the exception or not 
+->So if main will not take care then it will return the error or print into the console -> Default Exception Handling 
+
+
+-> if main will take care of the exception then it will not print the error or it will not print into the console -> it is called the user defined Exception Handling
+Stack Trace:- 
+-> This is a process of showing the exception that occurs during the program of the execution
+-> It is a sequence of method calls that are made during the program of the execution
+
+
+Syntax of Exception Handling:- 
+try {
+    // code that may throw an exception
+} catch (ExceptionType e) {
+    // code to handle the exception
+}
+
+Example:- 
+try {
+    int a = 5;
+    int b = 0;
+    System.out.println(a / b);
+} catch (ArithmeticException e) {
+    System.out.println(e.getMessage());
+}
