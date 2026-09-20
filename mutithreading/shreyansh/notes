@@ -1,0 +1,105 @@
+What is process ?
+So when ever some one write the code and then generate the bytecode and run the program then on that time process will create inside the os. 
+And every process have there independent memory  
+so it would look like 
+so the jvm create the process 
+===============================================================================================================
+|                                                                                                             |
+|                                                    OS                                                         |
+|                                                                                                             |
+|        +--------------------+                            +--------------------+                           |
+|        |                    |                            |                    |                           |
+|        |  Process 1         |                            |  Process 2         |                           |
+|        |    JVM 1            |                            |    JVM 2           |                           |
+|        |                    |                            |                    |                           |
+|        |   Memory 1         |                            |   Memory 2         |                           |
+|        |                    |                            |                    |                           |
+|        +--------------------+                            +--------------------+                           |
+===============================================================================================================
+
+what is thread ?
+in this os we have process and inside the process we have thread and every thread have independent stack (LIFO) but share the same 
+memory which is heap.
+->one process will have multiple thread 
+Smallest sequence of instructions that are execute by cpu independently that are called thread 
+
+
+===============================================================================================================
+So suppose that there are two process are running so there memory will be independed they will not have the same memory 
+====================================
+When a Process is created it start with 1 thread and that initial thread know as 'main thread' and from that we can create multiple threads to perform task concurrently. 
+So one process have multiple thread 
+
+
+
+How much memory does process get? 
+answer:- While creating the process "java MainClassName" command a new JVM instance will get created and we can tell how much memory need to be allocated . 
+
+java-Xm256m-Xmx2g MainClassName
+-Xms<size>:
+This will set the intial heap size,above i allocated 256mb. It will start with 256mb of memory.
+-Xmx<size>:
+This will set the maximum heap size,above i allocated 2gb. It will not exceed more than 2gb.
+if tries to allocate more memory "outofMemoryError"will occur
+
+how the program run 
+1.Create a process 
+2.jvm instance created 
+
+
+
+So the heap Memory 
+Code segment Data Segment are shared to the every thread suppose that there are three thread then that three thread will share this but the every thread have there individual Register,stack,counter,thread1 so every thread have this 
+
+
+1.Code segment:- 
+Contains the complied BYTECODE i.e machine code of the java program 
+It's read only 
+All thread with the same process share the same code segment 
+2.Data segment 
+Contains the GLOBAL and STATIC variables. 
+All thread within the same process,share the same data segment.
+Threads can read and modify the same data. 
+Synchronization is required between multiple threads. 
+Heap:- 
+objects are created on the heap memory with the new keyword
+Heap is shared among all the threads of the same process 
+Threads can read and modify the heap data. 
+Synchronization is required between multiple threads.
+
+Stack: 
+Each thread has it's own stack;
+It manages,method calls,local variable 
+Register: 
+When jit just-in-time compiles the bytecode into native machine codes its uses registers to 
+optimized the generated machine code 
+Also helps in context switching between threads 
+Each thread has it's own Register
+Counter that is Program counter: 
+->Also known as program counter it point to the instructions which is getting executed 
+->Increments its counter after succesfully  execution of the instructions 
+
+All these are managed by jvm 
+
+So like this when suppose that we have mutliple task like this so we are runnign the program  and then 50 cpu executed then it will context switch and then it will pick the again other t2 thread and then it will take the another task 
+
+so suppose that if you have multiple cpu like 
+cpu1 and cpu2 and cpu3 
+then on that time 
+t1 pick by cpu1 and t2 pick by cpu2 then on this time called parralllism 
+
+Definition of Multithreading:- 
+Allows a program to perform multiple task or multiple operation simultaneously 
+Multiple threads share the same resources such as a memory  space but still can perform task independently 
+Benefits :- 
+Improved performance by task parallelism
+Responsivness
+Resource sharing 
+Challeng:
+Concurrency issues by deadlock data inconsistency etc 
+synchornized overhead.
+testing and dubbing is diffuclt
+
+
+
+Multitasking vs multithread
