@@ -27,6 +27,7 @@
     --t-adv: var(--accent);
     --t-col: var(--accent);
     --t-str: var(--accent);
+    --t-multi: var(--accent);
     --t-rec: var(--accent);
     --track: var(--accent);
 
@@ -57,6 +58,7 @@
       --t-adv: var(--accent);
       --t-col: var(--accent);
       --t-str: var(--accent);
+      --t-multi: var(--accent);
       --t-rec: var(--accent);
     }
   }
@@ -82,6 +84,7 @@
     --t-adv: var(--accent);
     --t-col: var(--accent);
     --t-str: var(--accent);
+    --t-multi: var(--accent);
     --t-rec: var(--accent);
   }
 
@@ -1294,13 +1297,6 @@
     </div>
   </div>
   <div class="tabs" role="tablist" aria-label="Note tracks">
-<<<<<<< Updated upstream
-    <button class="tab" role="tab" id="tab-core" aria-controls="p-core" data-panel="p-core" data-track="core" aria-selected="true">Core Java <em>14</em></button>
-    <button class="tab" role="tab" id="tab-adv" aria-controls="p-adv" data-panel="p-adv" data-track="adv" aria-selected="false">Advanced Java <em>13</em></button>
-    <button class="tab" role="tab" id="tab-col" aria-controls="p-col" data-panel="p-col" data-track="col" aria-selected="false">Collections <em>15</em></button>
-    <button class="tab" role="tab" id="tab-str" aria-controls="p-str" data-panel="p-str" data-track="str" aria-selected="false">Streams <em>07</em></button>
-    <button class="tab" role="tab" id="tab-rec" aria-controls="p-rec" data-panel="p-rec" data-track="rec" aria-selected="false">Recall &amp; Gaps <em>04</em></button>
-=======
     <button class="tab" role="tab" id="tab-core" aria-controls="p-core" data-panel="p-core" data-track="core"
       aria-selected="true">Core Java <em>14</em></button>
     <button class="tab" role="tab" id="tab-adv" aria-controls="p-adv" data-panel="p-adv" data-track="adv"
@@ -1309,9 +1305,10 @@
       aria-selected="false">Collections <em>15</em></button>
     <button class="tab" role="tab" id="tab-str" aria-controls="p-str" data-panel="p-str" data-track="str"
       aria-selected="false">Streams <em>08</em></button>
+    <button class="tab" role="tab" id="tab-multi" aria-controls="p-multi" data-panel="p-multi" data-track="multi"
+      aria-selected="false">Multithreading <em>10</em></button>
     <button class="tab" role="tab" id="tab-rec" aria-controls="p-rec" data-panel="p-rec" data-track="rec"
       aria-selected="false">Recall &amp; Gaps <em>04</em></button>
->>>>>>> Stashed changes
   </div>
 </header>
 
@@ -3901,15 +3898,6 @@ String label = switch (grade) {                  <i>// an expression, so it must
 
 if (o instanceof Student s &amp;&amp; s.marks() &gt; 90) { ... }   <i>// test and bind in one</i></pre>
 
-<<<<<<< Updated upstream
-      <div class="deep"><span class="lbl">Design note &mdash; how to use these without being annoying about it</span>
-        <ul>
-          <li><b>Records are for data, not for everything.</b> They are transparent carriers: all components are public through accessors. If the type has behaviour or hidden invariants, it is a class.</li>
-          <li><b><code>Optional</code> is a return type.</b> Not a field (it is not serialisable and adds an object per instance), not a parameter (the caller then has to wrap). And <code>opt.get()</code> without <code>isPresent()</code> is just a NullPointerException wearing a costume &mdash; use <code>orElse</code>, <code>orElseGet</code>, <code>orElseThrow</code>, <code>map</code>.</li>
-          <li><b><code>var</code> is for when the right-hand side already names the type.</b> <code>var list = new ArrayList&lt;String&gt;()</code> reads fine; <code>var x = compute()</code> hides exactly the information the reader needed.</li>
-          <li><b>Sealed + records + switch patterns</b> is the combination worth knowing as one idea: a closed set of shapes the compiler can check exhaustively. It is how Java expresses a discriminated union.</li>
-        </ul>
-=======
         <div class="deep"><span class="lbl">Design note &mdash; how to use these without being annoying about it</span>
           <ul>
             <li><b>Records are for data, not for everything.</b> They are transparent carriers: all components are
@@ -3951,7 +3939,6 @@ if (o instanceof Student s &amp;&amp; s.marks() &gt; 90) { ... }   <i>// test an
           <span><b>3</b> animated mechanisms</span>
           <span><b>Asked in</b> ~90% of interviews</span>
         </div>
->>>>>>> Stashed changes
       </div>
 
       <!-- col 1 -->
@@ -5935,73 +5922,7 @@ Collections.binarySearch(sorted, 25);   <b>// -3 &mdash; not found; it belongs a
             &ldquo;stream is dead&rdquo;, which is exactly right &mdash; card&nbsp;03 has the exception it throws.</li>
         </ul>
 
-<<<<<<< Updated upstream
-      <div class="say"><span class="lbl">Say it out loud</span><p>Most of the collections API hands back <b>views, not copies</b> &mdash; and &ldquo;unmodifiable&rdquo; means <b>you</b> cannot change it, not that it cannot change.</p></div>
-    </section>
-
-    <!-- col 15 -->
-    <section id="k11">
-      <div class="s-head"><span class="s-num">15</span><h2>The one-page comparison sheet</h2><span class="src">set/note1.txt &sect;19</span></div>
-      <p class="s-why">If you can reproduce this table, the collections round is finished</p>
-
-      <div class="tbl"><table>
-        <tr><th>#</th><th>The line to remember</th></tr>
-        <tr><td>1</td><td>A Set is internally a <b>HashMap with a dummy <code>PRESENT</code></b> value.</td></tr>
-        <tr><td>2</td><td><code>add</code> &rarr; <code>put</code>, <code>contains</code> &rarr; <code>containsKey</code>, <code>remove</code> &rarr; <code>remove</code>.</td></tr>
-        <tr><td>3</td><td><code>index = hashCode() % capacity</code> &mdash; really <code>hash &amp; (n-1)</code>, hence power-of-two capacity.</td></tr>
-        <tr><td>4</td><td>Collision &rarr; <b>chaining</b> in the bucket. Java does not use open addressing.</td></tr>
-        <tr><td>5</td><td><code>equals()</code> true <b>&rArr;</b> hash codes equal. <b>The reverse is not true.</b></td></tr>
-        <tr><td>6</td><td>Load factor <b>0.75</b> &rarr; rehash &rarr; <b>double</b> the array, re-index everything.</td></tr>
-        <tr><td>7</td><td>Default capacity <b>16</b>; 16 &rarr; 32 &rarr; 64 &rarr; 128.</td></tr>
-        <tr><td>8</td><td>Chain of <b>8</b> (table &ge; 64) &rarr; <b>red-black tree</b>; back to a list at <b>6</b>.</td></tr>
-        <tr><td>9</td><td>LinkedHashSet = hashing + a <b>doubly linked list</b> for insertion order.</td></tr>
-        <tr><td>10</td><td>TreeSet = red-black tree, sorted, <b>O(log n)</b>, range queries, <b>no null</b>.</td></tr>
-        <tr><td>11</td><td><code>Iterable &rarr; Collection &rarr; Set &rarr; HashSet &rarr; LinkedHashSet</code>, and <code>Set &rarr; SortedSet &rarr; NavigableSet &rarr; TreeSet</code>.</td></tr>
-        <tr><td>12</td><td>Set declares no methods of its own; TreeSet gains them from SortedSet + NavigableSet.</td></tr>
-        <tr><td>13</td><td><b>Map does not extend Collection</b> &mdash; it defines its own methods.</td></tr>
-        <tr><td>14</td><td>Hashtable = legacy + fully synchronized; use <b>ConcurrentHashMap</b>.</td></tr>
-        <tr><td>15</td><td>Properties = String-only config map. WeakHashMap = GC-collectable keys.</td></tr>
-        <tr><td>16</td><td>IdentityHashMap uses <code>==</code>; EnumMap is an array indexed by <code>ordinal()</code>.</td></tr>
-        <tr><td>17</td><td>ArrayList grows <b>1.5&times;</b> from 10; <code>get(i)</code> O(1), middle insert O(n).</td></tr>
-        <tr><td>18</td><td>Queue is FIFO; <b>ArrayDeque</b> beats LinkedList and replaces the legacy <code>Stack</code>.</td></tr>
-        <tr><td>19</td><td>CME = <code>modCount != expectedModCount</code>; fix with <code>it.remove()</code> or <code>removeIf()</code>.</td></tr>
-        <tr><td>20</td><td>In a Map, duplicate <b>values</b> are fine &mdash; only duplicate <b>keys</b> are not.</td></tr>
-      </table></div>
-    </section>
-
-  </div><!-- /collections -->
-  <!-- ============================================================ STREAMS -->
-  <div class="panel" id="p-str" role="tabpanel" aria-labelledby="tab-str" hidden>
-
-    <div class="lede">
-      <div class="kicker">Track four &middot; the newest folder, and the one interviews ask about</div>
-      <h1>Streams: a pipeline, not a loop.</h1>
-      <p>Everything here is rebuilt from <code>Stream/Note.txt</code> and <code>Stream/Demo.java</code> &mdash; course #39&ndash;42. Your note already lands the three things that matter: a stream is <b>a tool for processing a sequence of data through a chain of operations</b>, the pipeline is <b>source &rarr; intermediate &rarr; terminal</b>, and <b>nothing runs until the terminal operation</b>. This track takes each of those down a level.</p>
-      <p>The water-pipeline picture in your note is the right mental model and worth keeping: one source, a chain of filters, and a tap at the end. Until somebody opens the tap, no water moves &mdash; and no filter is ever asked a question.</p>
-      <p><b>This was listed as the largest gap in the repo until this folder appeared.</b> It is asked in roughly nine backend interviews out of ten, usually as &ldquo;rewrite this loop with streams&rdquo; followed by &ldquo;now what does <code>parallel()</code> change?&rdquo;</p>
-      <div class="lede-meta">
-        <span><b>7</b> cards</span>
-        <span><b>1</b> animated mechanism</span>
-        <span><b>Course</b> #39&ndash;42</span>
-      </div>
-    </div>
-
-    <!-- str 1 -->
-    <section id="s1" data-key="1">
-      <div class="s-head"><span class="s-num">01</span><h2>Imperative to declarative <span class="star">&#9733;</span></h2><span class="src">Stream/Note.txt &middot; the Employee example</span></div>
-      <p class="s-why">The exact rewrite your note opens with &mdash; and what the second version actually buys you</p>
-      <ul class="facts">
-        <li><b>The loop describes the machinery; the pipeline describes the result.</b> Your imperative version has to declare a result list, manage a loop variable, write the branch, and remember to sort afterwards. None of those four things is the requirement &mdash; the requirement is &ldquo;names of employees earning over 50,000, sorted&rdquo;.</li>
-        <li><b>A stream is not a data structure.</b> It holds no elements, it allocates no storage for them, and it <b>never modifies its source</b>. It is a description of work to be done over a sequence, which is why <code>list.stream()</code> is O(1) no matter how large the list is.</li>
-        <li><b>Every stage takes one of the functional interfaces from Advanced&nbsp;09&ndash;12.</b> <code>filter</code> takes a <code>Predicate</code>, <code>map</code> takes a <code>Function</code>, <code>sorted</code> takes a <code>Comparator</code>, <code>forEach</code> takes a <code>Consumer</code>. There is nothing new to learn about the arguments &mdash; you already wrote all four.</li>
-        <li><b>Declarative does not mean shorter, it means the <i>what</i> is on the page and the <i>how</i> is in the library.</b> That is also the cost: when the pipeline is wrong, the stack trace is inside the JDK rather than inside your loop.</li>
-        <li><b>A stream is single-use.</b> The loop can be run twice; a stream cannot. Your note calls it &ldquo;stream is dead&rdquo;, which is exactly right &mdash; card&nbsp;03 has the exception it throws.</li>
-      </ul>
-
-      <pre><i>// your imperative version, tidied so it compiles</i>
-=======
         <pre><i>// your imperative version, tidied so it compiles</i>
->>>>>>> Stashed changes
 List&lt;String&gt; result = new ArrayList&lt;&gt;();
 for (Employee e : employees){
     if (e.getSalary() &gt; 50000) result.add(e.getName());
@@ -6520,19 +6441,6 @@ big.stream().filter(x -&gt; x &gt; 10).sorted().toList();   <b>// sorts only the
         </div>
       </section>
 
-<<<<<<< Updated upstream
-    <!-- str 6 -->
-    <section id="s6" data-key="1">
-      <div class="s-head"><span class="s-num">06</span><h2>Terminal operations &amp; collecting <span class="star">&#9733;</span></h2><span class="src">Stream/Note.txt &middot; &ldquo;final triggering&rdquo;</span></div>
-      <p class="s-why">Where the work happens, and where the interview question usually lands</p>
-      <ul class="facts">
-        <li><b>A terminal operation returns anything except a Stream</b> &mdash; a collection, a number, an <code>Optional</code>, a boolean, or nothing. That is the whole definition; there is no list to memorise.</li>
-        <li><b>The ones that can return &ldquo;nothing found&rdquo; return an <code>Optional</code>:</b> <code>findFirst</code>, <code>findAny</code>, <code>reduce</code> without an identity, <code>min</code>, <code>max</code>. This is precisely the return-type use of <code>Optional</code> that Advanced&nbsp;13 argues for.</li>
-        <li><b><code>toList()</code> (Java 16) returns an <i>unmodifiable</i> list</b>; <code>collect(Collectors.toList())</code> makes no promise about mutability, and <code>Collectors.toUnmodifiableList()</code> is the explicit Java&nbsp;10 form. Calling <code>add</code> on the result of <code>toList()</code> throws.</li>
-        <li><b><code>collect</code> is the general one.</b> Everything else is a convenience over it &mdash; and <code>Collectors.groupingBy</code> is the single most useful method in the whole API for backend work.</li>
-        <li><b><code>forEach</code> gives no ordering guarantee on a parallel stream.</b> <code>forEachOrdered</code> does, at a cost. On a sequential stream they behave the same, which is how the bug survives testing.</li>
-      </ul>
-=======
       <!-- str 6 -->
       <section id="s6" data-key="1">
         <div class="s-head"><span class="s-num">06</span>
@@ -6557,7 +6465,6 @@ big.stream().filter(x -&gt; x &gt; 10).sorted().toList();   <b>// sorts only the
           <li><b><code>forEach</code> gives no ordering guarantee on a parallel stream.</b> <code>forEachOrdered</code>
             does, at a cost. On a sequential stream they behave the same, which is how the bug survives testing.</li>
         </ul>
->>>>>>> Stashed changes
 
         <div class="tbl">
           <table>
@@ -6732,259 +6639,6 @@ double value = avg.orElse(0);                             <i>// never call getAs
         </div>
       </section>
 
-<<<<<<< Updated upstream
-  </div><!-- /streams -->
-
-  <!-- ============================================================ RECALL -->
-  <div class="panel" id="p-rec" role="tabpanel" aria-labelledby="tab-rec" hidden>
-
-    <div class="lede">
-      <div class="kicker">Track five &middot; test yourself, then look at the map</div>
-      <h1>What you can answer, and what is still missing.</h1>
-      <p>The first card is rapid-fire recall: read the question, answer it out loud, <i>then</i> open it. The second is the mistakes log pulled out of your own notes files &mdash; those are the errors you have already made once, which makes them the ones most likely to come back.</p>
-      <p>The last two are the honest map: what the repo covers, and the four heavyweight topics still ahead that carry more interview weight than everything above them combined.</p>
-      <div class="lede-meta">
-        <span><b>46</b> recall questions</span>
-        <span><b>19</b> folders mapped</span>
-        <span><b>3</b> tracks still ahead</span>
-      </div>
-    </div>
-
-    <!-- rec 1 -->
-    <section id="r1">
-      <div class="s-head"><span class="s-num">01</span><h2>Rapid-fire recall</h2><span class="src">answer out loud first</span></div>
-      <p class="s-why">If an answer takes more than fifteen seconds, that card goes back into the notes</p>
-
-      <details class="qa"><summary>Is Java pass by value or pass by reference?</summary><div class="ans"><p><b>Always pass by value.</b> For objects the <i>reference value</i> is copied, so mutating the object is visible outside but reassigning the parameter is not.</p></div></details>
-
-      <details class="qa"><summary>Difference between overloading and overriding?</summary><div class="ans"><p>Overloading: same name, different parameters, same class, resolved at <b>compile time</b>. Overriding: same signature, parent and child, resolved at <b>runtime</b> from the actual object.</p></div></details>
-
-      <details class="qa"><summary>Why can't you override a static method?</summary><div class="ans"><p>Because overriding is runtime dispatch on an <i>object</i>, and a static method belongs to the class. Redeclaring it in a child is <b>method hiding</b>, and it resolves by the reference type.</p></div></details>
-
-      <details class="qa"><summary>Can an abstract class have a constructor?</summary><div class="ans"><p>Yes &mdash; and it runs, via <code>super()</code>, when a concrete child is instantiated. You just cannot call <code>new</code> on the abstract class itself.</p></div></details>
-
-      <details class="qa"><summary>Interface or abstract class &mdash; how do you choose?</summary><div class="ans"><p>Shared <b>state and code</b> between related types &rarr; abstract class. A <b>capability</b> unrelated types can each claim &rarr; interface. A class has only one <code>extends</code> slot, so spend it carefully.</p></div></details>
-
-      <details class="qa"><summary>What makes a class immutable?</summary><div class="ans"><p>Final class, private final fields, no setters, all fields set in the constructor, and <b>defensive copies in and out</b> for any mutable field. <code>final</code> locks the reference, not the object it points at.</p></div></details>
-
-      <details class="qa"><summary>Why must you override <code>hashCode()</code> when you override <code>equals()</code>?</summary><div class="ans"><p>Because the contract says equal objects must have equal hash codes. Break it and a key is stored in one bucket and searched for in another &mdash; it vanishes from every HashMap and HashSet.</p></div></details>
-
-      <details class="qa"><summary><code>Integer a = 127, b = 127; a == b;</code> &mdash; true or false?</summary><div class="ans"><p><b>true</b> &mdash; <code>valueOf()</code> caches &minus;128 to 127, so both refer to the same object. At <b>128 it is false.</b> Always compare wrappers with <code>.equals()</code>.</p></div></details>
-
-      <details class="qa"><summary>What is type erasure?</summary><div class="ans"><p>Generics exist only at compile time; the type argument is erased to <code>Object</code> (or the bound) in the bytecode. That is why there are no primitives as type arguments, no <code>new T()</code>, and no generic arrays.</p></div></details>
-
-      <details class="qa"><summary>How does a HashMap store an entry?</summary><div class="ans"><p><code>hashCode()</code> &rarr; spread &rarr; index into the bucket array &rarr; if empty, store a node; if not, walk the chain comparing <b>hash then <code>equals()</code></b>. Duplicate key overwrites and returns the old value; anything else is appended.</p></div></details>
-
-      <details class="qa"><summary>What is the load factor, and what happens at it?</summary><div class="ans"><p><b>0.75.</b> Once size exceeds capacity &times; 0.75, the table <b>doubles</b> and every entry is re-indexed against the new capacity &mdash; rehashing.</p></div></details>
-
-      <details class="qa"><summary>What changed in HashMap in Java 8?</summary><div class="ans"><p><b>Treeification.</b> A bucket chain reaching <b>8</b> nodes (with the table at least 64) becomes a <b>red-black tree</b>, moving the worst case from O(n) to O(log n). It degrades back to a list at 6.</p></div></details>
-
-      <details class="qa"><summary>Why is a Set said to be a HashMap?</summary><div class="ans"><p>Because <code>HashSet</code> literally holds a <code>HashMap</code> and stores your element as the <b>key</b>, with a shared dummy <code>PRESENT</code> object as every value.</p></div></details>
-
-      <details class="qa"><summary>HashSet vs LinkedHashSet vs TreeSet?</summary><div class="ans"><p>No order, O(1) / insertion order via a doubly linked list, O(1) / sorted red-black tree, O(log n) with range queries and no nulls.</p></div></details>
-
-      <details class="qa"><summary>Why does Map not extend Collection?</summary><div class="ans"><p>A Collection stores single elements; a Map stores key-value pairs, so <code>add(E)</code> has no meaning. Map defines its own method set, and is not Iterable &mdash; you loop <code>entrySet()</code>.</p></div></details>
-
-      <details class="qa"><summary>Difference between Iterable and Iterator?</summary><div class="ans"><p>Iterable is the collection that can be walked &mdash; one method, <code>iterator()</code>. Iterator is the cursor that does the walking and <b>holds the position</b>. One Iterable can hand out many independent Iterators.</p></div></details>
-
-      <details class="qa"><summary>What causes ConcurrentModificationException?</summary><div class="ans"><p>A structural change to the collection while an iterator is live: <code>modCount</code> no longer matches the iterator's <code>expectedModCount</code>, so <code>next()</code> fails fast. Fix with <code>it.remove()</code> or <code>removeIf()</code>.</p></div></details>
-
-      <details class="qa"><summary>Fail-fast vs fail-safe?</summary><div class="ans"><p>Fail-fast (ArrayList, HashMap) throws CME immediately. Fail-safe (<code>CopyOnWriteArrayList</code>, <code>ConcurrentHashMap</code>) iterates a snapshot, never throws, but may show stale data.</p></div></details>
-
-      <details class="qa"><summary>ArrayDeque or LinkedList for a queue?</summary><div class="ans"><p><b>ArrayDeque</b> &mdash; a contiguous, cache-friendly circular array beats pointer-chasing across the heap. It just does not accept null. And it replaces the legacy synchronized <code>Stack</code> too.</p></div></details>
-
-      <details class="qa"><summary>Checked vs unchecked exception?</summary><div class="ans"><p>Checked is verified by the compiler &mdash; catch it or declare <code>throws</code> (<code>IOException</code>). Unchecked extends <code>RuntimeException</code> and needs neither (<code>NullPointerException</code>). Checked = recoverable condition; unchecked = programming bug.</p></div></details>
-
-      <h3>The second round &mdash; the follow-ups</h3>
-
-      <details class="qa"><summary>Comparable or Comparator &mdash; which and why?</summary><div class="ans"><p><b>Comparable</b> is the type's single natural ordering, written inside the class. <b>Comparator</b> is an external ordering, and you can have many &mdash; including for classes you cannot modify. Both return negative / zero / positive, and <code>compareTo</code> should be consistent with <code>equals</code> or TreeSet and HashSet will disagree about duplicates.</p></div></details>
-
-      <details class="qa"><summary>Why is <code>a.marks - b.marks</code> a bad comparator?</summary><div class="ans"><p>It <b>overflows</b>. For large or negative values the subtraction wraps and the sign flips, so the sort silently produces a wrong order. Use <code>Integer.compare(a, b)</code>. Since Java 7 a broken comparator can also throw <i>&ldquo;Comparison method violates its general contract&rdquo;</i> &mdash; but only on inputs big enough for TimSort to start merging.</p></div></details>
-
-      <details class="qa"><summary>Why is capacity always a power of two in HashMap?</summary><div class="ans"><p>So the bucket index can be <code>(n-1) &amp; hash</code> &mdash; a bitmask instead of a division. That only distributes correctly for a power of two, and it is why the hash is first spread with <code>h ^ (h &gt;&gt;&gt; 16)</code>: the mask keeps only the low bits, so the high bits have to be mixed down. <code>ArrayDeque</code> uses the same trick for its circular indices.</p></div></details>
-
-      <details class="qa"><summary>Why 8 for treeification, and why 6 to go back?</summary><div class="ans"><p>With a decent hash and load factor 0.75, bucket sizes follow a Poisson distribution &mdash; the chance of reaching 8 is about six in a hundred million. So treeification should essentially never fire unless the hash is bad or adversarial. The gap down to 6 is <b>hysteresis</b>, so a bucket at the boundary does not convert back and forth on every operation.</p></div></details>
-
-      <details class="qa"><summary>Where does the String pool live, and why does that matter?</summary><div class="ans"><p>In the <b>heap</b> since Java 7 (it was in PermGen before), so interned strings can be garbage collected. Since Java 9, strings use a <code>byte[]</code> with a coder flag &mdash; <b>compact strings</b> &mdash; roughly halving the memory of Latin-1 text, which is significant because strings are often a quarter of a server heap.</p></div></details>
-
-      <details class="qa"><summary>What does <code>final</code> guarantee beyond &ldquo;cannot reassign&rdquo;?</summary><div class="ans"><p>A <b>memory-model guarantee</b>: final fields are frozen at the end of the constructor, so any thread seeing the reference sees them fully initialised, with no synchronisation. That is the real reason immutable objects are thread-safe. It holds only if <code>this</code> does not escape the constructor.</p></div></details>
-
-      <details class="qa"><summary>Is fail-fast guaranteed?</summary><div class="ans"><p>No &mdash; the javadoc says so explicitly. <code>modCount</code> is an unsynchronised <code>int</code>, so across threads the iterator may never observe the change. Treat CME as a debugging aid for single-threaded bugs, never as a concurrency mechanism. <code>ConcurrentHashMap</code>'s iterator is a third thing: <b>weakly consistent</b> &mdash; never throws, may or may not show later writes.</p></div></details>
-
-      <details class="qa"><summary>Anonymous class or lambda &mdash; are they the same thing?</summary><div class="ans"><p>No. An anonymous class produces a real class file and a new instance per evaluation. A lambda compiles to a private method plus an <code>invokedynamic</code> call site linked by <code>LambdaMetafactory</code>, and a <b>non-capturing lambda is reused as a singleton</b>. Also <code>this</code> means the enclosing instance in a lambda, and the anonymous instance in an anonymous class.</p></div></details>
-
-      <details class="qa"><summary>Why must a captured local be effectively final?</summary><div class="ans"><p>Because the local lives in a stack frame that disappears when the method returns, so its value is <b>copied</b> into the lambda. Allowing reassignment would create two independent copies with no defined answer for which one you see &mdash; the same reasoning as pass-by-value. Fields have no such restriction because they are captured through <code>this</code>.</p></div></details>
-
-      <details class="qa"><summary>What is wrong with <code>Collections.unmodifiableList(x)</code>?</summary><div class="ans"><p>It is a read-only <b>view</b>, not an immutable copy. Whoever still holds <code>x</code> can mutate it and every reader of the &ldquo;unmodifiable&rdquo; list sees the change. <code>List.copyOf(x)</code> actually copies. Same distinction as the defensive-copy rule for immutable classes.</p></div></details>
-
-      <details class="qa"><summary>Why should a method never return <code>null</code> for a collection?</summary><div class="ans"><p>Because it pushes a null check onto every caller, forever, and one of them will forget. Return <code>List.of()</code>. The same instinct applies to <code>Optional</code> as a return type for a single value &mdash; and to never using <code>Optional</code> as a field or a parameter.</p></div></details>
-
-      <details class="qa"><summary>What does try-with-resources add over <code>finally</code>?</summary><div class="ans"><p>It closes in <b>reverse declaration order</b>, before any catch or finally runs, and it fixes a real bug: if the body throws and <code>close()</code> also throws, hand-written <code>finally</code> loses the original. Try-with-resources keeps the body's exception as primary and attaches the close failure as a <b>suppressed</b> exception.</p></div></details>
-
-      <h3>The third round &mdash; lambdas, references and the map surface</h3>
-
-      <details class="qa"><summary>Name the four kinds of method reference.</summary><div class="ans"><p><b>Static</b> (<code>Math::abs</code>), <b>bound instance</b> (<code>System.out::println</code> &mdash; the receiver is an object you already hold), <b>unbound instance</b> (<code>String::isEmpty</code> &mdash; the receiver arrives as the first argument) and <b>constructor</b> (<code>ArrayList::new</code>, <code>String[]::new</code>). &ldquo;Predicate reference&rdquo; is not a fifth kind &mdash; that is an unbound reference that happens to land in a <code>Predicate</code> slot.</p></div></details>
-
-      <details class="qa"><summary><code>s -&gt; s.isEmpty()</code> becomes <code>String::isEmpty</code> &mdash; where did the parameter go?</summary><div class="ans"><p>It became the <b>receiver</b>. In an unbound reference the left side is a <i>type</i>, so the functional interface&rsquo;s first parameter is the object the method is invoked on. The same rule explains why <code>String::compareTo</code>, a one-argument method, satisfies the two-argument <code>Comparator</code>: <code>compare(a,b)</code> runs as <code>a.compareTo(b)</code>.</p></div></details>
-
-      <details class="qa"><summary><code>andThen</code> or <code>compose</code> &mdash; which one runs first?</summary><div class="ans"><p><code>f.andThen(g)</code> is <b><code>g(f(x))</code></b> &mdash; reading order. <code>f.compose(g)</code> is <b><code>f(g(x))</code></b> &mdash; the argument runs first. They compile to the same type, so getting it backwards is a silent bug. Use <code>andThen</code>.</p></div></details>
-
-      <details class="qa"><summary>What exactly does <code>.reversed()</code> reverse in a comparator chain?</summary><div class="ans"><p><b>Everything built before it</b>, not the last key. <code>comparing(A).thenComparing(B).reversed()</code> flips both. To reverse only the second key: <code>comparing(A).thenComparing(B, Comparator.reverseOrder())</code>.</p></div></details>
-
-      <details class="qa"><summary>Why is <code>containsKey</code> O(1) but <code>containsValue</code> O(n)?</summary><div class="ans"><p>A key is hashed straight to its bucket, so the lookup touches one bucket. A value has no hash and no index &mdash; the map must walk every bucket and every node in each chain. Needing <code>containsValue</code> often means you wanted a second map keyed the other way round.</p></div></details>
-
-      <details class="qa"><summary>What does <code>map.computeIfAbsent(k, x -&gt; new ArrayList&lt;&gt;()).add(v)</code> save you?</summary><div class="ans"><p>Two extra hash lookups and a branch &mdash; it replaces <code>containsKey</code> + <code>put</code> + <code>get</code> with one operation, and the new list is allocated <b>only when the key is genuinely new</b>. Its sibling <code>map.merge(k, 1, Integer::sum)</code> is the same trick for counting. Do not modify the same map inside the function: since Java 9 that throws <code>ConcurrentModificationException</code>.</p></div></details>
-
-      <details class="qa"><summary>Why can&rsquo;t <code>ConcurrentHashMap</code> store <code>null</code>?</summary><div class="ans"><p>Because <code>get(k) == null</code> would be ambiguous &mdash; absent, or present with a null value &mdash; and the usual fix, a follow-up <code>containsKey</code>, proves nothing when another thread can change the map between the two calls. Banning null removes the ambiguity at the source. <code>HashMap</code> allows one null key (special-cased to bucket 0) and any number of null values; <code>TreeMap</code> allows no null key because it must call <code>compareTo</code> on it.</p></div></details>
-
-      <h3>The fourth round &mdash; streams</h3>
-
-      <details class="qa"><summary>What are the three parts of a stream pipeline?</summary><div class="ans"><p><b>Source</b>, zero or more <b>intermediate</b> operations, and exactly one <b>terminal</b> operation. You can tell them apart by return type with no memorising: an intermediate returns a <code>Stream</code> so it chains; a terminal returns anything else, so the chain has to stop.</p></div></details>
-
-      <details class="qa"><summary>What happens if you leave the terminal operation off?</summary><div class="ans"><p><b>Nothing runs at all</b> &mdash; not even once. <code>list.stream().filter(p)</code> builds two objects and never calls <code>p</code>. Streams are lazy: intermediate operations only assemble the pipeline, and the terminal is what pulls elements through it.</p></div></details>
-
-      <details class="qa"><summary>What is vertical processing?</summary><div class="ans"><p>Each element travels through <b>every stage</b> before the next element is read &mdash; 12 is filtered, mapped and collected before 7 is even looked at. It is not &ldquo;filter the whole list, then map the whole list&rdquo;, which would allocate an intermediate collection per stage. It is also what makes short-circuiting and infinite streams possible.</p></div></details>
-
-      <details class="qa"><summary>Why can&rsquo;t you reuse a stream?</summary><div class="ans"><p>Because the terminal operation <b>consumes</b> it, and each intermediate operation marks its upstream stage as linked. Touching it again throws <code>IllegalStateException: stream has already been operated upon or closed</code>. A stream behaves like an iterator, not like a collection &mdash; call <code>list.stream()</code> again, which is cheap.</p></div></details>
-
-      <details class="qa"><summary><code>iterate</code> or <code>generate</code> &mdash; what is the difference?</summary><div class="ans"><p><code>Stream.iterate(seed, f)</code> computes each value <b>from the previous one</b>, so it is ordered and dependent. <code>Stream.generate(supplier)</code> calls a <code>Supplier</code> with <b>no dependency</b> on what came before &mdash; <code>Math::random</code> is the typical case. Both are infinite, so both need <code>limit</code> or a short-circuiting terminal.</p></div></details>
-
-      <details class="qa"><summary>Which stream operations are stateful, and why does it matter?</summary><div class="ans"><p><code>sorted</code>, <code>distinct</code>, <code>limit</code> and <code>skip</code>. <code>sorted</code> is a <b>full barrier</b> &mdash; it must see the last element before releasing the first, so it never terminates on an infinite stream, and it is the reason to <b>filter before you sort</b> rather than after. <code>distinct</code> has to remember everything it has emitted, using <code>equals</code> and <code>hashCode</code>.</p></div></details>
-
-      <details class="qa"><summary>When is <code>parallelStream()</code> the wrong call?</summary><div class="ans"><p>Almost always, unless four things hold: a <b>large</b> data set, <b>expensive</b> per-element work, a source that <b>splits cheaply</b> (an array or ArrayList, not a LinkedList), and lambdas with <b>no shared mutable state</b>. It runs on the shared common ForkJoinPool, so a parallel stream doing blocking I/O starves every other user of that pool in the JVM. And <code>reduce</code>&rsquo;s function must be associative, or sequential and parallel give different answers.</p></div></details>
-    </section>
-
-    <!-- rec 2 -->
-    <section id="r2">
-      <div class="s-head"><span class="s-num">02</span><h2>The mistakes log</h2><span class="src">from your own notes files</span></div>
-      <p class="s-why">Errors you have already made once &mdash; which is exactly why they will come back</p>
-      <ul class="facts">
-        <li><b>&ldquo;Object is the blueprint&rdquo;</b> &mdash; it is the other way round. Class is the blueprint, object is the entity.</li>
-        <li><b>A constructor with a return statement.</b> A constructor has no return type; <code>return name;</code> inside one does not compile.</li>
-        <li><b>Calling overloading &ldquo;chaining&rdquo;.</b> Chaining requires <code>this(...)</code> or <code>super(...)</code> as the first statement.</li>
-        <li><b>Two <code>next()</code> calls in one loop pass</b> &mdash; silently skips elements, then <code>NoSuchElementException</code>.</li>
-        <li><b><code>list.remove(30)</code> on a <code>List&lt;Integer&gt;</code></b> &mdash; that is <code>remove(int index)</code>. Use <code>Integer.valueOf(30)</code> to remove the value.</li>
-        <li><b>File name not matching the public class.</b> <code>Immutableclass.java</code> holding <code>public class ImmutableClass</code> fails on <code>javac</code> even though Windows hides the case difference.</li>
-        <li><b>Constructor that never assigns the field</b> &mdash; the field stays null and the getter throws NPE. Found in the first version of <code>ImmutableClass.java</code>.</li>
-        <li><b>Comments that disagree with the code</b> &mdash; the comment said <code>iitg</code> while the code passed <code>IITB</code>. A demo that contradicts itself proves nothing.</li>
-        <li><b>A local class declared but never instantiated</b> (<code>NestedClasses/Local.java</code>) &mdash; the program runs and prints nothing.</li>
-        <li><b>Lowercase class names</b> &mdash; <code>class outer</code>, <code>class school</code>. Java class names start with a capital.</li>
-        <li><b>Trusting HashSet iteration order</b> because small integers happened to come out sorted. There is no guarantee.</li>
-        <li><b>The wrong <code>Entry</code>.</b> <code>set/Demo2.java</code> imported <code>java.security.KeyStore.Entry</code> &mdash; an auto-import that took the first suggestion. The one you want is <code>java.util.Map.Entry</code>, and writing <code>Map.Entry&lt;K,V&gt;</code> needs no import at all.</li>
-        <li><b>Calling a query and discarding the answer.</b> <code>mpp.size();</code> and <code>mpp.isEmpty();</code> as statements compute a value and drop it. Every non-mutating method on a Map is useful only for what it returns.</li>
-        <li><b>A subtraction comparator.</b> <code>(s1,s2) -&gt; s1.marks - s2.marks</code> works on marks and overflows on anything that can go negative. <code>Integer.compare</code>, or <code>Comparator.comparingInt</code>.</li>
-        <li><b>One colon and lowercase class names</b> in <code>Lambda/note.txt</code> &mdash; <code>math:abs</code> and <code>system.out:println</code>. It is <code>Math::abs</code> and <code>System.out::println</code>.</li>
-        <li><b>Parentheses on a method reference.</b> <code>String::isEmpty()</code> does not compile &mdash; the parentheses would mean you are calling it, and a reference is never called at the point it is written.</li>
-        <li><b>Semicolons between pipeline stages.</b> <code>Stream/Note.txt</code> writes <code>.filter(&hellip;);</code> then <code>.map(&hellip;);</code> on the next line. The first semicolon ends the statement and the next line starts with a dot &mdash; one pipeline is one statement, with one semicolon at the end.</li>
-        <li><b>Filtering the wrong type.</b> <code>.filter(x -&gt; x &gt; 50000)</code> where <code>x</code> is an <code>Employee</code>. Always know what is in the pipe at that stage &mdash; after a <code>map</code> it is a different type than before it.</li>
-        <li><b><code>arr.stream(arr)</code></b> &mdash; an array has no methods. It is <code>Arrays.stream(arr)</code>. And <code>Stream.of(intArray)</code> gives a stream of <b>one</b> element, the array itself.</li>
-        <li><b><code>.tolist()</code> and <code>.parrallelstream()</code></b> &mdash; <code>toList()</code> (Java&nbsp;16+) and <code>parallelStream()</code>. Java is case-sensitive and these are the two that autocomplete will not rescue.</li>
-        <li><b>&ldquo;Method references only work for inbuilt methods.&rdquo;</b> Written in <code>Lambda/Demo.java</code>, and not true &mdash; <code>Student::getMarks</code> is your own class and the most useful reference in the file.</li>
-      </ul>
-    </section>
-
-    <!-- rec 3 -->
-    <section id="r3">
-      <div class="s-head"><span class="s-num">03</span><h2>Coverage map</h2><span class="src">the repo, folder by folder</span></div>
-      <p class="s-why">Where the notes are deep, where they are thin, and what that costs</p>
-
-      <div class="tbl"><table>
-        <tr><th>Folder</th><th>Covers</th><th>Depth</th></tr>
-        <tr><td><code>set/</code></td><td>HashSet internals, hashing, collisions, load factor, treeification, LinkedHashSet, TreeSet, the map zoo, and the full Map API surface in <code>Demo2.java</code></td><td><b>Strongest &mdash; above 3-year level</b></td></tr>
-        <tr><td><code>Interable/</code></td><td>Iterator vs Iterable, for-each internals, custom Iterable, CME, ListIterator, map iteration</td><td><b>Very good</b></td></tr>
-        <tr><td><code>oops/</code></td><td>Class/object, constructors, chaining, call by value, static, packages, encapsulation, inheritance, abstraction, interfaces</td><td><b>Very good</b></td></tr>
-        <tr><td><code>ImmutableClass.java</code></td><td>Five rules, both leaks, defensive copy</td><td><b>Very good</b></td></tr>
-        <tr><td><code>Stream/</code></td><td>Imperative vs declarative, the pipeline, laziness and vertical processing, sources, intermediate and terminal ops, primitive and parallel streams</td><td><b>Newest &mdash; and the notes are already strong</b></td></tr>
-        <tr><td><code>Lambda/</code></td><td>Anonymous class &rarr; lambda &rarr; method reference on a real Comparator; the four reference kinds; composition</td><td><b>Newest, and already deep</b> &mdash; notes ahead of the code</td></tr>
-        <tr><td><code>Comparable/</code></td><td>Comparable vs Comparator, the danger of returning 0, the <code>Collections</code> utility set</td><td><b>Very good</b> &mdash; it reached functional interfaces on its own</td></tr>
-        <tr><td><code>Queue/</code></td><td>Array and linked-list queues, circular wrap, Deque, ArrayDeque vs LinkedList, why not Stack</td><td>Good notes, code still a stub</td></tr>
-        <tr><td><code>NestedClasses/</code></td><td>Static nested, inner, local &mdash; access rules and why</td><td>Good &mdash; anonymous class pending</td></tr>
-        <tr><td><code>JavaI/o/</code></td><td>Stream concept, the BufferedReader chain, checked vs unchecked</td><td>Good on input; output side missing</td></tr>
-        <tr><td><code>Autoboxing/</code></td><td>Wrappers, boxing, the Integer cache trap</td><td>Notes good, code thin</td></tr>
-        <tr><td><code>typecasting/</code></td><td>Widening, narrowing, plus the one <code>Box&lt;T&gt;</code> generics example</td><td>Enough on casting, thin on generics</td></tr>
-        <tr><td><code>Enum/</code>, <code>Interface/</code>, <code>ObjectClass/</code></td><td>Practice files</td><td><b>No notes yet</b></td></tr>
-        <tr><td><code>List/</code></td><td>ArrayList API calls only</td><td><b>Thin &mdash; no internals</b></td></tr>
-        <tr><td><code>Strings/</code></td><td>String constructors only</td><td><b>Thin &mdash; pool and methods missing</b></td></tr>
-        <tr><td><code>Grid/</code>, <code>Headfirstjava/</code></td><td>Practice &mdash; enum + package, book exercises</td><td>Practice only</td></tr>
-        <tr><td><code>Framework/</code></td><td>&mdash;</td><td><b>Empty</b> &mdash; the folder is made, the Collections-framework overview is not written</td></tr>
-      </table></div>
-
-      <h3>Where each folder is answered in this notebook</h3>
-      <p style="max-width:66ch;color:var(--ink-soft)">Every folder in the repo, mapped to the cards that cover it. Checked file by file &mdash; if a folder is not listed here, it is not in the notebook.</p>
-
-      <div class="tbl"><table>
-        <tr><th>Folder / file</th><th>Answered by</th></tr>
-        <tr><td><code>oops/</code></td><td>Core&nbsp;01&ndash;09 &mdash; class, constructors, call by value, static, packages, encapsulation, inheritance, polymorphism, abstraction</td></tr>
-        <tr><td><code>ObjectClass/</code></td><td>Core&nbsp;10 &mdash; the <code>Object</code> contract</td></tr>
-        <tr><td><code>ImmutableClass.java</code></td><td>Core&nbsp;11 and Core&nbsp;14 &mdash; the five rules, both leaks, shallow vs deep copy</td></tr>
-        <tr><td><code>NestedClasses/</code></td><td>Core&nbsp;12, plus Advanced&nbsp;10 for the anonymous class the folder never got to</td></tr>
-        <tr><td><code>Autoboxing/</code></td><td>Advanced&nbsp;01</td></tr>
-        <tr><td><code>typecasting/</code></td><td>Advanced&nbsp;02 (generics) and Advanced&nbsp;03 (casting)</td></tr>
-        <tr><td><code>Strings/</code></td><td>Advanced&nbsp;04</td></tr>
-        <tr><td><code>Enum/</code>, <code>Grid/</code></td><td>Advanced&nbsp;05, with packages in Core&nbsp;05</td></tr>
-        <tr><td><code>JavaI/o/</code></td><td>Advanced&nbsp;06&ndash;08 &mdash; the decorator chain, checked vs unchecked, exceptions in depth</td></tr>
-        <tr><td><code>Lambda/</code></td><td>Advanced&nbsp;09&ndash;12 &mdash; functional interfaces, the collapse to one arrow, method references, composition</td></tr>
-        <tr><td><code>Interable/</code></td><td>Collections&nbsp;01 (the family tree and the <code>Collection</code> API), 10 and 11</td></tr>
-        <tr><td><code>List/</code></td><td>Collections&nbsp;02</td></tr>
-        <tr><td><code>set/</code></td><td>Collections&nbsp;03&ndash;08 &mdash; including the Map API and <code>NavigableMap</code> from <code>Demo2</code> and <code>Demo3</code></td></tr>
-        <tr><td><code>Queue/</code></td><td>Collections&nbsp;09 &mdash; including writing both implementations by hand</td></tr>
-        <tr><td><code>Comparable/</code></td><td>Collections&nbsp;12, and Collections&nbsp;13 for the <code>Collections</code> utility list at the end of your note</td></tr>
-        <tr><td><code>Stream/</code></td><td>Streams&nbsp;01&ndash;07 &mdash; the whole track</td></tr>
-        <tr><td><code>Headfirstjava/</code></td><td><b>Deliberately not covered</b> &mdash; while loops, if/else and string concatenation. Book exercises, not interview material</td></tr>
-        <tr><td><code>Framework/</code></td><td><b>Empty folder</b> &mdash; nothing to cover yet</td></tr>
-      </table></div>
-
-      <div class="gap"><span class="lbl">The habit worth keeping</span>Every folder has a <code>revision.txt</code> and a &ldquo;mistakes I made&rdquo; section, and the notes explain the <b>internal mechanism</b> rather than the definition. &ldquo;A Set is a HashMap with a dummy PRESENT object&rdquo; is the answer an interviewer wants; &ldquo;a Set does not allow duplicates&rdquo; is the one everybody gives.</div>
-    </section>
-
-    <!-- rec 4 -->
-    <section id="r4">
-      <div class="s-head"><span class="s-num">04</span><h2>What is still ahead</h2><span class="src">course #39&ndash;57 &middot; from your own playlist screenshots</span></div>
-      <p class="s-why">These four carry more interview weight than every card in this notebook</p>
-      <p style="max-width:64ch;color:var(--ink-soft)">Nobody grills a three-year candidate on &ldquo;what is a class&rdquo;. The base above is solid; these are the scoring topics, and they are the ones still unwritten.</p>
-
-      <h3>The rest of the course, video by video</h3>
-      <p style="max-width:64ch;color:var(--ink-soft)">Read off your own playlist screenshots, so the numbers are the real ones. Everything above #38 is now in this notebook; everything below it is not.</p>
-
-      <div class="tbl"><table>
-        <tr><th>#</th><th>Video</th><th>Status here</th></tr>
-        <tr><td>35</td><td>Queue deep dive &middot; PriorityQueue &amp; heap</td><td>Collections&nbsp;09 &mdash; <b>covered</b></td></tr>
-        <tr><td>36</td><td>Comparable, Comparator, the <code>Collections</code> class</td><td>Collections&nbsp;12 &mdash; <b>covered</b></td></tr>
-        <tr><td>37</td><td>Lambdas &amp; functional interfaces &middot; Comparator</td><td>Advanced&nbsp;09&ndash;10 &mdash; <b>covered</b></td></tr>
-        <tr><td>38</td><td>Deep dive &middot; method references &amp; composition</td><td>Advanced&nbsp;11&ndash;12 &mdash; <b>covered</b></td></tr>
-        <tr><td>39</td><td>Streams &mdash; creation &amp; architecture</td><td>Streams&nbsp;01&ndash;04 &mdash; <b>covered</b></td></tr>
-        <tr><td>40</td><td>Stream methods &mdash; intermediate &amp; terminal</td><td>Streams&nbsp;05&ndash;06 &mdash; <b>covered</b></td></tr>
-        <tr><td>41</td><td><code>Optional</code> &mdash; all methods, stream integration</td><td>Advanced&nbsp;13 has the rules, Streams&nbsp;06 the returns; the full method set is ahead</td></tr>
-        <tr><td>42</td><td>Parallel streams &middot; primitive Optionals</td><td>Streams&nbsp;07 &mdash; <b>covered</b></td></tr>
-        <tr><td>43&ndash;44</td><td>Exceptions &middot; hierarchy, <code>throw</code> vs <code>throws</code>, custom</td><td>Advanced&nbsp;07&ndash;08 &mdash; <b>covered</b></td></tr>
-        <tr><td>45&ndash;46</td><td>Memory &middot; stack, heap, method area, GC algorithms</td><td>Core&nbsp;13 &mdash; <b>covered</b></td></tr>
-        <tr><td>47&ndash;48</td><td>Multithreading intro &middot; thread creation &amp; lifecycle</td><td><b>Ahead</b></td></tr>
-        <tr><td>49&ndash;51</td><td>Thread methods &middot; race conditions &amp; visibility &middot; monitor locks</td><td><b>Ahead</b> &mdash; <code>synchronized</code>, <code>volatile</code></td></tr>
-        <tr><td>52&ndash;53</td><td><code>wait</code>/<code>notify</code> &middot; <code>ReentrantLock</code>, <code>ReadWriteLock</code>, <code>Semaphore</code></td><td><b>Ahead</b></td></tr>
-        <tr><td>54&ndash;55</td><td>Lock-free &middot; atomics, CAS, the ABA problem</td><td><b>Ahead</b></td></tr>
-        <tr><td>56&ndash;57</td><td>Executors, <code>Future</code>, <code>CompletableFuture</code>, fork-join, virtual threads</td><td><b>Ahead</b> &mdash; and the most quotable in an interview</td></tr>
-      </table></div>
-
-      <div class="end-grid">
-        <div class="end-card"><h4>Concurrency</h4><p>Course #47&ndash;57, eleven videos &mdash; the single biggest rejection reason for people switching into Java backend. Thread lifecycle, race conditions and visibility, monitor locks, <code>wait</code>/<code>notify</code>, the lock family, atomics and CAS, the executor framework, <code>CompletableFuture</code> and virtual threads.</p></div>
-        <div class="end-card"><h4>Spring &amp; JPA</h4><p>A separate track, and the one job specs actually list. Dependency injection, the bean lifecycle, transactions, and the entity <code>equals</code>/<code>hashCode</code> problem from card&nbsp;10.</p></div>
-        <div class="end-card"><h4>SQL &amp; two DSA problems</h4><p>The rest of a three-year loop. Joins, indexes and <code>EXPLAIN</code>; and enough DSA to talk through a HashMap-based solution out loud.</p></div>
-      </div>
-
-      <div class="deep"><span class="lbl">Now covered here, not pending</span>
-        <p>Six items that were on this list have moved into the notebook: <b>exceptions in depth</b> (Advanced&nbsp;08), <b>functional interfaces and lambdas</b> (Advanced&nbsp;09), <b>the anonymous-class-to-method-reference journey</b> (Advanced&nbsp;10, rebuilt from <code>Lambda/Demo.java</code>), <b>the four kinds of method reference</b> (Advanced&nbsp;11), <b>functional composition</b> (Advanced&nbsp;12) and <b>JVM memory and GC</b> (Core&nbsp;13). Collections gained a fourteenth card, <b>the Map API method by method</b> (Collections&nbsp;08), from <code>set/Demo2.java</code>.</p>
-        <p>Advanced cards 10&ndash;12 are course #37 and #38; the whole <b>Streams track</b> is #39&ndash;42, written from <code>Stream/Note.txt</code> the day the folder appeared. That closes what this card called the largest gap in the repo for as long as it has existed &mdash; streams were listed as pending in every earlier version of this notebook, and they are now seven cards with their own tab.</p>
-        <p>What is genuinely left is <b>concurrency</b>, and it is eleven videos rather than four. That is now the honest answer to &ldquo;what have you not covered yet&rdquo;.</p>
-      </div>
-
-      <div class="end">
-        <h2>How to use this notebook</h2>
-        <p>Read a card, close it, and say the bold line out loud. If the words do not come, that card is not revision &mdash; it is relearning, and it belongs back in the notes file. When you want the clock instead of the detail, the <a href="java-revision-15min.html">15-minute drill</a> is the same material at speed.</p>
-      </div>
-    </section>
-
-  </div><!-- /recall -->
-=======
 
       <!-- str 8 -->
       <section id="s8" data-key="1">
@@ -7150,12 +6804,771 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
         </div>
       </section>
     </div><!-- /streams -->
+<!-- ============================================================ MULTITHREADING -->
+    <div class="panel" id="p-multi" role="tabpanel" aria-labelledby="tab-multi" hidden>
 
-    <!-- ============================================================ RECALL -->
+      <div class="lede">
+        <div class="kicker">Track five &middot; concurrency &amp; the JVM runtime</div>
+        <h1>Multithreading: processes, thread lifecycle &amp; the memory barrier.</h1>
+        <p>Concurrency is where backend candidate answers fall apart &mdash; because the moment multiple threads touch shared state, the code stops being deterministic. Everything here is rebuilt directly from your notes and code in <code>mutithreading/Threadcreationlifecycle/</code>, <code>mutithreading/threadmethods/</code>, <code>mutithreading/problemsinmultithreading/</code>, and <code>mutithreading/shreyansh/</code>.</p>
+        <p>The mental model that anchors this entire track is the <b>restaurant and chefs analogy</b>: a process is the restaurant building with its pantry and refrigerator (Heap &amp; Metaspace), while threads are the chefs inside, each holding their own private notepad and utensils (Call Stack &amp; Program Counter). Concurrency bugs only happen when multiple chefs reach into the shared pantry at the same time without coordination.</p>
+        <p><b>This covers course #47&ndash;51 in full</b>: thread creation, metadata, the 6 lifecycle states, time slicing, race conditions, compound atomicity, CPU cache visibility, instruction reordering, and monitor locks.</p>
+        <div class="lede-meta">
+          <span><b>10</b> cards</span>
+          <span><b>2</b> animated mechanisms</span>
+          <span><b>Course</b> #47&ndash;51</span>
+          <span><b>Pillars:</b> lifecycle, memory model, hazards, locks</span>
+        </div>
+      </div>
+
+      <!-- multi 1 -->
+      <section id="m1" data-key="1">
+        <div class="s-head"><span class="s-num">01</span>
+          <h2>Process vs. Thread &amp; the OS memory model <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/shreyansh/notes &middot; Threadcreationlifecycle/notes.txt</span>
+        </div>
+        <p class="s-why">The restaurant mental model &middot; shared heap vs private call stack &middot; 1:1 kernel thread mapping</p>
+        <ul class="facts">
+          <li><b>A Process is an isolated program in execution with its own dedicated OS memory space.</b> Chrome, IntelliJ, and your JVM are independent processes. The OS strictly isolates them; Process&nbsp;A cannot read or write Process&nbsp;B's memory directly. Inter-process communication (IPC) requires sockets or OS pipes and is heavyweight.</li>
+          <li><b>A Thread is the smallest independent unit of CPU execution inside a process.</b> Often called a &ldquo;Lightweight Process&rdquo; (LWP). Every Java process starts with one initial thread &mdash; the <code>main</code> thread &mdash; which can spawn worker threads that execute concurrently.</li>
+          <li><b>The JVM memory division is the root of all concurrency bugs:</b>
+            <ul>
+              <li><b>SHARED across all threads:</b> <b>Heap Memory</b> (all objects created with <code>new</code>, instance variables, arrays) and <b>Metaspace / Method Area</b> (bytecode and static variables).</li>
+              <li><b>PRIVATE to each thread:</b> <b>Call Stack</b> (method call frames, local variables, primitive parameters) and <b>Program Counter (PC Register)</b> (points to the exact bytecode instruction currently executing).</li>
+            </ul>
+          </li>
+          <li><b>Stack memory is ALWAYS thread-safe.</b> Local variables declared inside a method live on that thread's private stack frame; no other thread can ever access or corrupt them. Concurrency bugs ONLY occur when threads read and write <b>shared mutable state</b> living on the Heap.</li>
+          <li><b>JVM process memory tuning:</b> <code>java -Xms256m -Xmx2g MainClassName</code> sets initial heap (256MB) and maximum heap (2GB). Exceeding <code>-Xmx</code> causes <code>java.lang.OutOfMemoryError: Java heap space</code>.</li>
+        </ul>
+
+        <pre><i>// Visualizing the JVM Process memory partition</i>
++-------------------------------------------------------------------------+
+|                              JVM PROCESS                                |
+|  SHARED MEMORY (Synchronization required if mutable):                   |
+|   +------------------------------------------------------------------+  |
+|   |  HEAP: all objects (new), instance fields, shared data           |  |
+|   +------------------------------------------------------------------+  |
+|   |  METASPACE: loaded class definitions, static fields, bytecode    |  |
+|   +------------------------------------------------------------------+  |
+|                                                                         |
+|  PRIVATE MEMORY (Always thread-safe; never shared):                     |
+|   [Thread-1 (Worker)]                  [Thread-2 (Worker)]              |
+|   +------------------------------+     +------------------------------+ |
+|   | Call Stack: local vars, args |     | Call Stack: local vars, args | |
+|   | PC Register: inst #42        |     | PC Register: inst #108       | |
+|   +------------------------------+     +------------------------------+ |
++-------------------------------------------------------------------------+</pre>
+
+        <pre><i>// mutithreading/shreyansh/Demo.java &middot; every execution begins on the main thread</i>
+package mutithreading.shreyansh;
+
+public class Demo {
+    public static void main(String[] args) {
+        System.out.println("Thread name : " + Thread.currentThread().getName());
+        <i>// Prints: Thread name : main</i>
+    }
+}</pre>
+
+        <div class="say"><span class="lbl">Say it out loud</span>
+          <p>Threads share the <b>Heap</b>; they never share the <b>Stack</b>. If data stays on the local method stack, it is thread-safe by definition. If an object is mutable and shared on the heap, you must synchronize access.</p>
+        </div>
+
+        <div class="deep"><span class="lbl">JVM internals &mdash; 1:1 kernel thread mapping &amp; stack cost</span>
+          <ul>
+            <li><b>HotSpot uses a 1:1 threading model.</b> Every <code>java.lang.Thread</code> corresponds directly to one native OS kernel thread (<code>pthread_t</code> on Linux, <code>CreateThread</code> on Windows). Thread scheduling is handled by the host OS kernel scheduler, not Java.</li>
+            <li><b>Thread stack memory overhead:</b> Each thread allocates a native call stack (default <b>1MB</b> configured via <code>-Xss1024k</code>). Creating 1,000 threads consumes ~1GB of native RAM purely for stack frames. If native memory runs out, the JVM crashes with <code>OutOfMemoryError: unable to create native thread</code>.</li>
+          </ul>
+        </div>
+
+        <div class="trap"><span class="lbl">Interview trap &mdash; StackOverflowError vs OutOfMemoryError</span>
+          <ul>
+            <li><b><code>StackOverflowError</code>:</b> Caused by infinite recursion or excessively deep method call frames exceeding that single thread's stack limit (<code>-Xss</code>). It is an <code>Error</code>, not an <code>Exception</code>.</li>
+            <li><b><code>OutOfMemoryError: Java heap space</code>:</b> Caused when the garbage collector cannot reclaim sufficient room on the Heap for new object allocations (<code>-Xmx</code> exceeded).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- multi 2 -->
+      <section id="m2" data-key="1">
+        <div class="s-head"><span class="s-num">02</span>
+          <h2>Thread creation: <code>Thread</code> class vs. <code>Runnable</code> interface <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/Threadcreationlifecycle/Demo.java &middot; Demo2.java</span>
+        </div>
+        <p class="s-why">Why implements Runnable wins in 99% of production systems &middot; separating the task from the worker</p>
+        <ul class="facts">
+          <li><b>Approach 1 (extends <code>Thread</code>):</b> Your class extends <code>java.lang.Thread</code> and overrides <code>public void run()</code>. You start it with <code>new MyThread().start()</code>.</li>
+          <li><b>Approach 2 (implements <code>Runnable</code>):</b> Your class implements the functional interface <code>Runnable</code>, overriding <code>public void run()</code>. You instantiate a worker thread passing the task: <code>new Thread(task).start()</code>.</li>
+          <li><b>Why <code>Runnable</code> is overwhelmingly preferred (Top 4 Interview reasons):</b>
+            <ol>
+              <li><b>No Single-Inheritance Lock:</b> Java does not support multiple class inheritance. If your class does <code>class MyTask extends Thread</code>, it can never extend any other class (like <code>BaseService</code> or <code>OrderEntity</code>). With <code>implements Runnable</code>, your class retains its one inheritance slot.</li>
+              <li><b>Separation of Concerns:</b> A thread is the execution engine (<b>worker</b>); <code>Runnable</code> is the job to be executed (<b>task</b>). Conflating the task with the worker violates the Single Responsibility Principle.</li>
+              <li><b>Thread Pool (<code>ExecutorService</code>) compatibility:</b> In production backends, we never spawn raw <code>new Thread()</code> calls due to the ~1MB allocation and OS context-switch overhead. Instead, fixed worker pools execute thousands of <code>Runnable</code> jobs. Submitting a <code>Thread</code> subclass to an executor pool is an anti-pattern.</li>
+              <li><b>Lambda syntax:</b> Since <code>Runnable</code> has exactly one abstract method (<code>@FunctionalInterface</code>), you don't even need a named class: <code>new Thread(() -&gt; System.out.println("Running")).start();</code>.</li>
+            </ol>
+          </li>
+        </ul>
+
+        <pre><i>// Approach 1: Extends Thread (Demo.java)</i>
+class MyThread extends Thread {
+    @Override
+    public void run() {
+        System.out.println("thread is running");
+    }
+}
+MyThread mt = new MyThread();
+mt.start(); <i>// JVM requests OS kernel to allocate thread and invoke run()</i>
+
+<i>// Approach 2: Implements Runnable &mdash; PREFERRED (Demo2.java)</i>
+class MyTask implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("task thread is running");
+    }
+}
+Thread t1 = new Thread(new MyTask());
+t1.start();
+
+<i>// Modern one-liner with lambda:</i>
+Thread t2 = new Thread(() -&gt; System.out.println("Lambda thread running"));
+t2.start();</pre>
+
+        <div class="trap"><span class="lbl">Interview trap &mdash; new Thread() does not start a thread</span>
+          <p>Calling <code>new MyThread()</code> or <code>new Thread(task)</code> allocates an ordinary Java object on the <b>Heap</b>. <b>No OS thread exists yet!</b> The OS thread and private call stack are only created when <code>start()</code> is invoked.</p>
+        </div>
+      </section>
+
+      <!-- multi 3 -->
+      <section id="m3">
+        <div class="s-head"><span class="s-num">03</span>
+          <h2>Thread metadata &amp; properties: names, priorities &amp; daemons</h2><span
+            class="src">mutithreading/Threadcreationlifecycle/Demo3.java</span>
+        </div>
+        <p class="s-why">What every thread carries &middot; why thread dumps demand custom names &middot; daemon thread lifecycle</p>
+        <ul class="facts">
+          <li><b><code>Thread.currentThread()</code>:</b> Static method returning a direct reference to whichever thread is currently executing that exact line of bytecode. Calling it inside <code>main()</code> returns the main thread.</li>
+          <li><b>Custom thread names:</b> Default names are <code>"Thread-0"</code>, <code>"Thread-1"</code>. In production, <b>always assign meaningful names</b>: <code>new Thread(task, "OrderProcessor-1")</code>. Why? When troubleshooting a production outage, deadlock, or CPU spike with <code>jstack</code> thread dumps, named threads reveal the offending business subsystem instantly.</li>
+          <li><b><code>threadId()</code> (or legacy <code>getId()</code>):</b> A unique, positive <code>long</code> identifier assigned by the JVM upon creation. It remains fixed for the thread's entire lifetime.</li>
+          <li><b>Thread Priorities (1 to 10, default 5):</b> Constants <code>Thread.MIN_PRIORITY (1)</code>, <code>NORM_PRIORITY (5)</code>, <code>MAX_PRIORITY (10)</code>.
+            <ul>
+              <li><b>The reality:</b> Priority is merely an <i>advisory hint</i> to the host OS scheduler. Modern preemptive schedulers (Linux CFS, Windows scheduler) frequently ignore or dynamically adjust Java thread priorities. <b>Never rely on priorities for program correctness!</b></li>
+            </ul>
+          </li>
+          <li><b>User Thread vs. Daemon Thread:</b>
+            <ul>
+              <li><b>User Thread (default):</b> The JVM will remain active and <b>will not exit</b> as long as even one non-daemon user thread is still running.</li>
+              <li><b>Daemon Thread:</b> A background helper (e.g. Garbage Collector, finalizers, background metrics). When all user threads terminate, the JVM <b>abruptly terminates immediately</b>, killing all daemon threads on the spot without running their <code>finally</code> blocks!</li>
+              <li><b>The rule:</b> You must call <code>t.setDaemon(true)</code> <b>before</b> calling <code>t.start()</code>. Invoking it after <code>start()</code> throws <code>IllegalThreadStateException</code>.</li>
+            </ul>
+          </li>
+          <li><b><code>isAlive()</code>:</b> Returns <code>true</code> from the moment <code>start()</code> is invoked until the thread completes its <code>run()</code> method.</li>
+        </ul>
+
+        <pre><i>// mutithreading/Threadcreationlifecycle/Demo3.java &middot; Thread inspection</i>
+public class Demo3 {
+    public static void main(String[] args) {
+        System.out.println(Thread.currentThread().getId());   <i>// Main thread ID</i>
+        System.out.println(Thread.currentThread().getName()); <i>// Prints: main</i>
+
+        Thread t1 = new Thread(() -&gt; {
+            System.out.println("Worker running: " + Thread.currentThread().getName());
+        }, "PaymentWorker-1");
+
+        t1.setPriority(Thread.MAX_PRIORITY); <i>// Hint to OS</i>
+        t1.setDaemon(false);                 <i>// Explicit user thread</i>
+        t1.start();
+
+        System.out.println(t1.getId());      <i>// e.g. 21</i>
+        System.out.println(t1.getName());    <i>// Prints: PaymentWorker-1</i>
+        System.out.println(t1.isAlive());    <i>// true while running</i>
+    }
+}</pre>
+
+        <div class="trap"><span class="lbl">Interview trap &mdash; finally block in a daemon thread</span>
+          <p>Never put critical resource cleanup, file flush, or database commit logic inside a daemon thread's <code>finally</code> block. Because the JVM halts immediately when all user threads finish, <b>the daemon thread's <code>finally</code> block may never execute!</b></p>
+        </div>
+      </section>
+
+      <!-- multi 4 -->
+      <section id="m4" data-key="1">
+        <div class="s-head"><span class="s-num">04</span>
+          <h2>The two cardinal rules of thread execution <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/Threadcreationlifecycle/Demo4.java</span>
+        </div>
+        <p class="s-why">Calling start() twice &middot; why t.run() is NOT multithreading &middot; native start0()</p>
+        <ul class="facts">
+          <li><b>Cardinal Rule 1: Never call <code>start()</code> twice on the same thread instance.</b>
+            <ul>
+              <li>Calling <code>t.start()</code> a second time throws <code>java.lang.IllegalThreadStateException</code>.</li>
+              <li><b>Why?</b> A Java thread's lifecycle is strictly one-way. Once started, its internal <code>threadStatus</code> transitions away from <code>0 (NEW)</code>. Once it terminates, it cannot be resurrected. If you need to run the task again, you must instantiate a fresh <code>Thread</code> object.</li>
+            </ul>
+          </li>
+          <li><b>Cardinal Rule 2: <code>t.start()</code> spawns; <code>t.run()</code> merely calls.</b>
+            <ul>
+              <li>When you invoke <code>t.start()</code>, the JVM calls native C++ code <code>private native void start0()</code>. The OS allocates a brand-new OS kernel thread, assigns it an independent call stack and PC register, registers it with the OS scheduler, and asynchronously invokes <code>run()</code> on the new thread. Output: <code>Current thread is Thread-0</code>.</li>
+              <li>When you invoke <code>t.run()</code>, <b>no new thread or stack is created</b>. It behaves like an ordinary method call on an ordinary Java object, executing synchronously on the <b>caller thread</b> (<code>main</code>) and blocking it until finished. Output: <code>Current thread is main</code>.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="tbl">
+          <table>
+            <tr>
+              <th>Feature</th>
+              <th><code>t.start()</code></th>
+              <th><code>t.run()</code></th>
+            </tr>
+            <tr>
+              <td><b>New OS thread?</b></td>
+              <td><b>Yes</b> &mdash; allocates kernel thread &amp; private stack</td>
+              <td><b>No</b> &mdash; zero threads created</td>
+            </tr>
+            <tr>
+              <td><b>Execution mode</b></td>
+              <td><b>Asynchronous</b> &mdash; runs concurrently with caller</td>
+              <td><b>Synchronous</b> &mdash; blocks caller until return</td>
+            </tr>
+            <tr>
+              <td><b>Active thread name</b></td>
+              <td><code>Thread-0</code> (or custom assigned name)</td>
+              <td><code>main</code> (caller thread name)</td>
+            </tr>
+            <tr>
+              <td><b>Multiple calls allowed?</b></td>
+              <td><b>No</b> &mdash; throws <code>IllegalThreadStateException</code></td>
+              <td><b>Yes</b> &mdash; just an ordinary Java method call</td>
+            </tr>
+          </table>
+        </div>
+
+        <pre><i>// mutithreading/Threadcreationlifecycle/Demo4.java</i>
+public class Demo4 {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -&gt; {
+            System.out.println("Current thread is " + Thread.currentThread().getName());
+        });
+
+        <i>// t1.start(); t1.start(); // THROWS IllegalThreadStateException!</i>
+
+        t1.run();   <i>// PRINTS: Current thread is main  (Synchronous, blocking!)</i>
+        t1.start(); <i>// PRINTS: Current thread is Thread-0 (Asynchronous, multithreaded!)</i>
+    }
+}</pre>
+
+        <div class="say"><span class="lbl">Say it out loud</span>
+          <p><code>start()</code> creates a new call stack and executes asynchronously; <code>run()</code> reuses the current call stack and executes synchronously. Calling <code>run()</code> directly completely defeats multithreading.</p>
+        </div>
+      </section>
+
+      <!-- multi 5 -->
+      <section id="m5">
+        <div class="s-head"><span class="s-num">05</span>
+          <h2>Concurrency, time slicing &amp; non-determinism</h2><span
+            class="src">mutithreading/Threadcreationlifecycle/Demo5.java</span>
+        </div>
+        <p class="s-why">The Odd/Even interleaving demo &middot; OS preemptive scheduling &middot; CPU quanta &amp; context switching</p>
+        <ul class="facts">
+          <li><b>The Demo5 experiment:</b> T1 prints even numbers (2, 4, 6, 8...), T2 prints odd numbers (1, 3, 5, 7...). Running this program produces an interleaved, unpredictable output (e.g. <code>T1:2, T1:4, T2:1, T1:6, T2:3...</code>). Running it five times yields five completely different sequences.</li>
+          <li><b>Non-determinism is the defining nature of multithreading:</b> Independent threads run asynchronously. You can <b>never predict or assume the execution order</b> of independent threads unless you explicitly synchronize them (via <code>join()</code>, countdown latches, or locks).</li>
+          <li><b>The OS Preemptive Scheduler &amp; Time Slicing:</b> The host OS scheduler allocates small time windows (<b>CPU Quanta</b>, typically 10&ndash;20ms) to runnable threads. When a thread's quantum expires, the OS timer interrupt triggers:
+            <ol>
+              <li><b>Preemption:</b> The running thread is paused.</li>
+              <li><b>State Preservation:</b> The thread's hardware CPU registers, flags, and Program Counter are saved to its Thread Control Block (TCB) in kernel memory.</li>
+              <li><b>Context Switch:</b> The scheduler selects the next runnable thread and restores its saved registers onto the physical CPU core.</li>
+              <li><b>Resumption:</b> Execution resumes on the new thread.</li>
+            </ol>
+          </li>
+          <li><b>Context switch overhead:</b> Switching threads consumes CPU cycles (saving/loading registers, flushing processor pipelines, TLB cache invalidation, and L1/L2 cache misses). Spawning 10,000 threads does not make code 10,000 times faster &mdash; excessive context switching causes <b>CPU thrashing</b>!</li>
+          <li><b>Concurrency vs. Parallelism:</b>
+            <ul>
+              <li><b>Concurrency:</b> Managing and interleaving multiple tasks over time (e.g. two threads taking turns on a single CPU core via time slicing).</li>
+              <li><b>Parallelism:</b> Physically executing multiple tasks simultaneously at the exact same instant on multiple physical CPU cores.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <pre><i>// mutithreading/Threadcreationlifecycle/Demo5.java &middot; Non-deterministic interleaving</i>
+public class Demo5 {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -&gt; {
+            for (int i = 1; i &lt;= 100; i++) {
+                if (i % 2 == 0) System.out.println("T1 : " + i);
+            }
+        });
+        Thread t2 = new Thread(() -&gt; {
+            for (int i = 1; i &lt;= 100; i++) {
+                if (i % 2 != 0) System.out.println("T2 : " + i);
+            }
+        });
+        t1.start();
+        t2.start(); <i>// OS scheduler interleaves T1 and T2 unpredictably!</i>
+    }
+}</pre>
+      </section>
+
+      <!-- multi 6 -->
+      <section id="m6" data-key="1">
+        <div class="s-head"><span class="s-num">06</span>
+          <h2>The 6 thread lifecycle states (<code>Thread.State</code>) <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/Threadcreationlifecycle/Demo6.java</span>
+        </div>
+        <p class="s-why">NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED &middot; exact triggers and lock behavior</p>
+        <ul class="facts">
+          <li><b>Java defines exactly 6 thread states</b> in the <code>java.lang.Thread.State</code> enum:
+            <ol>
+              <li><b><code>NEW</code>:</b> A thread object has been created (<code>new Thread()</code>), but <code>start()</code> has not been called yet. Exists solely on the JVM Heap; no OS thread or stack allocated.</li>
+              <li><b><code>RUNNABLE</code>:</b> <code>start()</code> was called. In Java, this combines two OS concepts: <b>Ready</b> (sitting in OS run queue waiting for CPU) and <b>Running</b> (actively executing instructions on a CPU core). Java merges them because OS scheduling happens sub-millisecond at the kernel level.</li>
+              <li><b><code>BLOCKED</code>:</b> The thread is waiting to acquire an intrinsic monitor lock to enter or re-enter a <code>synchronized</code> block/method currently held by another thread.</li>
+              <li><b><code>WAITING</code>:</b> Waiting indefinitely with <b>no timeout</b> for another thread to perform a specific action. Triggered by <code>object.wait()</code>, <code>thread.join()</code>, or <code>LockSupport.park()</code>. Exits only when another thread calls <code>notify()</code>, <code>notifyAll()</code>, or the joined thread dies.</li>
+              <li><b><code>TIMED_WAITING</code>:</b> Waiting for another thread or for a <b>specified time duration</b>. Triggered by <code>Thread.sleep(ms)</code>, <code>object.wait(ms)</code>, <code>thread.join(ms)</code>, or <code>LockSupport.parkNanos()</code>. Wakes up when the timer expires or upon notification/interruption.</li>
+              <li><b><code>TERMINATED</code>:</b> The thread has finished executing its <code>run()</code> method, either normally or abruptly due to an uncaught exception. It is dead and cannot be restarted.</li>
+            </ol>
+          </li>
+          <li><b>BLOCKED vs. WAITING &mdash; the critical distinction:</b>
+            <ul>
+              <li><code>BLOCKED</code> is passive: waiting strictly for an intrinsic monitor lock (<code>synchronized</code>).</li>
+              <li><code>WAITING</code> is active cooperative waiting: the thread intentionally yielded the CPU via <code>wait()</code> or <code>join()</code>. Calling <code>wait()</code> <b>releases</b> the monitor lock; <code>Thread.sleep()</code> does <b>NOT</b> release the lock!</li>
+            </ul>
+          </li>
+        </ul>
+
+        <figure class="anim" data-anim data-max="5" id="tls">
+          <div class="anim-stage">
+            <div style="min-width:580px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span class="chip" data-tls="st-new">NEW</span>
+                <span class="arrow">&rarr;</span>
+                <span class="chip" data-tls="st-run">RUNNABLE</span>
+                <span class="arrow">&rarr;</span>
+                <span class="chip" data-tls="st-twait">TIMED_WAITING</span>
+                <span class="arrow">&rarr;</span>
+                <span class="chip" data-tls="st-blk">BLOCKED</span>
+                <span class="arrow">&rarr;</span>
+                <span class="chip" data-tls="st-wait">WAITING</span>
+                <span class="arrow">&rarr;</span>
+                <span class="chip" data-tls="st-term">TERMINATED</span>
+              </div>
+              <div style="background:var(--surface-2);border:1px solid var(--rule);padding:12px 14px;border-radius:2px;display:grid;grid-template-columns:120px 1fr;gap:10px;font-family:var(--f-mono);font-size:12px">
+                <span style="color:var(--ink-faint)">Thread:</span>
+                <span data-tls="th-name" style="font-weight:700">PaymentWorker-1</span>
+                <span style="color:var(--ink-faint)">Active State:</span>
+                <span data-tls="th-state" class="chip" style="display:inline-block;padding:2px 8px;width:fit-content">NEW</span>
+                <span style="color:var(--ink-faint)">OS Kernel:</span>
+                <span data-tls="th-os">No OS thread allocated &middot; Heap object only</span>
+                <span style="color:var(--ink-faint)">Monitor Lock:</span>
+                <span data-tls="th-lock">None</span>
+              </div>
+            </div>
+          </div>
+          <div class="anim-cap">
+            <p><b>Step 0: NEW.</b> <code>Thread t = new Thread(task);</code> has been executed. The object lives on the JVM Heap as normal memory. No OS thread or private call stack has been created yet.</p>
+            <p><b>Step 1: RUNNABLE.</b> <code>t.start()</code> is invoked! The JVM makes native call <code>start0()</code>. The OS creates a native thread with its own Call Stack and PC Register. It is now either queued in the OS ready queue or running on a CPU core.</p>
+            <p><b>Step 2: TIMED_WAITING.</b> The thread executes <code>Thread.sleep(2000)</code>. It surrenders its CPU time slice and enters a sleep queue. <b>Key: If it held a synchronized monitor lock, it DOES NOT release it!</b></p>
+            <p><b>Step 3: BLOCKED.</b> The thread attempts to enter <code>synchronized void pay()</code>, but another thread currently holds that monitor lock. The thread is blocked from CPU execution until the lock is released.</p>
+            <p><b>Step 4: WAITING.</b> The thread invokes <code>object.wait()</code> inside a synchronized block. It <b>releases the monitor lock</b> and waits indefinitely for another thread to call <code>object.notify()</code>.</p>
+            <p><b>Step 5: TERMINATED.</b> The thread finishes its <code>run()</code> method. Its call stack is deallocated by the OS. The thread is dead and can never transition to any other state.</p>
+          </div>
+          <div class="anim-ctl">
+            <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+            <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+            <button class="play" data-act="play">Play</button>
+            <div class="dots" data-dots></div>
+          </div>
+        </figure>
+
+        <div class="tbl">
+          <table>
+            <tr>
+              <th>State</th>
+              <th>How it Enters</th>
+              <th>How it Exits</th>
+              <th>Locks Retained?</th>
+            </tr>
+            <tr>
+              <td><b><code>NEW</code></b></td>
+              <td><code>new Thread(task)</code></td>
+              <td><code>t.start()</code></td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td><b><code>RUNNABLE</code></b></td>
+              <td><code>t.start()</code> or lock acquired</td>
+              <td>CPU preempted, sleep, block, wait, or finish</td>
+              <td>Retains any held locks</td>
+            </tr>
+            <tr>
+              <td><b><code>BLOCKED</code></b></td>
+              <td>Contending for a <code>synchronized</code> monitor lock</td>
+              <td>Monitor lock is acquired</td>
+              <td>Waiting to acquire lock</td>
+            </tr>
+            <tr>
+              <td><b><code>WAITING</code></b></td>
+              <td><code>wait()</code>, <code>join()</code>, <code>LockSupport.park()</code></td>
+              <td><code>notify()</code>, joined thread terminates</td>
+              <td><b>Releases monitor lock on wait()</b></td>
+            </tr>
+            <tr>
+              <td><b><code>TIMED_WAITING</code></b></td>
+              <td><code>sleep(ms)</code>, <code>wait(ms)</code>, <code>join(ms)</code></td>
+              <td>Timer expires or notification received</td>
+              <td><b>Retains locks on sleep()!</b></td>
+            </tr>
+            <tr>
+              <td><b><code>TERMINATED</code></b></td>
+              <td><code>run()</code> returns or uncaught exception</td>
+              <td>None &mdash; terminal state</td>
+              <td>Releases all locks</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- multi 7 -->
+      <section id="m7">
+        <div class="s-head"><span class="s-num">07</span>
+          <h2>Thread control methods: sleep, join, yield &amp; interrupt</h2><span
+            class="src">mutithreading/threadmethods/Demo.java &middot; Threadcreationlifecycle/Demo6.java</span>
+        </div>
+        <p class="s-why">Pausing, waiting for completion, cooperative interruption &middot; why stop() is permanently banned</p>
+        <ul class="facts">
+          <li><b><code>Thread.sleep(millis)</code>:</b>
+            <ul>
+              <li>Static method; pauses the <b>currently executing thread</b> for at least the specified duration.</li>
+              <li>Transitions: <code>RUNNABLE &rarr; TIMED_WAITING &rarr; RUNNABLE</code>.</li>
+              <li><b>CRITICAL RULE: <code>sleep()</code> releases CPU time but NEVER releases monitor locks!</b> If a thread sleeps inside a <code>synchronized</code> method, every other thread waiting for that lock is frozen in <code>BLOCKED</code>.</li>
+              <li>Throws checked <code>InterruptedException</code>, requiring an explicit <code>try-catch</code> block.</li>
+            </ul>
+          </li>
+          <li><b><code>t.join()</code> and <code>t.join(millis)</code>:</b>
+            <ul>
+              <li>Instance method; causes the calling thread (e.g. <code>main</code>) to wait until thread <code>t</code> terminates (enters <code>TERMINATED</code>).</li>
+              <li>Transitions caller: <code>RUNNABLE &rarr; WAITING</code> (or <code>TIMED_WAITING</code>).</li>
+              <li><b>Essential for barrier synchronization:</b> <code>t1.start(); t2.start(); t1.join(); t2.join();</code> ensures background worker threads finish before the main thread reads the computed results (used in <code>problemsinmultithreading/Demo.java</code>).</li>
+            </ul>
+          </li>
+          <li><b><code>Thread.yield()</code>:</b>
+            <ul>
+              <li>Static advisory hint indicating the current thread is willing to surrender its current CPU time slice to other runnable threads of equal priority. The OS scheduler is completely free to ignore this hint.</li>
+            </ul>
+          </li>
+          <li><b><code>t.interrupt()</code> &amp; cooperative cancellation:</b>
+            <ul>
+              <li>Java does NOT support forceful thread killing. <code>interrupt()</code> sets an internal boolean flag (interrupted status).</li>
+              <li>If the target thread is blocked in <code>sleep()</code>, <code>wait()</code>, or <code>join()</code>, it immediately wakes up and throws <code>InterruptedException</code> (which clears the flag).</li>
+              <li>If the target thread is running active CPU loops, it does not stop automatically &mdash; it must periodically check <code>if (Thread.currentThread().isInterrupted()) break;</code>.</li>
+            </ul>
+          </li>
+          <li><b>The Banned Methods (<code>stop()</code>, <code>suspend()</code>, <code>resume()</code>):</b>
+            <ul>
+              <li><code>Thread.stop()</code> was deprecated in Java 1.2 and permanently disabled in Java 20. It unlocked all acquired monitor locks instantaneously, exposing objects in inconsistent, corrupted states.</li>
+              <li><code>Thread.suspend()</code> paused a thread without releasing its locks, guaranteeing deadlocks.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <pre><i>// mutithreading/threadmethods/Demo.java &middot; Thread.sleep pattern</i>
+package mutithreading.threadmethods;
+
+public class Demo {
+    public static void main(String[] args) {
+        System.out.println("Main thread Start");
+        try {
+            Thread.sleep(2000); <i>// Main thread enters TIMED_WAITING for 2 seconds</i>
+        } catch (InterruptedException e) {
+            System.out.println("Sleep was interrupted!");
+        }
+        System.out.println("Main thread END");
+    }
+}</pre>
+      </section>
+
+      <!-- multi 8 -->
+      <section id="m8" data-key="1">
+        <div class="s-head"><span class="s-num">08</span>
+          <h2>Concurrency hazards: race conditions &amp; atomicity <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/problemsinmultithreading/Demo.java &middot; notes.txt</span>
+        </div>
+        <p class="s-why">The broken counter experiment &middot; why count++ is 3 bytecode instructions &middot; check-then-act &amp; lost updates</p>
+        <ul class="facts">
+          <li><b>The Demo counter experiment:</b> Two threads concurrently loop 10,000 times calling <code>c1.increment()</code> on a shared <code>Counter</code> instance. Expected output: 20,000. Actual output: unpredictable numbers always less than 20,000 (e.g. 14,285 or 17,920)!</li>
+          <li><b>What is a Critical Section?</b> Any code block that reads or writes shared mutable resources (here, <code>count</code>) that must not be concurrently accessed by more than one thread.</li>
+          <li><b>What is Atomicity?</b> An operation is atomic if it executes as a single, indivisible step that completes in its entirety or not at all, with no possibility of preemption in the middle.</li>
+          <li><b>Why <code>count++</code> is NOT atomic (The 3-Instruction Trap):</b>
+            <p>In Java source code, <code>count++</code> appears as a single statement. Under the hood, javac compiles it into <b>three separate bytecode instructions</b>:</p>
+            <ol>
+              <li><code>getfield / iload</code>: <b>READ</b> <code>count</code> from shared heap memory into the thread's local CPU register.</li>
+              <li><code>iadd</code>: <b>INCREMENT</b> the register value by 1.</li>
+              <li><code>putfield / istore</code>: <b>WRITE</b> the updated register value back to shared heap memory.</li>
+            </ol>
+          </li>
+          <li><b>The Lost Update Anomaly:</b>
+            <ul>
+              <li>Initial: <code>count = 0</code> in shared memory.</li>
+              <li>T1 reads <code>count = 0</code> into register R1.</li>
+              <li>OS timer interrupt preempts T1! Context switch to T2.</li>
+              <li>T2 reads <code>count = 0</code> into register R2, increments R2 to 1, and writes <code>count = 1</code> to memory.</li>
+              <li>OS switches back to T1. T1 increments its stale R1 (0 &rarr; 1) and writes <code>count = 1</code> back to memory!</li>
+              <li><b>Result:</b> Two increments occurred, but <code>count</code> is 1 instead of 2! T2's update was silently erased and permanently lost.</li>
+            </ul>
+          </li>
+          <li><b>Check-Then-Act Compound Actions:</b> Code like <code>if (balance &gt;= amount) { balance -= amount; }</code>. If two threads check simultaneously, both see sufficient funds, both withdraw, and the account balance goes negative.</li>
+        </ul>
+
+        <figure class="anim" data-anim data-max="5" id="race">
+          <div class="anim-stage">
+            <div style="min-width:580px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;justify-content:center;margin-bottom:6px">
+                <div style="border:2px solid var(--accent);background:var(--surface);padding:10px 24px;border-radius:2px;text-align:center">
+                  <div style="font-family:var(--f-mono);font-size:11px;color:var(--ink-faint)">SHARED HEAP MEMORY (c1.count)</div>
+                  <div data-rc="ram" style="font-family:var(--f-mono);font-size:24px;font-weight:800;color:var(--ink)">0</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                <div style="background:var(--surface-2);border:1px solid var(--rule);padding:12px;border-radius:2px">
+                  <div style="font-family:var(--f-mono);font-size:12px;font-weight:700;margin-bottom:8px">THREAD 1 (T1)</div>
+                  <div style="font-family:var(--f-mono);font-size:11px;color:var(--ink-faint)">Register R1: <span data-rc="r1" style="font-weight:700;color:var(--ink)">empty</span></div>
+                  <div data-rc="t1-act" class="chip" style="margin-top:8px;display:inline-block">Idle</div>
+                </div>
+                <div style="background:var(--surface-2);border:1px solid var(--rule);padding:12px;border-radius:2px">
+                  <div style="font-family:var(--f-mono);font-size:12px;font-weight:700;margin-bottom:8px">THREAD 2 (T2)</div>
+                  <div style="font-family:var(--f-mono);font-size:11px;color:var(--ink-faint)">Register R2: <span data-rc="r2" style="font-weight:700;color:var(--ink)">empty</span></div>
+                  <div data-rc="t2-act" class="chip" style="margin-top:8px;display:inline-block">Idle</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="anim-cap">
+            <p><b>Step 0: Initial state.</b> Shared memory holds <code>count = 0</code>. Both threads T1 and T2 are about to execute <code>c1.increment()</code>.</p>
+            <p><b>Step 1: T1 reads count.</b> T1 executes instruction 1 (<code>iload</code>), loading <code>count = 0</code> into its private CPU register <code>R1 = 0</code>.</p>
+            <p><b>Step 2: OS Preemption! Context switch to T2.</b> Before T1 can increment, the OS preempts T1. T2 runs and reads shared memory <code>count = 0</code> into its private CPU register <code>R2 = 0</code>.</p>
+            <p><b>Step 3: T1 resumes and writes 1.</b> T1 gets CPU time, increments R1 to 1 (<code>iadd</code>), and writes <code>count = 1</code> to shared memory (<code>istore</code>).</p>
+            <p><b>Step 4: T2 overwrites T1!</b> T2 resumes. Using its old register value <code>R2 = 0</code>, it increments to 1 and writes <code>count = 1</code> to shared memory, obliterating T1's work!</p>
+            <p><b>Step 5: Lost update demonstrated!</b> Both threads called <code>increment()</code>, but shared memory holds <b>1</b> instead of <b>2</b>. One increment was permanently lost due to a race condition.</p>
+          </div>
+          <div class="anim-ctl">
+            <button class="step-btn" data-act="prev" aria-label="Previous step">&larr;</button>
+            <button class="step-btn" data-act="next" aria-label="Next step">&rarr;</button>
+            <button class="play" data-act="play">Play</button>
+            <div class="dots" data-dots></div>
+          </div>
+        </figure>
+
+        <pre><i>// mutithreading/problemsinmultithreading/Demo.java</i>
+package mutithreading.problemsinmultithreading;
+
+public class Demo {
+    public static void main(String[] args) throws InterruptedException {
+        Counter c1 = new Counter();
+        Thread t1 = new Thread(() -&gt; {
+            for (int i = 0; i &lt; 10000; i++) c1.increment();
+        });
+        Thread t2 = new Thread(() -&gt; {
+            for (int i = 0; i &lt; 10000; i++) c1.increment();
+        });
+
+        t1.start();
+        t2.start();
+        t1.join(); <i>// Barrier: wait for T1 to finish</i>
+        t2.join(); <i>// Barrier: wait for T2 to finish</i>
+
+        System.out.println(c1.count); <i>// Prints: ~14320 (Lost updates!)</i>
+    }
+}
+
+class Counter {
+    public int count = 0;
+    void increment() { count++; } <i>// Critical section &mdash; NOT ATOMIC!</i>
+}</pre>
+
+        <div class="say"><span class="lbl">Say it out loud</span>
+          <p><code>count++</code> is not atomic &mdash; it is a read-modify-write compound action taking three separate bytecode instructions. When two threads interleave across those three steps, updates are silently overwritten and lost.</p>
+        </div>
+      </section>
+
+      <!-- multi 9 -->
+      <section id="m9" data-key="1">
+        <div class="s-head"><span class="s-num">09</span>
+          <h2>Concurrency hazards: visibility &amp; instruction reordering <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/problemsinmultithreading/Demo1.java &middot; notes.txt</span>
+        </div>
+        <p class="s-why">Multi-core CPU cache hierarchy vs RAM &middot; why thread 2 loops forever without volatile &middot; JIT compiler reordering</p>
+        <ul class="facts">
+          <li><b>The CPU Cache Hierarchy:</b> Modern CPUs have multiple cores. Each core has private L1 and L2 caches (1&ndash;3ns access time) and a shared L3 cache (10&ndash;20ns), whereas main memory / RAM is comparatively slow (50&ndash;100ns).</li>
+          <li><b>The Visibility Problem:</b> When Thread 1 running on Core 1 updates a variable, the write is buffered inside Core 1's local cache/store buffer. Thread 2 running on Core 2 reads from its own L1 cache and <b>does not see Thread 1's write to RAM</b>!</li>
+          <li><b>The Infinite Loop in Demo1.java:</b>
+            <ul>
+              <li>Thread 1 sleeps 1s then sets <code>flag = true</code>.</li>
+              <li>Thread 2 loops <code>while (!flag) { ... }</code>.</li>
+              <li><b>Without <code>volatile</code>:</b> The JIT compiler optimizes the loop by caching <code>flag</code> in a CPU register or hoisting it to <code>if (!flag) while (true) {}</code>. Thread 2 will loop <b>FOREVER</b>, completely blind to Thread 1's update!</li>
+            </ul>
+          </li>
+          <li><b>The <code>volatile</code> Keyword:</b>
+            <ul>
+              <li><b>Direct Memory Visibility:</b>
+                <ol>
+                  <li>Every write to a <code>volatile</code> variable is immediately flushed to main memory (RAM).</li>
+                  <li>Every read of a <code>volatile</code> variable bypasses CPU registers/caches and reads directly from main memory.</li>
+                </ol>
+              </li>
+              <li><b>Happens-Before Relationship:</b> A write to a volatile field <i>happens-before</i> every subsequent read of that same field. All writes performed by Thread 1 before writing the volatile flag become immediately visible to Thread 2 once it reads that flag.</li>
+            </ul>
+          </li>
+          <li><b>Instruction Reordering:</b>
+            <ul>
+              <li>To maximize CPU instruction pipelining, the JVM JIT compiler and CPU hardware reorder instructions.</li>
+              <li><b>As-if-serial guarantee:</b> Reordering is allowed only if it preserves single-threaded correctness.</li>
+              <li><b>Multithreaded hazard:</b> <code>x = 10; flag = true;</code> can be reordered so <code>flag = true</code> runs before <code>x = 10</code>! A reader thread checking <code>if (flag) System.out.println(x);</code> could print <code>0</code>!</li>
+              <li>Marking <code>flag</code> as <code>volatile</code> inserts hardware <b>Memory Barriers (Fences)</b> preventing instructions from floating across the volatile boundary.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <pre><i>// mutithreading/problemsinmultithreading/Demo1.java &middot; The visibility fix</i>
+package mutithreading.problemsinmultithreading;
+
+public class Demo1 {
+    <i>// volatile forces reads and writes directly to/from main memory (RAM)</i>
+    static volatile boolean flag = false;
+
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -&gt; {
+            try {
+                Thread.sleep(1000);
+                flag = true; <i>// Flushed directly to RAM</i>
+                System.out.println("Thread 1 finished and set flag = true");
+            } catch (Exception e) { e.printStackTrace(); }
+        });
+
+        Thread t2 = new Thread(() -&gt; {
+            while (!flag) {
+                <i>// Without volatile, this loop would spin FOREVER</i>
+            }
+            System.out.println("Thread 2 detected flag change and finished");
+        });
+
+        t1.start();
+        t2.start();
+    }
+}</pre>
+
+        <div class="trap"><span class="lbl">CRITICAL INTERVIEW TRAP &mdash; volatile does NOT provide atomicity!</span>
+          <p>Declaring <code>volatile int count = 0; count++;</code> is <b>STILL BROKEN</b>! <code>volatile</code> ensures reading <code>count</code> and writing <code>count</code> hit RAM, but the 3-step read-modify-write compound action is still non-atomic! <b>Volatile guarantees visibility, not atomicity.</b></p>
+        </div>
+      </section>
+
+      <!-- multi 10 -->
+      <section id="m10" data-key="1">
+        <div class="s-head"><span class="s-num">10</span>
+          <h2>Fixing concurrency: synchronization, monitor locks &amp; beyond <span class="star">&#9733;</span></h2><span
+            class="src">mutithreading/problemsinmultithreading/ &middot; Threadcreationlifecycle/</span>
+        </div>
+        <p class="s-why">Intrinsic monitor locks &middot; synchronized methods vs blocks &middot; reentrancy &middot; AtomicInteger (CAS) vs ReentrantLock</p>
+        <ul class="facts">
+          <li><b>Intrinsic Locks (Monitors):</b> Every single object in Java has a built-in monitor lock stored in its object header (the Mark Word). When a thread enters a synchronized block, it acquires this monitor.</li>
+          <li><b>Synchronized Method vs. Synchronized Block:</b>
+            <ul>
+              <li><code>public synchronized void increment()</code> locks the entire method on <code>this</code> object instance.</li>
+              <li><code>public static synchronized void log()</code> locks on the <code>Class</code> object (e.g. <code>Counter.class</code>).</li>
+              <li><b>Synchronized Block (Preferred):</b> <code>synchronized(this) { count++; }</code> restricts locking strictly to the critical lines of code. Keeping the critical section small maximizes concurrency and throughput.</li>
+            </ul>
+          </li>
+          <li><b>The Core Guarantees of <code>synchronized</code>:</b>
+            <ol>
+              <li><b>Mutual Exclusion (Mutex):</b> Only one thread can hold the monitor lock at any given time. All other contending threads are blocked in <code>BLOCKED</code>.</li>
+              <li><b>Atomicity:</b> The critical section executes without interruption from other threads acquiring the same lock.</li>
+              <li><b>Visibility &amp; Ordering:</b> Entering a monitor flushes local caches and reads from RAM; exiting flushes all modifications to RAM.</li>
+              <li><b>Reentrancy:</b> Java monitors are reentrant! If a thread holding a lock calls another method requiring the same lock, it acquires it automatically without deadlocking (tracked by a recursion counter in the monitor).</li>
+            </ol>
+          </li>
+          <li><b>The 3 Ways to Fix the Counter Problem:</b>
+            <ol>
+              <li><b>Synchronized method/block:</b> <code>synchronized void increment() { count++; }</code> &mdash; simple, built-in, but blocks contending threads.</li>
+              <li><b>Explicit Locks (<code>ReentrantLock</code>):</b> Provides advanced features like <code>tryLock()</code>, timed lock acquisition, interruptibility, and fairness policies.</li>
+              <li><b>Lock-Free Atomics (<code>AtomicInteger</code>):</b> Uses CPU hardware-level <b>Compare-And-Swap (CAS)</b> instructions (e.g. <code>LOCK CMPXCHG</code> on x86). Zero thread blocking, zero context-switch overhead, maximum throughput!</li>
+            </ol>
+          </li>
+        </ul>
+
+        <div class="tbl">
+          <table>
+            <tr>
+              <th>Mechanism</th>
+              <th>Atomicity?</th>
+              <th>Visibility?</th>
+              <th>Blocks Threads?</th>
+              <th>Best Use Case</th>
+            </tr>
+            <tr>
+              <td><b><code>volatile</code></b></td>
+              <td><b>No</b> (only simple writes)</td>
+              <td><b>Yes</b> (RAM flush/read)</td>
+              <td><b>No</b></td>
+              <td>Status flags, boolean cancellation, single-writer state</td>
+            </tr>
+            <tr>
+              <td><b><code>synchronized</code></b></td>
+              <td><b>Yes</b></td>
+              <td><b>Yes</b></td>
+              <td><b>Yes</b> (BLOCKED state)</td>
+              <td>Simple critical sections, guarding multi-variable invariants</td>
+            </tr>
+            <tr>
+              <td><b><code>AtomicInteger</code></b></td>
+              <td><b>Yes</b> (via CPU CAS)</td>
+              <td><b>Yes</b></td>
+              <td><b>No</b> (lock-free loop)</td>
+              <td>Counters, sequence generators, metrics, high-throughput stats</td>
+            </tr>
+            <tr>
+              <td><b><code>ReentrantLock</code></b></td>
+              <td><b>Yes</b></td>
+              <td><b>Yes</b></td>
+              <td><b>Yes</b> (parked)</td>
+              <td>Timed lock attempts, interruptible locks, fairness policies</td>
+            </tr>
+          </table>
+        </div>
+
+        <pre><i>// Three ways to make Counter thread-safe</i>
+
+<i>// Solution 1: synchronized (Intrinsic lock)</i>
+class SynchronizedCounter {
+    private int count = 0;
+    public synchronized void increment() { count++; }
+    public synchronized int getCount() { return count; }
+}
+
+<i>// Solution 2: AtomicInteger (Lock-free hardware CAS &mdash; HIGHEST PERFORMANCE)</i>
+import java.util.concurrent.atomic.AtomicInteger;
+class AtomicCounter {
+    private final AtomicInteger count = new AtomicInteger(0);
+    public void increment() { count.incrementAndGet(); } <i>// Atomic CPU instruction</i>
+    public int getCount() { return count.get(); }
+}
+
+<i>// Solution 3: ReentrantLock (Explicit lock with try/finally)</i>
+import java.util.concurrent.locks.ReentrantLock;
+class LockCounter {
+    private int count = 0;
+    private final ReentrantLock lock = new ReentrantLock();
+    public void increment() {
+        lock.lock();
+        try { count++; } finally { lock.unlock(); }
+    }
+}</pre>
+
+        <div class="say"><span class="lbl">Say it out loud</span>
+          <p><code>volatile</code> gives visibility without atomicity. <code>synchronized</code> provides both mutual exclusion and visibility by blocking threads. <code>AtomicInteger</code> provides both without blocking by leveraging CPU-level Compare-And-Swap instructions.</p>
+        </div>
+      </section>
+
+    </div><!-- /multithreading -->
+
+  <!-- ============================================================ RECALL -->
     <div class="panel" id="p-rec" role="tabpanel" aria-labelledby="tab-rec" hidden>
 
       <div class="lede">
-        <div class="kicker">Track five &middot; test yourself, then look at the map</div>
+        <div class="kicker">Track six &middot; test yourself, then look at the map</div>
         <h1>What you can answer, and what is still missing.</h1>
         <p>The first card is rapid-fire recall: read the question, answer it out loud, <i>then</i> open it. The second
           is the mistakes log pulled out of your own notes files &mdash; those are the errors you have already made
@@ -7163,9 +7576,9 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
         <p>The last two are the honest map: what the repo covers, and the four heavyweight topics still ahead that carry
           more interview weight than everything above them combined.</p>
         <div class="lede-meta">
-          <span><b>53</b> recall questions</span>
-          <span><b>20</b> folders mapped</span>
-          <span><b>3</b> tracks still ahead</span>
+          <span><b>62</b> recall questions</span>
+          <span><b>23</b> folders mapped</span>
+          <span><b>2</b> tracks still ahead</span>
         </div>
       </div>
 
@@ -7175,6 +7588,69 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
           <h2>Rapid-fire recall</h2><span class="src">answer out loud first</span>
         </div>
         <p class="s-why">If an answer takes more than fifteen seconds, that card goes back into the notes</p>
+
+<details class="qa">
+          <summary>What is the difference between a process and a thread?</summary>
+          <div class="ans">
+            <p>A <b>Process</b> is an isolated program execution with its own dedicated OS memory space (heavyweight, slow IPC). A <b>Thread</b> is the smallest independent unit of CPU execution inside a process (lightweight, shares Heap and Metaspace with other threads, has its own private Call Stack and Program Counter).</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>Which memory areas are shared across threads, and which are private?</summary>
+          <div class="ans">
+            <p><b>Shared:</b> Heap (all objects, instance variables, arrays) and Metaspace (class metadata, static variables). <b>Private:</b> Call Stack (method frames, local variables, parameters) and Program Counter (PC register). Because the Call Stack is private, local variables are always inherently thread-safe.</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>Why is implementing Runnable preferred over extending Thread?</summary>
+          <div class="ans">
+            <p>Java supports single inheritance only &mdash; extending <code>Thread</code> uses up that one class inheritance slot. <code>Runnable</code> separates the task (job) from the thread (worker engine), enables use with <code>ExecutorService</code> thread pools, and works cleanly with lambda expressions.</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>What happens if you call start() twice on the same thread?</summary>
+          <div class="ans">
+            <p>Throws <b><code>java.lang.IllegalThreadStateException</code></b>. A thread lifecycle is strictly one-way and monotonic; once started or dead (<code>TERMINATED</code>), it can never be restarted.</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>What is the difference between calling t.start() and t.run()?</summary>
+          <div class="ans">
+            <p><code>t.start()</code> invokes OS native <code>start0()</code>, creates a brand-new OS kernel thread with a new private Call Stack, and runs asynchronously. <code>t.run()</code> creates no thread &mdash; it executes synchronously on the caller's stack (<code>main</code>), completely defeating multithreading.</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>What are the 6 thread lifecycle states in Java?</summary>
+          <div class="ans">
+            <p>The 6 states in <code>Thread.State</code> are: <b><code>NEW</code></b>, <b><code>RUNNABLE</code></b> (Ready + Running), <b><code>BLOCKED</code></b> (waiting for a monitor lock), <b><code>WAITING</code></b> (indefinite wait/join), <b><code>TIMED_WAITING</code></b> (timed sleep/wait/join), and <b><code>TERMINATED</code></b> (dead).</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>Does Thread.sleep() release monitor locks?</summary>
+          <div class="ans">
+            <p><b>NO!</b> <code>Thread.sleep()</code> releases CPU time slices, but <b>retains all held monitor locks</b>. Any other thread contending for that synchronized lock remains frozen in <code>BLOCKED</code>. In contrast, <code>object.wait()</code> releases the monitor lock.</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>Why is count++ not thread-safe in Java?</summary>
+          <div class="ans">
+            <p>Because <code>count++</code> is a compound action of <b>three separate bytecode instructions</b>: <code>iload</code> (read from memory), <code>iadd</code> (increment in CPU register), and <code>istore</code> (write back to memory). An OS context switch between read and write causes <b>lost updates</b> (data race).</p>
+          </div>
+        </details>
+
+        <details class="qa">
+          <summary>Does volatile make count++ thread-safe?</summary>
+          <div class="ans">
+            <p><b>NO.</b> <code>volatile</code> guarantees memory visibility and prevents instruction reordering by forcing reads and writes to main memory, but it does <b>NOT guarantee atomicity</b>. The 3-step read-modify-write cycle is still non-atomic. You need <code>synchronized</code> or <code>AtomicInteger</code>.</p>
+          </div>
+        </details>
 
         <details class="qa">
           <summary>Is Java pass by value or pass by reference?</summary>
@@ -8056,12 +8532,12 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
             <tr>
               <td>47&ndash;48</td>
               <td>Multithreading intro &middot; thread creation &amp; lifecycle</td>
-              <td><b>Ahead</b></td>
+              <td>Multithreading&nbsp;01&ndash;06 &mdash; <b>covered</b></td>
             </tr>
             <tr>
               <td>49&ndash;51</td>
               <td>Thread methods &middot; race conditions &amp; visibility &middot; monitor locks</td>
-              <td><b>Ahead</b> &mdash; <code>synchronized</code>, <code>volatile</code></td>
+              <td>Multithreading&nbsp;07&ndash;10 &mdash; <b>covered</b></td>
             </tr>
             <tr>
               <td>52&ndash;53</td>
@@ -8119,8 +8595,7 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
             Advanced&nbsp;13 had the design rules and Streams&nbsp;06 had the return types, but the method set itself
             was unwritten. It is now a full card, which means <b>#35 through #46 are all covered</b> and the pending
             list starts cleanly at #47.</p>
-          <p>What is genuinely left is <b>concurrency</b>, and it is eleven videos rather than four. That is now the
-            honest answer to &ldquo;what have you not covered yet&rdquo;.</p>
+          <p>Course #47&ndash;51 has now landed as <b>Track 5: Multithreading</b> with 10 deep cards and 2 interactive mechanisms &mdash; covering thread lifecycle, memory architecture, race conditions, atomicity, visibility, and monitor locks. What remains ahead is <b>advanced concurrency</b> (course #52&ndash;57: wait/notify, ReentrantLock, atomics/CAS, and thread pools).</p>
         </div>
 
         <div class="end">
@@ -8132,7 +8607,6 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
       </section>
 
     </div><!-- /recall -->
->>>>>>> Stashed changes
 
   </main>
 </div>
@@ -8530,6 +9004,72 @@ String city = getUser()                     <i>// Optional&lt;User&gt;</i>
         el.classList.toggle("hot", on && !(st.bad && name === "f"));
         el.classList.toggle("bad", !!st.bad && name === "f");
       });
+    };
+
+    
+    /* --- thread lifecycle states --- */
+    var tlsSteps = [
+      { state: "NEW", desc: "No OS thread allocated · Heap object only", lock: "None", hot: "st-new", bad: false },
+      { state: "RUNNABLE", desc: "OS kernel thread allocated & stack active · In CPU queue or running", lock: "None", hot: "st-run", bad: false },
+      { state: "TIMED_WAITING", desc: "Thread.sleep(2000) active · CPU yielded · In sleep queue", lock: "Locks retained (if held)", hot: "st-twait", bad: false },
+      { state: "BLOCKED", desc: "Waiting to acquire monitor lock held by another thread", lock: "Contending for lock", hot: "st-blk", bad: true },
+      { state: "WAITING", desc: "object.wait() executed · Waiting indefinitely for notify()", lock: "Monitor lock released", hot: "st-wait", bad: false },
+      { state: "TERMINATED", desc: "run() finished · Stack deallocated · Cannot restart", lock: "All locks released", hot: "st-term", bad: false }
+    ];
+    renderers["tls"] = function (f, s) {
+      var st = tlsSteps[s];
+      ["st-new", "st-run", "st-twait", "st-blk", "st-wait", "st-term"].forEach(function (id) {
+        var el = q(f, "tls", id);
+        if (el) {
+          el.classList.remove("hot", "bad", "dim");
+          if (id === st.hot) {
+            el.classList.add(st.bad ? "bad" : "hot");
+          } else {
+            el.classList.add("dim");
+          }
+        }
+      });
+      var stateEl = q(f, "tls", "th-state");
+      if (stateEl) {
+        stateEl.textContent = st.state;
+        stateEl.className = "chip " + (st.bad ? "bad" : "hot");
+      }
+      var osEl = q(f, "tls", "th-os");
+      if (osEl) osEl.textContent = st.desc;
+      var lockEl = q(f, "tls", "th-lock");
+      if (lockEl) lockEl.textContent = st.lock;
+    };
+
+    /* --- race condition / lost update --- */
+    var raceSteps = [
+      { ram: "0", r1: "empty", r2: "empty", a1: "Idle", a2: "Idle", hot1: false, hot2: false, bad: false },
+      { ram: "0", r1: "0", r2: "empty", a1: "iload (reads 0)", a2: "Idle", hot1: true, hot2: false, bad: false },
+      { ram: "0", r1: "0", r2: "0", a1: "Preempted!", a2: "iload (reads 0)", hot1: false, hot2: true, bad: false },
+      { ram: "1", r1: "1", r2: "0", a1: "istore (writes 1)", a2: "Paused", hot1: true, hot2: false, bad: false },
+      { ram: "1", r1: "1", r2: "1", a1: "Finished", a2: "istore (writes 1!)", hot1: false, hot2: true, bad: true },
+      { ram: "1 (BUG!)", r1: "1", r2: "1", a1: "Completed", a2: "Completed", hot1: false, hot2: false, bad: true }
+    ];
+    renderers["race"] = function (f, s) {
+      var st = raceSteps[s];
+      var ramEl = q(f, "rc", "ram");
+      if (ramEl) {
+        ramEl.textContent = st.ram;
+        ramEl.style.color = st.bad ? "var(--alert)" : "var(--ink)";
+      }
+      var r1El = q(f, "rc", "r1");
+      if (r1El) r1El.textContent = st.r1;
+      var r2El = q(f, "rc", "r2");
+      if (r2El) r2El.textContent = st.r2;
+      var a1El = q(f, "rc", "t1-act");
+      if (a1El) {
+        a1El.textContent = st.a1;
+        a1El.className = "chip" + (st.hot1 ? " hot" : "");
+      }
+      var a2El = q(f, "rc", "t2-act");
+      if (a2El) {
+        a2El.textContent = st.a2;
+        a2El.className = "chip" + (st.hot2 ? " hot" : (st.bad && s >= 4 ? " bad" : ""));
+      }
     };
 
     /* ---------------- boot ---------------- */

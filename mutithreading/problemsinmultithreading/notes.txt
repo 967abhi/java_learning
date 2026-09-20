@@ -1,0 +1,115 @@
+Problems with multi-threading 
+1.Race condition 
+program to finalstate 
+Depend on the ordr of the extension of threads
+so suppose that if you are doing something like 
+Example
+int count=0; 
+count++; 
+so by seeing it it would look like that there is only a single statement but in reality it is not
+1.Load the value of variable from memory to register 
+2.Incriment the value of the register 
+3.Store the value of register to memory 
+1.Read count from Mmemory
+2.Increment count by 1
+3. write updated value back
+so class counter{
+    int count=0;
+    void increment(){
+        count++;
+    }
+}
+Counter c1=new counter();
+c1.increment();
+so this increment function will work fine when it is in the single thread but when it is in multi thread then it will not work fine 
+so the race condition will check and then the problems occur on the mutliple thread that these are the changes that are occuring on the frontend needs to be update 
+
+
+so there are two thread t1 and t2 and the both thread comes on the increment simultaneously 
+let assume value is 0 for both 
+
+now t1 thread will increment the value of count from 0 to 1  
+steps     t1           t2
+1         Read c=0
+2                      Read c=0
+3         c=c+1
+4                      c=c+1
+5         write 1 
+6                       write1
+so hona kya that as we are including two thread then in memory we need to store the value of the 2 but here what happening the value only 1 is storing so that was wrong in this that's we called this race condition 
+What is race condition? 
+multithreading code is nondeterministic code and it will rise the race condition problem 
+2.Problem of Atomicity
+Atomicity is the property of an operation such that it is either fully completed or not completed at all. 
+so if an opertaion is not atomic then it can be interrupted in the middle of its execution 
+so here in count++ the opertaion is not atomic 
+so any operation in java is called atomic or non-atomic operation so there will be the count of atomic and non-atomic 
+so if an operation is atomic then it will not be interrupted in the middle of its execution 
+like this 
+class Counter {
+    int count = 0;
+
+    void increment() {
+        count++;
+    }
+}
+Any operation that either happens completely or not at all is called atomicity 
+so there are the two operations that can be performed and these two operations can be performed in the interrupt 
+
+
+so there are two conditions 
+1.Race condition 
+2.Problem of Atomicity 
+
+Check how the atomicity problem will occur on the day to day life 
+like the atomicity a and atomictiy b 
+
+
+Account a account b 
+so you have to make a debit and credit facility
+Atomic 
+assignment 
+int c=2
+
+check and then act that are non atomic code 
+
+
+
+3 Problem of the Visibility
+one thread updates a variable but another thread does not see the updated values
+cpu->cache->ram
+so it comes the problem on the mutliple thread 
+
+
+ORDERING
+sequence in which instruction are executed 
+int a=1;
+int b=2;
+jvm optimised it not important that it will go line by line 
+jvm-> compiler optimization +cpu rendering 
+so there we get the mutlithreading 
+so as java know that this will be the error come then why the ordering come in the java 
+answer so java say that the ordering issues will not come in the single threaded it will come only in the multithreading
+
+
+int x=0;
+boolean flag=false;
+thread 1 thread 2
+x=10;
+flag=true if(flag==true){
+    sout(x);
+
+}
+t1.start()
+t2.start();
+
+
+Thread -Interference
+so there are mutliple thread and then it will make some change in their work 
+non atomic operation 
+shared resources 
+race condition 
+ordering 
+visibility 
+so it wll cause the data inconsistency 
+and we can use with the synchronization to solve these problem  volatile atomic intyer proker-locking 
